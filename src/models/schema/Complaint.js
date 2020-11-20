@@ -4,7 +4,10 @@ const Message = require('./Message');
 const schema = mongoose.Schema;
 
 const Complaint = new schema({
-    message:Message,
+    message:{
+        type: schema.Types.ObjectId,
+        ref: 'Message'
+    },
     garageId:String
 })
 

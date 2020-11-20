@@ -1,33 +1,39 @@
 const mongoose = require('mongoose')
 const OfferSchema = require('../schema/Offer');
+
 const OfferModel = mongoose.model('Offer', OfferSchema);
 
-module.exports = class Offer
+module.exports = 
 {
 
-    static createOffer(res,value)
+    createOffer(value)
     {
-        console.log(value);
-        OfferModel.create({discountRate:value.discountRate,duration:value.duration})
-                  .then(result => res.send("Created Offer"))
-                  .catch(err => res.send("Error with the creation Offer"));
+        const result = OfferModel.create({discountRate:value.discountRate,duration:value.duration});
+        if(result)
+        return result;
+        else
+        return {error:"Error with the creation Offer"};
     }
-
-    static updateOffer(res,value)
+    ,
+    updateOffer(value)
     {
-        OfferModel.findOneAndUpdate(
+        const result = OfferModel.findOneAndUpdate(
                 {_id:value._id},
                 {discountRate:value.discountRate,duration:value.duration}, {"useFindAndModify":false}
-                )
-                .then(result => res.send("Updated Offer"))
-                .catch(err => res.send("Error with the update Offer"));
+                );
+        if(result)
+            return result;
+        else
+            return {error:"Error with the update Offer"};
     }
-
-    static deleteOffer(res,value)
+    ,
+    deleteOffer(value)
     {
-        OfferModel.findOneAndDelete({_id:value._id})
-                  .then(result => res.send("Deleted Offer"))
-                  .catch(err => res.send("Error with the deletion Offer"));
+        const result = OfferModel.findOneAndDelete({_id:value._id});
+        if(result)
+        return result;
+        else
+        return {error:"Error with the deletion Offer"};
     }
 
 }

@@ -7,7 +7,10 @@ const Category = new schema({
     name: {type: String,required: true},
     image: {type: String,required: true},
     storeId: {type: String,required: true},
-    products: [Product]
+    products: [{
+        type: schema.Types.ObjectId,
+        ref: 'Product'
+    }]
 })
 
 module.exports = Category;
