@@ -4,8 +4,11 @@ const Category = require('./Category');
 const schema = mongoose.Schema;
 
 const Menu = new schema({
-    storeId: {type: String,unique: true,required: true},
-    Categories:[Category]
+    //storeId: {type: String,required: true},
+    Categories:[{
+        type: schema.Types.ObjectId,
+        ref: 'Category'
+    }]
 })
 
 module.exports = Menu;

@@ -1,15 +1,18 @@
 const mongoose = require('mongoose')
 const ComplaintSchema = require("../schema/Complaint");
-const ComplaintModel = mongoose.model('Complaint', ComplaintSchema);
-const MessageModel = require('./Message');
 
-module.exports = class Complaint
+const ComplaintModel = mongoose.model('Complaint', ComplaintSchema);
+
+module.exports = 
 {
-    static createComplaint(res,value)
+
+    createComplaint(value)
     {
-        console.log(value.message);
-        ComplaintModel.create({message:value.message,garageId:value.garageId})
-                      .then(result => res.send("Created Complaint"))
-                      .catch(err => res.send("Error with the creation Complaint"));
+        const result = ComplaintModel.create({message:value.message,garageId:value.garageId});
+        if(result)
+        return result;
+        else
+        return {error:"Error with the creation Complaint"};  
     }
+
 }
