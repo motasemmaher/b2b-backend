@@ -16,9 +16,9 @@ module.exports = {
     },
 
     updateOrder(value) {
-        const result = OrderModel.findByIdAndUpdate({
+        const result = OrderModel.findOneAndUpdate({
             _id: value._id
-        }, Order);
+        }, value, { "useFindAndModify": false });
 
         if (result) {
             return result;
@@ -54,6 +54,12 @@ module.exports = {
                 error: "Error with the getting Order"
             };
     },
+
+    // getCarOwnerByOrderId(value) {
+    //     const result = OrderModel.findOne({
+            
+    //     });
+    // },
 
     deleteAllOrder() {
         const result = OrderModel.deleteMany({});

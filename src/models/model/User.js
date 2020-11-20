@@ -15,9 +15,9 @@ module.exports = {
     },
 
     updateUser(value) {
-        const result = UserModel.findByIdAndUpdate({
+        const result = UserModel.findOneAndDelete({
             _id: value._id
-        }, user);
+        }, value, { "useFindAndModify": false });
 
         if (result) {
             return result;

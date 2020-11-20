@@ -3,11 +3,15 @@ const mongoose = require('mongoose');
 const schema = mongoose.Schema;
 
 const Warehouse = new schema({
-
+    storeId: {type: String},
     storage: [{
         productId: {
             type: schema.Types.ObjectId,
             ref: 'Product'
+        },
+        categoryId: {
+            type: String,
+            required: true
         },
         amount: {
             type: Number,

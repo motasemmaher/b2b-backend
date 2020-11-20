@@ -1,5 +1,5 @@
 {
-  "name": "graduation_project_backend",
+  "name": "b2b",
   "version": "1.0.0",
   "description": "This is the backend for the graduation project",
   "main": "server.js",
@@ -19,6 +19,7 @@
     "mongoose": "^5.10.11",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
+    "rate-limiter-flexible": "^2.1.13",
     "supertest": "^6.0.0",
     "validator": "^13.1.17"
   }
