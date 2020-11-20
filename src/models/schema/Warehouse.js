@@ -3,9 +3,13 @@ const mongoose = require('mongoose');
 const schema = mongoose.Schema;
 
 const Warehouse = new schema({
-    storeId: {type: String,unique: true,required: true},
+    storeId: {type: String},
     storage: [{
         productId: {
+            type: String,
+            required: true
+        },
+        categoryId: {
             type: String,
             required: true
         },

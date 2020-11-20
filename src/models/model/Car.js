@@ -1,49 +1,61 @@
 const mongoose = require('mongoose')
 const CarSchema = require("../schema/Car");
+
 const CarModel= mongoose.model('Car', CarSchema);
 
 module.exports = 
 {
-    createCar(res,value)
+
+    createCar(value)
     {
-        console.log("Inside create car");
         const result = CarModel.create({userId:value.userId,model:value.model,make:value.make,year:value.year});
+
         if(result)
             return result;
         else
-            return {error:"Error with the creation Car"};
-                
-                /*
-                .then(result => {
+            return {error:"Error with the creation Car"};  
+    }
+    ,
+    updateCar(value)
+    {
 
-                    console.log(result); 
-                    return result;
-                })
-                .catch(err => console.log("Error with the creation Car:\n"+err));   
-                */
+        const result = CarModel.findOneAndUpdate(
+                        {_id:value._id},
+                        {userId:value.userId,model:value.model,make:value.make,year:value.year}, {"useFindAndModify":false}
+                    );
+     
+           if(result)
+                return result;
+            else
+                return {error:"Error with the update Car"};  
+        
     }
     ,
-    updateCar(res,value)
+    deleteCar(value)
     {
-        CarModel.findOneAndUpdate(
-                {_id:value._id},
-                {userId:value.userId,model:value.model,make:value.make,year:value.year}, {"useFindAndModify":false}
-                )
-                .then(result => res.send("Updated Car"))
-                .catch(err => res.send("Error with the update Car"));
+        const result = CarModel.findOneAndDelete({_id:value._id}).then(()=> console.log("Deleted car")).catch(()=>console.log("Error with deleting car"));
+        if(result)
+            return result;
+        else
+        return {error:"Error with the delete Car"};  
     }
     ,
-    deleteCar(res,value)
+    getCar(value)
     {
-        CarModel.findOneAndDelete({_id:value._id})
-                .then(result => res.send("Deleted Car"))
-                .catch(err => res.send("Error with the deletion Car"));
+        const result = CarModel.findById({_id:value._id});
+        if(result)
+            return result;
+        else
+        return {error:"Error with the getting Car"};  
     }
     ,
     deleteAllCars()
     {
-        CarModel.deleteMany({})
-                .then(result => console.log("Deleted All Cars"))
-                .catch(err => console.log("Error with the deletion Cars"));;
+        const result = CarModel.deleteMany({});
+        if(result)
+        return result;
+        else
+        return {error:"Error with the delete all Cars"};  
     }
+
 }

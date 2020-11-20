@@ -10,7 +10,10 @@ const Product = new schema({
     categoryId: {type: String,required: true},
     productType: {type: String,required: true,enum: ["Part", "Accessory", "Service"]},
     description: {type: String,required: true},
-    offer: Offer
+    offer: {
+        type: schema.Types.ObjectId,
+        ref: 'Offer'
+    }
 })
 
 module.exports = Product;

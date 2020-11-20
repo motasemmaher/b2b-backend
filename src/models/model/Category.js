@@ -1,39 +1,87 @@
 const mongoose = require('mongoose')
 const CategorySchema = require("../schema/Category");
-CategoryMode = mongoose.model('Category', CategorySchema);
+ProductModel = require('../model/Product');
 
-module.exports = class Category
+CategoryModel = mongoose.model('Category', CategorySchema);
+
+
+module.exports = 
 {
-    static createCategory(res,value)
-    {
-        console.log(value);
-        CategoryModel.create({name:value.name,image:value.image,storeId:value.storeId})
-                     .then(result => res.send("Created Category"))
-                     .catch(err => res.send("Error with the creation Category"));
-    }
 
-    static updateCategory(res,value)
+    createCategory(value)
     {
-        CategoryModel.findOneAndUpdate(
+        const result = CategoryModel.create({name:value.name,image:value.image,storeId:value.storeId});
+        if(result)
+        return result;
+        else
+        return {error:"Error with the creation Category"};  
+    }
+    ,
+    updateCategory(value)
+    {
+        const result = CategoryModel.findOneAndUpdate(
                 {_id:value._id},
-                {name:value.name,image:value.image,storeId:value.storeId}, {"useFindAndModify":false}
-                )
-                .then(result => res.send("Updated Category"))
-                .catch(err => res.send("Error with the update Category"));
+                {name:value.name,image:value.image},
+                {"useFindAndModify":false}
+                );
+        if(result)
+            return result;
+        else
+            return {error:"Error with the update Category"};  
     }
-
-    static deleteCategory(res,value)
+    ,
+    deleteCategory(value)
     {
-        CategoryModel.findOneAndDelete({_id:value._id})
-                     .then(result => res.send("Deleted Category"))
-                     .catch(err => res.send("Error with the deletion Category"));
+        const result = CategoryModel.findOneAndDelete({_id:value._id});
+        if(result)
+            return result;
+        else
+            return {error:"Error with the deletion Category"};  
     }
-
-    static getCategoryInfo(res,value)
+    ,
+    addProduct(value)
     {
-        CategoryModel.findById({_id:value._id})
-                     .then(result => res.send(result))
-                     .catch(err => res.send("Error with the getting Category"));
+        const result = CategoryModel.findOneAndUpdate(
+                                    {_id:value._id},
+                                    {$push:{products:value.product}},
+                                    {"useFindAndModify":false}
+                                );
+        if(result)
+            return result;
+        else
+            return {error:"Error with the adding product to the Category"};  
     }
+    ,
+    removeProductFromCategory(value)
+    {
+        console.log("pid: "+value.productId)
+        console.log("cid: "+value.categoryId)
 
+        const result = CategoryModel.update({_id:value.categoryId},
+                                            { $pull: { products:value.productId } },
+                                            { multi: true },
+                                            );
+        if(result)
+            return result;
+        else
+            return {error:"Error with the removing product from category"};
+    }
+    ,
+    findCategoryById(value)
+    {
+        const result = CategoryModel.findById({_id:value._id});
+        if(result)
+            return result;
+        else
+            return {error:"Error with the getting Category information by id"};  
+    }
+    ,
+    findCategoryByName(value)
+    {
+        const result = CategoryModel.find({name:value.name});
+        if(result)
+            return result;
+        else
+            return {error:"Error with the finding Category information by name"};  
+    }
 }

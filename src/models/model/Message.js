@@ -1,15 +1,18 @@
 const mongoose = require('mongoose')
 const MessageSchema = require("../schema/Message");
+
 const MessageModel = mongoose.model('Message', MessageSchema);
 
-module.exports = class Message
+module.exports =
 {
-    static createMessage(res,value)
+
+    createMessage(value)
     {
-        console.log(value);
-        MessageModel.create({owner:value.owner,data:value.data})
-                    .then(result => res.send("Created Message"))
-                    .catch(err => res.send("Error with the creation Message"));
+        const result = MessageModel.create({owner:value.owner,data:value.data});
+        if(result)
+        return result;
+        else
+        return {error:"Error with the creation Message"};
     }
 
     /*
@@ -30,4 +33,5 @@ module.exports = class Message
                 .catch(err => console.log("Error with the deletion Message"));
     }
     */
+
 }
