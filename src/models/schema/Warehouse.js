@@ -3,7 +3,10 @@ const mongoose = require('mongoose');
 const schema = mongoose.Schema;
 
 const Warehouse = new schema({
-    storeId: {type: String},
+    storeId: {
+        type: schema.Types.ObjectId,
+        ref: 'Store'
+    },
     storage: [{
         productId: {
             type: schema.Types.ObjectId,

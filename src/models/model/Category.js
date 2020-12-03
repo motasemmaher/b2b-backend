@@ -36,6 +36,15 @@ module.exports =
             return { error: "Error with the deletion Category" };
     }
     ,
+    deleteCategoriesByStoreIds(value)
+    {
+        const result = CategoryModel.deleteMany({storeId: {$in:value.storeIds}});
+        if (result)
+            return result;
+        else
+            return { error: "Error with the deletion Categories of the store" };
+    }
+    ,
     getCategoryInfo(value) {
         const result = CategoryModel.findById({ _id: value._id });
         if (result)
@@ -77,10 +86,19 @@ module.exports =
     }
     ,
     findCategoryByName(value) {
-        const result = CategoryModel.find({ name: value.name });
+        const result = CategoryModel.findOne({ name: value.name });
         if (result)
             return result;
         else
             return { error: "Error with the finding Category information by name" };
+    }
+    ,
+    findAllCategoriesInUserStores(value)
+    {
+        const result = CategoryModel.find({ storeId: {$in:value.storeIds }},{id:1});
+        if (result)
+            return result;
+        else
+            return { error: "Error with the finding Categories for that user's stores" };
     }
 }

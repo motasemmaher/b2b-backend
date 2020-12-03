@@ -40,10 +40,13 @@ module.exports =
                             .then(menuResult =>{
                             WarehouseModel.createWarehouse()
                                 .then(warehouseResult =>{
-                                StoreModel.createStore({...storeInfo,menu:menuResult,warehouse:warehouseResult})
+                                StoreModel.createStore({...storeInfo,userId:userResult._id,menu:menuResult,warehouse:warehouseResult})
                                     .then(storeResult => {
                                     GarageOwnerModel.createGarageOwner({user:userResult,stores:[storeResult]})
                                         .then(garageOwnerResult => {
+                                        WarehouseModel.linkWarehouse({_id:warehouseResult._id,storeId:storeResult._id}).then().catch();
+                                        MenuModel.linkMenu({_id:menuResult._id,storeId:storeResult._id}).then().catch();
+                                        StoreModel.makeCopy({_id:storeResult._id,storeIdCopy:storeResult._id}).then().catch();
                                         res.send("Successfully created GarageOwner (waiting user)");
                                     })
                                         .catch(garageOwnerError => {

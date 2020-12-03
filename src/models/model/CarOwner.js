@@ -77,4 +77,12 @@ module.exports = {
                 error: "Error with the delete all CarOwners"
             };
     }
+    ,
+    findAllCarOwners() {
+        const result = CarOwnerModel.find({}).populate('user').populate('cars').exec();
+        if (result)
+            return result;
+        else
+            return {error: "Error with the getting all CarOwners"};
+    }
 };

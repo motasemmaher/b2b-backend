@@ -1,11 +1,18 @@
 const WarehouseModel = require('../../models/model/Warehouse')
-
+const WarehouseValidation = require('./validate');
 
 module.exports = class Warehouse{
 
     constructor(){
 
      }
+
+    validateWarehouseInfo(warehouseInfo)
+    {
+        const validationResult = WarehouseValidation.validateWarehouseInfo(warehouseInfo);
+        if(validationResult !== "pass")
+            return {err:"Error: "+validationResult};
+    }
 
     addProduct(storeId,productId,categoryId,amount)
     {
@@ -26,4 +33,9 @@ module.exports = class Warehouse{
         return promiseResult;
     }
 
+    deleteWarehouseByStoreId(storeIds)
+    {
+        const promiseResult = WarehouseModel.deleteWarehouseByStoreId({storeIds:storeIds});
+        return promiseResult;
+    }
 }

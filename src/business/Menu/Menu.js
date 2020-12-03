@@ -26,4 +26,10 @@ module.exports = class Menu{
         return promiseResult;
     }
 
+    deleteMenuByStoreId(storeIds)
+    {
+        const promiseResult = MenuModel.deleteMenuByStoreId({storeIds:storeIds});
+        return promiseResult;
+    }
+
 }

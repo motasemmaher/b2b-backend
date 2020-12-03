@@ -1,6 +1,6 @@
 const CategoryModel = require('../../models/model/Category');
 const ProductModel = require('../../models/model/Product');
-
+const CategoryValidation = require('./validate');
 
 module.exports = class Category{
 
@@ -9,6 +9,13 @@ module.exports = class Category{
      
     }
     
+    validateCategoryInfo(categoryInfo)
+    {
+        const validationResult = CategoryValidation.validateCategoryInfo(categoryInfo);
+        if(validationResult !== "pass")
+            return {err:"Error: "+validationResult};
+    }
+
     createCategory(categoryInfo)
     {
         const promiseResult = CategoryModel.createCategory(categoryInfo);
@@ -42,6 +49,18 @@ module.exports = class Category{
     findCategoryById(categoryId)
     {
         const promiseResult = CategoryModel.findCategoryById({_id:categoryId});
+        return promiseResult;
+    }
+
+    deleteCategoriesByStoreIds(storeIds)
+    {
+        const promiseResult = CategoryModel.deleteCategoriesByStoreIds({storeIds:storeIds});
+        return promiseResult;
+    }
+
+    getAllCategoriesInUserStores(storeIds)
+    {
+        const promiseResult = CategoryModel.findAllCategoriesInUserStores({storeIds:storeIds});
         return promiseResult;
     }
 

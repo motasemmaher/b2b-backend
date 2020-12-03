@@ -26,7 +26,7 @@ module.exports =
         if(result)
             return result;
         else
-            return {error:"Error with the update Warehouse"};
+            return {error:"Error with the linking Warehouse"};
     }
     ,
     updateWarehouse(value)
@@ -56,6 +56,15 @@ module.exports =
         else
             return {error:"Error with the deletion Warehouse"};
     }
+    ,
+    deleteWarehouseByStoreId(value)
+    {
+        const result = WarehouseModel.findOneAndDelete({storeId: {$in:value.storeIds}}).then().catch();
+        if(result)
+            return result;
+        else
+            return {error:"Error with the deletion Warehouse by store id."};
+    }
     /*,
     removeAllproducts(value)
     {
@@ -71,8 +80,8 @@ module.exports =
     removeProductsFromWarehouse(value)
     {
         const result = WarehouseModel.updateOne({storeId:value.storeId},
-                                 { $pull: { "storage.cateoryId": value.categoryId  } },
-                                 //{ $pull: { storage: { categoryId: value.categoryId } } },
+                                 //{ $pull: { "storage.categoryId": value.categoryId  } },
+                                 { $pull: { storage: { categoryId: value.categoryId } } },
                                  { multi: true });
         if(result)
             return result;

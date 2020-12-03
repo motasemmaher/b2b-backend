@@ -42,7 +42,17 @@ module.exports = {
             };
         }
     },
-
+    deleteGarageOwnerByUserId(value) {
+        const result = GarageOwnerModel.findOneAndDelete({user: value._id});
+        if (result) {
+            return result;
+        } else {
+            return {
+                error: "Error with the delete GarageOwner by user id"
+            };
+        }
+    }
+    ,
     getGarageOwner(value) {
         const result = GarageOwnerModel.findById({
             _id: value._id
@@ -53,8 +63,8 @@ module.exports = {
             return {
                 error: "Error with the getting GarageOwner"
             };
-    },
-
+    }
+    ,
     deleteAllGarageOwner() {
         const result = GarageOwnerModel.deleteMany({});
 
@@ -65,4 +75,21 @@ module.exports = {
                 error: "Error with the delete all GarageOwners"
             };
     }
+    ,
+    findAllGarageOwners(value) {
+        const result = GarageOwnerModel.find({user : {$in:value.ids}}).populate('user').populate('stores').exec();
+        if (result)
+            return result;
+        else
+            return {error: "Error with getting all GarageOwners"};
+    }
+    ,
+    findWaitingUsers(value) {
+        const result = GarageOwnerModel.find({user : {$in:value.ids}}).populate('user').populate('stores').exec();
+        if (result)
+            return result;
+        else
+            return {error: "Error with getting all WaitingUsers"};
+    }
+    
 };

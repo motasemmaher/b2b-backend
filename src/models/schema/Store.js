@@ -8,6 +8,15 @@ const schema = mongoose.Schema;
 
 const Store = new schema({
 
+    userId: {
+        type: String,
+        required: true
+    },
+
+    storeIdCopy: {
+        type: String,
+    },
+
     storeName: {
         type: String,
         required: true,

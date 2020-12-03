@@ -27,7 +27,7 @@ module.exports =
         if(result)
             return result;
         else
-            return {error:"Error with the update Menu"};
+            return {error:"Error with the linking Menu"};
     }
     ,
     addCategory(value)
@@ -50,6 +50,15 @@ module.exports =
             return result;
         else
             return {error:"Error with the deletion Menu"};
+    }
+    ,
+    deleteMenuByStoreId(value)
+    {
+        const result = MenuModel.findOneAndDelete({storeId: {$in:value.storeIds}}).then().catch(); 
+        if(result)
+            return result;
+        else
+            return {error:"Error with the deletion Menu by store id"};
     }
     ,
     updateMenu(value)

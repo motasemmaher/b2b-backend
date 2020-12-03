@@ -8,7 +8,7 @@ module.exports =
 
     createMessage(value)
     {
-        const result = MessageModel.create({owner:value.owner,data:value.data});
+        const result = MessageModel.create({owner:value.userId,data:value.messageBody});
         if(result)
         return result;
         else

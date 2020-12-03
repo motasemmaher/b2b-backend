@@ -42,16 +42,12 @@ module.exports = {
         }
     },
 
-    getUser(value) {
-        const result = UserModel.findById({
-            _id: value._id
-        });
+    findUserById(value) {
+        const result = UserModel.findById({_id: value.userId});
         if (result)
             return result;
         else
-            return {
-                error: "Error with the getting User"
-            };
+            return {error: "Error with the getting User"};
     },
 
     findUserByUsername(username) {
@@ -75,5 +71,23 @@ module.exports = {
             return {
                 error: "Error with the delete all Users"
             };
+    },
+
+    findAllUsersIdOfARole(value)
+    {
+        const result = UserModel.find({role:value.role},{_id:1});
+        if (result)
+            return result;
+        else
+            return {error: "Error with finding the ids of all users in that role."};
+    }
+    ,
+    acceptWaitingUser(value)
+    {
+        const result = UserModel.findOneAndUpdate({_id:value._id},{role:'garageOwner'},{ "useFindAndModify": false });
+        if (result)
+            return result;
+        else
+            return {error: "Error with accepting WaitingUser"};
     }
 };

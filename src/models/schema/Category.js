@@ -6,7 +6,11 @@ const schema = mongoose.Schema;
 const Category = new schema({
     name: {type: String,required: true},
     image: {type: String,required: true},
-    storeId: {type: String,required: true},
+    storeId: {
+        type: schema.Types.ObjectId,
+        ref: 'Product',
+        required: true
+    },
     products: [{
         type: schema.Types.ObjectId,
         ref: 'Product'
