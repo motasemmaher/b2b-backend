@@ -3,8 +3,8 @@ const ShoppingCartSchema = require("../schema/ShoppingCart");
 const ShoppingCartModel= mongoose.model('ShoppingCart', ShoppingCartSchema);
 
 module.exports = {
-    createShoppingCart(value) {
-        const result = ShoppingCartModel.create(value);
+    createShoppingCart() {
+        const result = ShoppingCartModel.create({});
 
         if (result) {
             return result;
@@ -32,7 +32,7 @@ module.exports = {
     deleteShoppingCart(value) {
         const result = ShoppingCartModel.findOneAndDelete({
             _id: value._id
-        });
+        }).then().catch();
 
         if (result) {
             return result;

@@ -6,7 +6,7 @@ WarehouseModel = mongoose.model('Warehouse', WarehouseSchema);
 module.exports =  
 {
     //value
-    createWarehouse(storeId)
+    createWarehouse()
     {
         //{storeId:value.storeId}
         const result = WarehouseModel.create({});
@@ -22,7 +22,7 @@ module.exports =
                                     {_id:value._id},
                                     {storeId:value.storeId},
                                     {"useFindAndModify":false}
-                                );
+                               ).then().catch();
         if(result)
             return result;
         else
@@ -50,7 +50,7 @@ module.exports =
     ,
     deleteWarehouse(value)
     {
-        const result = WarehouseModel.findOneAndDelete({_id:value._id}).then(()=> console.log("Deleted warehouse")).catch(()=>console.log("Error with deleting warehouse"));
+        const result = WarehouseModel.findOneAndDelete({_id:value._id}).then().catch();
         if(result)
             return result;
         else

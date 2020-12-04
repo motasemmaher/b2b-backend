@@ -31,7 +31,7 @@ module.exports = {
     deleteUser(value) {
         const result = UserModel.findOneAndDelete({
             _id: value._id
-        });
+        }).then().catch();
 
         if (result) {
             return result;

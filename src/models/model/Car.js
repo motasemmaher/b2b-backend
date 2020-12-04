@@ -33,7 +33,7 @@ module.exports =
     ,
     deleteCar(value)
     {
-        const result = CarModel.findOneAndDelete({_id:value._id}).then(()=> console.log("Deleted car")).catch(()=>console.log("Error with deleting car"));
+        const result = CarModel.findOneAndDelete({_id:value._id}).then().catch();
         if(result)
             return result;
         else
