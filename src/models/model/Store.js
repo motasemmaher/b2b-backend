@@ -45,7 +45,7 @@ module.exports = {
     deleteStore(value) {
         const result = StoreModel.findOneAndDelete({
             _id: value._id
-        });
+        }).then().catch();
 
         if (result) {
             return result;

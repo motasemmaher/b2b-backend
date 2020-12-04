@@ -32,6 +32,8 @@ const Store = require('./src/business/Store/Store');
 const Complaint = require('./src/business/Complaint/Complaint');
 const Message = require('./src/business/Message/Message');
 const Offer = require('./src/business/Offer/Offer');
+const Car = require('./src/business/Car/Car');
+const ShoppingCart = require('./src/business//ShoppingCart/ShoppingCart');
 
 //const CarOwner = require("./src/models/model/CarOwner");
 const CartItem = require("./src/models/schema/CartItem");
@@ -50,6 +52,8 @@ const product = new Product();
 const complaint = new Complaint();
 const message = new Message();
 const offer = new Offer();
+const car = new Car();
+const shoppingCart = new ShoppingCart();
 
 const {
     userAuthenticated
@@ -84,31 +88,9 @@ app.use(session({
 }));
 app.use(passport.session());
 
-const multer = require('multer');
-const { deleteMenu } = require("./src/models/model/Menu");
-const storage = multer.diskStorage({
-    destination: function(req, file, cb) {
-      cb(null, './public/');
-    },
-    filename: function(req, file, cb) {
-      cb(null, file.originalname);
-    }
-  });
-  const fileFilter = (req, file, cb) => {
-    // reject a file
-    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
-      cb(null, true);
-    } else {
-      cb(null, false);
-    }
-  };
-  const upload = multer({
-    storage: storage,
-    limits: {
-      fileSize: 1024 * 1024 * 5
-    },
-    fileFilter: fileFilter
-  });
+const bcrypt = require('bcrypt');
+const upload = require('./src/shared/imageUpload');
+
 
 const moment = require('moment')
 const schedule = require('node-schedule');
@@ -212,45 +194,8 @@ app.post('/shoppingcart', userAuthenticated, (req, res) => {
     });
 });
 
-app.post('/order', (req, res) => {
-    
-});
-
-app.post('/create-product', (req, res) => {
-    WarehouseModel.getWarehouse({
-        _id: req.body.warehouseId
-    }).then((warehouse) => {
-        ProductModel.createProduct({
-            name: req.body.name,
-            price: req.body.price,
-            image: req.body.image,
-            categoryId: req.body.categoryId,
-            productType: req.body.productType,
-            description: req.body.description
-        }).then((product) => {
-            warehouse.storage.push({
-                productId: product,
-                amount: req.body.amount
-            });
-            warehouse.save().then(savedProduct => {
-                res.json("product is saved");
-            });
-        });
-
-    });
-});
-
-app.post('/create-category', (req, res) => {
-    CategoryModel.createCategory({
-        name: req.body.name,
-        image: req.body.image,
-        storeId: req.body.storeId
-    });
-    res.json("category is saved");
-});
 */
 /*-------------------------------------------------Thaer's work end-------------------------------------------------*/
-module.exports = app;
 
 //log-in & log-out CORS
 app.options('/user/login');
@@ -265,8 +210,8 @@ app.options('/store/:id/create-category'); //Create Category
 app.options('/store/:id/update-category/:categoryId'); //Update Category
 app.options('/store/:id/delete-category/:categoryId'); //Delete Category
 //Product CORS
-app.options('/store/:id/category/:categoryId/products'); //View Products of a store
-app.options('/store/:id/category/:categoryId/products/:productId'); //View a Product
+//app.options('/store/:id/category/:categoryId/products'); //View Products of a store
+app.options('/store/:id/category/:categoryId/products/:productId?'); //View a Product
 app.options('/store/:id/category/:categoryId/create-product'); //Create Product
 app.options('/store/:id/category/:categoryId/update-product/:productId'); //Update Product
 app.options('/store/:id/category/:categoryId/delete-product/:productId'); //Delete Product
@@ -281,19 +226,119 @@ app.options('/store/:id/create-complaint/:submitterId'); //Create Complaint
 app.options('/view-complaints/:userId'); //View Complaints
 app.options('/view-complaints/complaint/:complaintId'); //View A Complaint
 
+function hashPassword(password)
+{
+    const hash =  bcrypt.hashSync(password, 10);
+    return hash;
+}
 
-app.post('/user/garage-owner/create', (req, res) => {
-    const user = req.body.user;
-    const store = req.body.store;
+app.post('/user/garage-owner/create',upload.single('image'),(req, res) => {
+    userInfo = req.body.user;
+    const storeInfo = req.body.store;
 
-    SignUp.createGarageOwner(res, user, store);
+    const userValidationResult = user.validateUserInfo(userInfo);
+    const storeValidationResult = store.validateStoreInfo(storeInfo);
+    
+    if(typeof userValidationResult !== 'undefined')
+        res.send(userValidationResult.err);
+    else if(typeof storeValidationResult !== 'undefined')
+        res.send(storeValidationResult.err);
+    else
+    {
+        hashedPassword = hashPassword(userInfo.password);
+        userInfo = {...userInfo,password:hashedPassword,role:"waitingUser"};
+        
+        user.createUser(userInfo)
+        .then(userResult => {
+        menu.createMenu()
+            .then(menuResult =>{
+            warehouse.createWarehouse()
+                .then(warehouseResult =>{
+                store.createStore({...storeInfo,userId:userResult._id,menu:menuResult,warehouse:warehouseResult})//,image:req.file.path
+                    .then(storeResult => {
+                    garageOwner.createGarageOwner({user:userResult,stores:[storeResult]})
+                        .then(garageOwnerResult => {
+                        warehouse.linkWarehouse({_id:warehouseResult._id,storeId:storeResult._id});
+                        menu.linkMenu({_id:menuResult._id,storeId:storeResult._id});
+                        res.send("Successfully created GarageOwner (waiting user)");
+                        })
+                    .catch(garageOwnerError => {
+                    user.deleteUser(userResult._id);
+                    menu.deleteMenu(menuResult._id);
+                    warehouse.deleteWarehouse(warehouseResult._id);
+                    store.deleteStore(storeResult._id);
+                    res.send("Error with creating GarageOwner: "+garageOwnerError);
+                    });
+                })    
+                .catch(storeError =>{
+                user.deleteUser(userResult._id);
+                menu.deleteMenu(menuResult._id);
+                warehouse.deleteWarehouse(warehouseResult._id);
+                res.send("Error with creating Store: "+storeError);
+                });
+            })
+            .catch( warehouseError =>{
+            user.deleteUser(userResult._id);
+            menu.deleteMenu(menuResult._id);
+            res.send("Error with creating Warehouse: "+warehouseError);
+            });
+        })
+        .catch(menuError =>{
+        user.deleteUser(userResult._id);
+        res.send("Error with creating Menu: "+menuError);
+        });
+    })
+    .catch(userError =>{
+    res.send("Error with creating User: "+userError);
+    });
+    }
 });
 
 app.post('/user/car-owner/create', (req, res) => {
-    const user = req.body.user;
-    const car = req.body.car;
+    userInfo = req.body.user;
+    const carInfo = req.body.car;
 
-    SignUp.createCarOwner(res, user, car);
+    const userValidationResult = user.validateUserInfo(userInfo);
+    const carValidationResult = car.validateCarInfo(carInfo);
+    
+    if(typeof userValidationResult !== 'undefined')
+        res.send(userValidationResult.err);
+    else if(typeof carValidationResult !== 'undefined')
+        res.send(carValidationResult.err);
+    else
+    {
+        user.createUser(userInfo) 
+        .then(userResult =>{
+        car.createCar(carInfo)
+           .then(carResult => {
+           shoppingCart.createShoppingCart()
+               .then(shoppingCartResult => {
+               carOwner.createCarOwner({user:userResult,cars:[carResult],shoppingCart:shoppingCartResult._id}) 
+                   .then(carOwnerResult => {
+                   res.send("Successfully created CarOwner");
+                   })
+                   .catch(carOwnerError =>{
+                   user.deleteUser(userResult._id);
+                   car.deleteCar(carResult._id);
+                   shoppingCart.deleteShoppingCart(shoppingCartResult._id);
+                   res.send("Error with creating CarOwner: "+carOwnerError);
+                   });
+               })
+               .catch(shoppingCartError =>{
+               user.deleteUser(userResult._id);
+               car.deleteCar(carResult._id);
+               res.send("Error with creating ShoppingCart: "+shoppingCartError);
+               });
+           })
+           .catch(carError => {
+           user.deleteUser(userResult._id);    
+           res.send("Error with creating Car: "+carError);
+           });
+        })
+        .catch(userError => {
+        res.send("Error with creating User: "+userError);
+        });
+    }    
 });
 
 
@@ -784,7 +829,7 @@ const transporter = nodemailer.createTransport({
 });
 
 
-const garageOwnerReport = schedule.scheduleJob('* * * * *', () => {
+const garageOwnerReport = schedule.scheduleJob('0 0 1 * *', () => {
     fs.writeFile("./public/report.txt", "Hey there!\nfrom inside\nnodejs", (err) => {
         if(err)
             return console.log(err);
@@ -869,7 +914,7 @@ const adminReport = schedule.scheduleJob('0 0 1 * *', () => {
 */
 
 
-const checkOffers = schedule.scheduleJob('0 0 * * *', () => {
+const checkOffers = schedule.scheduleJob('0 * * * *', () => {
     console.log("CHECKING OFFERS");
     product.expiredOffers()
     .then(productsResult => {
@@ -894,7 +939,6 @@ const checkOffers = schedule.scheduleJob('0 0 * * *', () => {
     })
     .catch(err => console.log("Error with getting expired offers. "+err));
 });
-
 
 app.post('/store/:id/offers/add-offer',(req,res) => {
     productOffers = req.body.productOffers;
@@ -929,184 +973,3 @@ app.delete('/store/:id/offers/delete-offer/:offerId',(req,res) => {
 });
 
 module.exports = app;
-
-/*
-app.post('/user/car-owner/create', (req, res) => {
-    const user = req.body.user;
-    const car = req.body.car;
-
-    SignUp.createCarOwner(res,user,car);
-});
-
-app.put('/update-menu/:id', (req, res) => {
-    console.log("Inside put")
-
-    Menu.updateMenu({
-        _id:req.params.id,
-        temp:req.body.temp,
-    });
-    res.send("Updated Menu");
-});
-*/
-
-/*
----------------------------------CAR--------------------------------
-
-app.post('/create-car',(req,res) =>
-{
-    const promiseResult = Car.createCar(res,{
-                    ...req.body
-                });
-    console.log("result: ")
-    promiseResult.then(result => console.log(result));
-});
-
-
-app.put('/update-car/:id',(req,res) =>
-{
-    Car.updateCar(res,{
-                _id:req.params.id,
-                userId:req.body.userId,
-                model:req.body.model,
-                make:req.body.make,
-                year:req.body.year
-            });
-});
-
-app.delete('/delete-car/:id',(req,res) =>
-{
-    Car.deleteCar(res,{_id:req.params.id});
-});
-*/
-
-/*
----------------------------------CATEGORY--------------------------------
-app.post('/create-category',(req,res) =>
-{
-    Category.createCategory(res,{
-                name:req.body.name,
-                image:req.body.image,
-                storeId:req.body.storeId
-            });
-});
-
-app.put('/update-category/:id',(req,res) =>
-{
-    Category.updateCategory(res,{
-                _id:req.params.id,
-                name:req.body.name,
-                image:req.body.image,
-                storeId:req.body.storeId
-            });
-});
-
-app.get('/get-category/:id',(req,res) =>
-{
-    Category.getCategoryInfo(res,{_id:req.params.id});
-});
-
-app.delete('/delete-category/:id',(req,res) =>
-{
-    Category.deleteCategory(res,{_id:req.params.id});
-});
-*/
-
-/*
----------------------------------MESSAGE--------------------------------
-app.post('/create-message',(req,res) =>
-{
-    Message.createMessage(res,{
-                owner:req.body.owner,
-                data:req.body.data,
-            });
-});
-*/
-
-/*
----------------------------------PRODUCT--------------------------------
-app.post('/create-product',(req,res) =>
-{
-    Product.createProduct(res,{
-                name:req.body.name,
-                price:req.body.price,
-                image:req.body.image,
-                categoryId:req.body.categoryId,
-                productType:req.body.productType,
-                description:req.body.description
-            });
-});
-
-app.put('/update-product/:id',(req,res) =>
-{
-    Product.updateProduct(res,{
-                _id:req.params.id,
-                name:req.body.name,
-                price:req.body.price,
-                image:req.body.image,
-                categoryId:req.body.categoryId,
-                productType:req.body.productType,
-                description:req.body.description
-            });
-});
-
-app.delete('/delete-product/:id',(req,res) =>
-{
-    Product.deleteProduct(res,{_id:req.params.id});
-});
-*/
-
-/*
----------------------------------Offer--------------------------------
-app.post('/create-offer',(req,res) =>
-{
-    Offer.createOffer(res,{
-                discountRate:req.body.discountRate,
-                duration:req.body.duration
-            });
-});
-
-app.put('/update-offer/:id',(req,res) =>
-{
-    Offer.updateOffer(res,{
-                _id:req.params.id,
-                discountRate:req.body.discountRate,
-                duration:req.body.duration
-            });
-});
-
-app.delete('/delete-offer/:id',(req,res) =>
-{
-    Offer.deleteOffer(res,{_id:req.params.id});
-});
-*/
-
-/*
----------------------------------MENU--------------------------------
-app.post('/create-menu',(req,res) =>
-{
-    Menu.createMenu(res,{
-                storeId:req.body.storeId,
-                });
-});
-*/
-
-/*
----------------------------------WAREHOUSE--------------------------------
-app.post('/create-warehouse',(req,res) =>
-{
-    Warehouse.createWarehouse(res,{
-                storeId:req.body.storeId,
-                });
-});
-*/
-
-/*
----------------------------------COMPLAINT--------------------------------
-app.post('/create-complaint',(req,res) =>
-{
-    Complaint.createComplaint(res,{
-                message:req.body.message,
-                garageId:req.body.garageId
-                });
-});
-*/
