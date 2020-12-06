@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
 const CarOwnerSchema = require("../schema/CarOwner");
+const {
+    getOrder
+} = require('./Order');
 const CarOwnerModel = mongoose.model('CarOwner', CarOwnerSchema);
 
 module.exports = {
@@ -95,13 +98,13 @@ module.exports = {
             // }
 
         });
-        
+
         if (result)
-        return result;
-    else
-        return {
-            error: "Error in addOrder"
-        };
+            return result;
+        else
+            return {
+                error: "Error in addOrder"
+            };
     },
 
     async clearShoppingcart(value) {
@@ -116,13 +119,13 @@ module.exports = {
             }
 
         });
-        
+
         if (result)
-        return result;
-    else
-        return {
-            error: "Error in clearShoppingcart"
-        };
+            return result;
+        else
+            return {
+                error: "Error in clearShoppingcart"
+            };
     },
 
     async removeOrder(value) {
@@ -135,20 +138,43 @@ module.exports = {
             // .populate('stores')
             .then(cOwner => {
                 let index = cOwner.orders.indexOf(value.orderId);
-                if(index >= 0 ) {
-                // console.log();
-                //     // console.log(cOwner.stores[0].orders.splice(index, 1));
-                cOwner.orders.splice(index, 1);
-                result = cOwner.save();
+                if (index >= 0) {
+                    // console.log();
+                    //     // console.log(cOwner.stores[0].orders.splice(index, 1));
+                    cOwner.orders.splice(index, 1);
+                    result = cOwner.save();
                 }
                 //     result = Promise.resolve(cOwner);
             });
 
-            if (result)
+        if (result)
             return result;
         else
             return {
                 error: "Error in removeOrder"
+            };
+    },
+
+    async getOrder(value) {
+        let result = null;
+        await CarOwnerModel.findOne({
+            _id: value._id
+        }, {
+            orders: {
+                $elemMatch: {
+                    $eq: value.orderId
+                }
+            }
+        })
+        .then(cOwner => {
+            result = Promise.resolve(cOwner.orders[0]);
+        });
+
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error in getOrder"
             };
     }
 };

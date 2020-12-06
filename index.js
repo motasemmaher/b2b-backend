@@ -362,7 +362,52 @@ app.post('/shoppingcart/checkout', userAuthenticated, (req, res) => {
     }
 });
 
-app.put('/maintain/order', userAuthenticated, (req, res) => {
+// under dev
+app.put('/maintain/order/:orderId', userAuthenticated, (req, res) => {
+    carOwner = new CarOwner();
+    // store = new Store();
+    warehouse = new Warehouse();
+    shoppingCart = new ShoppingCart();
+    order = new Order();
+    const userInfo = req.user;
+    const orderId = req.params.orderId;
+    
+    if (userInfo.role === 'carOwner') {
+        carOwner.getCarOwnerByUserId({
+            user: userInfo._id
+        }).then(cOwner => {
+            order.getOrder(orderId).then(retrivedOrder => {
+                console.log(cOwner._id, retrivedOrder.carOwnerId);
+                if(cOwner._id.equals(retrivedOrder.carOwnerId)) {
+                    console.log(cOwner._id, retrivedOrder.carOwnerId);
+                    res.send(retrivedOrder);
+                }                
+            });
+        });
+    } else {
+        res.status(403).send({Error: 'you cannot access this page'});
+    }
+    
+});
+
+app.get('/garageowner/stores', userAuthenticated, (req, res) => {
+    store = new Store();
+    garageOwner = new GarageOwner();
+    userInfo = req.user;
+    if(userInfo.role === 'garageOwner') {
+        garageOwner.getGarageOwnerByUserId(userInfo._id).then(retrivedGarageOwner => {
+            console.log(retrivedGarageOwner._id);
+            store.getStoresAssociatedWithGarageOwner(retrivedGarageOwner._id).then(retrivedStores => {
+                res.send(retrivedStores);
+            }).catch(err => {
+                res.status(404).send(err);
+            });
+        }).catch(err => {
+            res.status(404).send(err);
+        });   
+    } else {
+        res.status(403).send({Error: 'you cannot access this page'});
+    }
 
 });
 
@@ -435,6 +480,7 @@ app.get('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
         res.status(403).send({Error: 'you cannot access this page'});
     }
 });
+
 //----------------processing order (accept order by garage owner or cancel the order)----------------\\
 app.put('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
     garageOwner = new GarageOwner();
@@ -469,7 +515,7 @@ app.put('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
                     res.status(501).send('Store Or order does not exist');
                 });
         } else if (status === 'cancel') {
-            store.getStoreAndOrder(storeId, orderId, status)
+            store.updateOrderStatus(storeId, orderId, status)
                 .then(storeOrder => {
                     res.status(200).send(storeOrder);
                 }).catch(err => {

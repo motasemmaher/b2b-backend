@@ -55,11 +55,17 @@ module.exports = {
             };
     },
 
-    // getCarOwnerByOrderId(value) {
-    //     const result = OrderModel.findOne({
-            
-    //     });
-    // },
+    getCarOwnerByOrderId(value) {
+        const result = OrderModel.findOne({
+            carOwnerId: value.carOwnerId
+        });
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error in getCarOwnerByOrderId"
+            };
+    },
 
     deleteAllOrder() {
         const result = OrderModel.deleteMany({});

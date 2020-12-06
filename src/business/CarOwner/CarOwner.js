@@ -44,7 +44,10 @@ module.exports = class CarOwner {
 
     removeOrder(carOwnerId, orderId) {
         // let result = null;
-        const result = CarOwnerModel.removeOrder({_id: carOwnerId, orderId: orderId});
+        const result = CarOwnerModel.removeOrder({
+            _id: carOwnerId,
+            orderId: orderId
+        });
         // .populate('stores')
         // .then(cOwner => {
         //     let index = cOwner.stores[0].orders.indexOf(value.orderId);
@@ -55,7 +58,18 @@ module.exports = class CarOwner {
         return result;
     }
     clearShoppingcart(userId) {
-        const result = CarOwnerModel.clearShoppingcart({user: userId});
+        const result = CarOwnerModel.clearShoppingcart({
+            user: userId
+        });
+        return result;
+    }
+
+    getOrder(carOwnerId, orderId) {
+        const result = CarOwnerModel.getOrder({
+            _id: carOwnerId,
+            orderId: orderId
+        });        
+
         return result;
     }
 
