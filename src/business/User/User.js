@@ -1,43 +1,58 @@
 const UserModel = require('../../models/model/User');
-const UserValidation = require('./validate');
-module.exports =  class User {
-    constructor() {}
 
+module.exports = class User {
+    acceptWaitingUser(userId)
+    {
+        const promiseResult = UserModel.acceptWaitingUser({_id:userId});
+        return promiseResult;
+    }
+    getAllUsersIdOfARole(role)
+    {
+        const promiseResult = UserModel.findAllUsersIdOfARole({role:role});
+        return promiseResult;
+    }
+    getUserById(userId)
+    {
+        const promiseResult = UserModel.findUserById({userId:userId});
+        return promiseResult;
+    }
     validateUserInfo(userInfo)
     {
         const validationResult = UserValidation.validateUserInfo(userInfo);
         if(validationResult !== "pass")
             return {err:"Error: "+validationResult};
     }
+    constructor (user)
+    {}
 
     createUser(userInfo)
     {
         const promiseResult = UserModel.createUser(userInfo);
         return promiseResult;
     }
-    
-    getUserById(userId)
-    {
-        const promiseResult = UserModel.findUserById({userId:userId});
-        return promiseResult;
+
+    updateUser(updatedUser) {
+        const result = UserModel.updateUser(updatedUser);
+        return result;
     }
 
-    getAllUsersIdOfARole(role)
-    {
-        const promiseResult = UserModel.findAllUsersIdOfARole({role:role});
-        return promiseResult;
+    deleteUser(userId) {
+        const result = UserModel.deleteUser(userId);
+        return result;
     }
 
-    acceptWaitingUser(userId)
-    {
-        const promiseResult = UserModel.acceptWaitingUser({_id:userId});
-        return promiseResult;
+    getUser(userId) {
+        const result = UserModel.getUser(userId);
+        return result;
     }
 
-    deleteUser(userId)
-    {
-        const promiseResult = UserModel.deleteUser({_id:userId});
-        return promiseResult;
+    findUserByUsername(username) {
+        const result = UserModel.findUserByUsername(username);
+        return result;
     }
 
-}
+    deleteAllUser() {
+        const result = UserModel.deleteAllUser();
+        return result;
+    }
+}; 

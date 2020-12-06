@@ -58,10 +58,10 @@ const shoppingCart = new ShoppingCart();
 const {
     userAuthenticated
 } = require('./src/middleware/authentication');
-
-
-
 const express = require("express");
+const bodyParser = require('body-parser');
+const passport = require('passport');
+const session = require('express-session');
 const app = express();
 app.use('./public', express.static('uploads'));
 
@@ -120,12 +120,30 @@ app.get('/user/login', (req, res) => {
 });
 
 login.login();
-app.post('/user/login', passport.authenticate('local', {
-    failureRedirect: '/user/login'
-}), (req, res) => {
-    res.json({
-        state: "User has logged in"
-    });
+app.post('/user/login', (req, res, next) => {
+    passport.authenticate('local', function (err, user, context = {}) {
+        if (err) {
+            return next(err);
+        }
+        if (context.statusCode === 429) {
+            res.set('Retry-After', String(context.retrySecs));
+            return res.status(429).send(context);
+        }
+        if (!user) {
+            return res.redirect('/user/login');
+        }
+
+        req.logIn(user, function (err) {
+            if (err) {
+                return next(err);
+            }
+            return res.json('User has logged in');
+        });
+
+    })(req, res, next);
+    // res.json({
+    //     state: "User has logged in"
+    // });
 });
 
 app.delete('/user/logout', (req, res) => {
@@ -147,50 +165,113 @@ app.delete('/user/logout', (req, res) => {
 //     });
 // });
 
-app.post('/shoppingcart', userAuthenticated, (req, res) => {
-    const product = req.body.product;
+//---------get shoppingcart---------------\\
+app.get('/shoppingcart', userAuthenticated, (req, res) => {
+    shoppingCart = new ShoppingCart();
+    cartItem = new CartItem();
+    carOwner = new CarOwner();
+
+    const userInfo = req.user;
+    if (userInfo.role === 'carOwner') {
+        carOwner.getCarOwnerByUserId({
+            user: userInfo._id
+        }).populate('shoppingCart').then(carOwnerInfo => {
+            cartItem.getCartItemsAssociatedWithShoppingCartId(carOwnerInfo.shoppingCart._id)
+                .then(retrivedCartItems => {
+                    res.send(retrivedCartItems);
+                }).catch(err => {
+                    res.status(404).send(err);
+                });
+        }).catch(err => {
+            res.status(404).send(err);
+        });
+    } else {
+        res.status(403).send({Error: {Error: 'you cannot access this page'}});
+    }
+});
+
+//------------------add cartItem to shoppingcart by car owner-----------------\\
+app.post('/shoppingcart/addcart', userAuthenticated, (req, res) => {
+    const productId = req.body.productId;
     const quantity = req.body.quantity;
     const date = req.body.date;
+    const storeId = req.body.storeId;
+    const userInfo = req.user;
 
-    StoreModel.getStore({
-        _id: req.body.storeId
-    }).then(store => {
-        WarehouseModel.getProductFromWarehouse({
-            _id: store.warehouse,
-            productId: product
-        }).populate({
-            path: 'storage.productId'
-        }).then(warehouse => {
-            if (warehouse.storage[0].amount >= quantity) {
-                const totalPrice = warehouse.storage[0].productId.price * quantity;
-                // res.json(totalPrice)
-                CartItemModel.createCartItem({
-                    product: product,
-                    quantity: quantity,
-                    date: date,
-                    totalPrice: totalPrice
-                }).then(item => {
-                    // res.json(item);
-                    UserModel.getUser({
-                        _id: req.user.id
-                    }).then(user => {
-                        // res.json(user);
-                        if (user.role === 'carOwner') {
-                            CarOwnerModel.getCarOwnerByUserId({
-                                user: user._id
-                            }).populate('shoppingCart').then(carOwner => {
-                                // res.json(carOwner);
-                                carOwner.shoppingCart.Items.push(item);
-                                carOwner.shoppingCart.totalBill += item.totalPrice;
-                                carOwner.shoppingCart.save().then(savedItem => {
-                                    res.json(savedItem);
+    if (quantity <= 0) {
+        res.status(501).send("Error: Quantity must be more than Zero");
+    }
+
+    shoppingCart = new ShoppingCart();
+    store = new Store();
+    cartItem = new CartItem();
+    carOwner = new CarOwner();
+    warehouse = new Warehouse();
+
+    if (userInfo.role === 'carOwner') {
+        carOwner.getCarOwnerByUserId({
+            user: userInfo._id
+        }).then(carOwnerInfo => {
+            store.getStore(storeId)
+                .then(storeInfo => {
+                    warehouse.getProductFromWarehouse(
+                        storeInfo.warehouse, productId
+                    ).populate({
+                        path: 'storage.productId'
+                    }).then(warehouseInfo => {
+                        if (warehouseInfo.storage[0].amount >= quantity) {
+                            const totalPrice = warehouseInfo.storage[0].productId.price * quantity;
+                            if (totalPrice > 0) {
+                                cartItem.createCartItem({
+                                    product: productId,
+                                    quantity: quantity,
+                                    date: date,
+                                    storeId: storeId,
+                                    shoppingCart: carOwnerInfo.shoppingCart,
+                                    totalPrice: totalPrice
+                                }).then(item => {
+                                    shoppingCart.addCartItem(carOwnerInfo.shoppingCart, item).then((updatedShoppingCart) => {
+                                        res.status(200).send(updatedShoppingCart);
+                                    });
+                                }).catch(err => {
+                                    res.status(501).send(err);
                                 });
-                            });                           
+                            } else {
+                                res.status(501).send('Error With The Price');
+                            }
+                        } else {
+                            res.status(501).send('Error This Quantity Is not available');
                         }
+                    }).catch(err => {
+                        res.status(501).send(err);
                     });
+                }).catch(err => {
+                    res.status(501).send(err);
                 });
-            }
+        }).catch(err => {
+            res.status(501).send(err);
         });
+    } else {
+        res.status(403).send({Error: 'you cannot access this page'});
+    }
+});
+
+//------------remove cartitem by car owner-----------\\
+app.delete('/shoppingcart/removecartitem', userAuthenticated, (req, res) => {
+    cartItem = new CartItem();
+    shoppingCart = new ShoppingCart();
+    const cartItemId = req.body.cartItemId;
+    const shoppingCartId = req.body.shoppingCartId;
+    shoppingCart.removeCartItem(shoppingCartId, cartItemId).then(updatedShoppingCart => {
+        cartItem.deleteCartItem({
+            _id: cartItemId
+        }).then(deletedCartItem => {
+            res.status(200).send(updatedShoppingCart);
+        }).catch(err => {
+            res.status(501).send(err);
+        });
+    }).catch(err => {
+        res.status(501).send(err);
     });
 });
 
@@ -416,44 +497,57 @@ app.put('/store/:id/update-category/:categoryId',upload.single('image'),(req,res
 app.delete('/store/:id/delete-category/:categoryId',(req,res) => {
     //Checking if the category exists by it's ID
     const categoryPromiseResultId = category.findCategoryById(req.params.categoryId);
-    categoryPromiseResultId.then().catch(err => res.send("Error getting category id.    "+err));
+    categoryPromiseResultId.then().catch(err => res.send("Error getting category id.    " + err));
     //Startting the process of deleting the category
     //1- Getting all the categories from the store's menu
     menu.getAllCategories(req.params.id)
-            .then(menuResult => {
+        .then(menuResult => {
             //2- Updating the categories list inside the store's list 
-            console.log("Menu result: \n"+menuResult.categories)   
+            console.log("Menu result: \n" + menuResult.categories)
             const index = menuResult.categories.indexOf(req.params.categoryId);
-            menuResult.categories.splice(index,1);
-            menu.updateMenu({storeId:menuResult.storeId,categories:menuResult.categories})
-                .then(updateMenuResult =>{
-                //3- Removing the category    
-                category.removeCategory(req.params.categoryId)
-                    .then(categoryResult =>{
-                    //4- Removing the products inside that category    
-                    product.removeProductsOfCategory(req.params.categoryId)
-                        .then(productsResult =>{
-                        //5- Removing the products from the warehouse
-                        warehouse.removeProductsFromWarehouse(req.params.id,req.params.categoryId)
-                            .then(warehouseResult => {
-                                res.send("Deleted category and its products.");
-                            })
-                            .catch(err => res.send({error:"Error removing products from warehouse.  "+err}));
-                        })
-                        .catch(err => res.send({error:"Error removing products of the category.  "+err}))
-                    })
-                    .catch(err => res.send({error:"Error removing products of the category.  "+err}));
+            menuResult.categories.splice(index, 1);
+            menu.updateMenu({
+                    storeId: menuResult.storeId,
+                    categories: menuResult.categories
                 })
-                .catch(err => res.send({error:"Error removing category from the menu.  "+err}));
-            })
-            .catch(err => res.send({error:"Error getting the categories of the menu.  "+err}));
+                .then(updateMenuResult => {
+                    //3- Removing the category    
+                    category.removeCategory(req.params.categoryId)
+                        .then(categoryResult => {
+                            //4- Removing the products inside that category    
+                            product.removeProductsOfCategory(req.params.categoryId)
+                                .then(productsResult => {
+                                    //5- Removing the products from the warehouse
+                                    warehouse.removeProductsFromWarehouse(req.params.id, req.params.categoryId)
+                                        .then(warehouseResult => {
+                                            res.send("Deleted category and its products.");
+                                        })
+                                        .catch(err => res.send({
+                                            error: "Error removing products from warehouse.  " + err
+                                        }));
+                                })
+                                .catch(err => res.send({
+                                    error: "Error removing products of the category.  " + err
+                                }))
+                        })
+                        .catch(err => res.send({
+                            error: "Error removing products of the category.  " + err
+                        }));
+                })
+                .catch(err => res.send({
+                    error: "Error removing category from the menu.  " + err
+                }));
+        })
+        .catch(err => res.send({
+            error: "Error getting the categories of the menu.  " + err
+        }));
 });
 
 //----------Create Product----------
 app.post('/store/:id/category/:categoryId/create-product',upload.single('image'),(req,res) => {
     //Checking if the category exists by id
     const categoryPromiseResultId = category.findCategoryById(req.params.categoryId);
-    categoryPromiseResultId.then().catch(err => res.send("Error getting category id.    "+err));
+    categoryPromiseResultId.then().catch(err => res.send("Error getting category id.    " + err));
     //Creating product
     productInfo = {name:req.body.name,price:req.body.price,image:req.file.path,categoryId:req.params.categoryId,productType:req.body.productType,description:req.body.description};
 
@@ -575,21 +669,27 @@ app.put('/store/:id/category/:categoryId/update-product/:productId',upload.singl
 app.delete('/store/:id/category/:categoryId/delete-product/:productId',(req,res) => {
     //Deleting product
     product.removeProduct(req.params.productId)
-            .then(deleteProductResult => {
+        .then(deleteProductResult => {
             //2- Updating the products list inside the category's list 
             //Removing product ref from the category
-            category.removeProductFromCategory(req.params.categoryId,req.params.productId)
+            category.removeProductFromCategory(req.params.categoryId, req.params.productId)
                 .then(updateCategoryResult => {
-                //Updating the warehouse
-                warehouse.removeProductFromWarehouse(req.params.id,req.params.productId)
-                    .then(warehouseResult => {
-                    res.send("Deleted product and updated warehouse and category")
-                    })
-                    .catch(err => res.send({error:"Error updating warehouse. "+err}));
+                    //Updating the warehouse
+                    warehouse.removeProductFromWarehouse(req.params.id, req.params.productId)
+                        .then(warehouseResult => {
+                            res.send("Deleted product and updated warehouse and category")
+                        })
+                        .catch(err => res.send({
+                            error: "Error updating warehouse. " + err
+                        }));
                 })
-                .catch(err => res.send({error:"Error updating category. "+err}));
-            })
-            .catch(err => res.send({error:"Error deleting product. "+err}));
+                .catch(err => res.send({
+                    error: "Error updating category. " + err
+                }));
+        })
+        .catch(err => res.send({
+            error: "Error deleting product. " + err
+        }));
 });
     
 /*
@@ -624,20 +724,24 @@ app.get('/store/:id/categories',(req,res) => {
 app.get('/store/:id/category/:categoryId/products',(req,res) => {
     //Checking if the category exists by it's ID
     const categoryPromiseResultId = category.findCategoryById(req.params.categoryId);
-    categoryPromiseResultId.then().catch(err => res.send("Error getting category id.    "+err));
+    categoryPromiseResultId.then().catch(err => res.send("Error getting category id.    " + err));
     //Getting the products of that category
     category.getProductsOfCategory(req.params.categoryId)
         .then(productsResult => res.send(productsResult))
-        .catch(err => res.send({error:"Error getting products of the requested category. "+err}));
+        .catch(err => res.send({
+            error: "Error getting products of the requested category. " + err
+        }));
 });
 //----------View a product----------
 app.get('/store/:id/category/:categoryId/products/:productId',(req,res) => {
     const categoryPromiseResultId = category.findCategoryById(req.params.categoryId);
-    categoryPromiseResultId.then().catch(err => res.send("Error getting category id.    "+err));
+    categoryPromiseResultId.then().catch(err => res.send("Error getting category id.    " + err));
 
     product.getProductById(req.params.productId)
         .then(productsResult => res.send(productsResult))
-        .catch(err => res.send({error:"Error getting products of the requested category. "+err}));
+        .catch(err => res.send({
+            error: "Error getting products of the requested category. " + err
+        }));
 });
 //----------View a category----------
 app.get('/store/:id/category/:categoryId',(req,res) => {

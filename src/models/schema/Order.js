@@ -5,7 +5,7 @@ const Shoppingcart = require('./ShoppingCart');
 const schema = mongoose.Schema;
 
 const Order = new schema({
-    shoppingcart: {
+    shoppingCart: {
         type: schema.Types.ObjectId,
         ref: 'ShoppingCart'
     },
@@ -13,12 +13,18 @@ const Order = new schema({
     phoneNumber: {
         type: String,
         require: true,
-        unique: true,
         minLength: 10,
         maxlength: 10
     },
+    carOwnerId: {
+        type: schema.Types.ObjectId,
+        ref: 'CarOwner'
+    },
     date: {type: Date, default: Date.now()},
-    status: {type: String}
+    status: {
+        type: String,
+        enum: ["pending", "cancel", "delivered"]
+    }
 });
 
 module.exports = Order;

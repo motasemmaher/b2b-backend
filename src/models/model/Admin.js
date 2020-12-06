@@ -16,9 +16,9 @@ module.exports = {
     },
 
     updateAdmin(value) {
-        const result = AdminModel.findByIdAndUpdate({
+        const result = AdminModel.findOneAndUpdate({
             _id: value._id
-        }, Admin);
+        },  value, { "useFindAndModify": false });
 
         if (result) {
             return result;

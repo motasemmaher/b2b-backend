@@ -1,9 +1,5 @@
 const mongoose = require('mongoose');
 
-const GarageOwner = require('./GarageOwner');
-const Menu = require('./Menu');
-const Warehouse = require('./Warehouse');
-
 const schema = mongoose.Schema;
 
 const Store = new schema({
@@ -70,6 +66,16 @@ const Store = new schema({
     warehouse: {
         type: schema.Types.ObjectId,
         ref: 'Warehouse'
+    },
+
+    orders: [{
+        type: schema.Types.ObjectId,
+        ref: 'Order'
+    }],
+
+    garageOwnerId: {
+        type: schema.Types.ObjectId,
+        ref: 'GarageOwner'
     }
 
 });

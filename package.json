@@ -26,6 +26,7 @@
     "nodemailer": "^6.4.16",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
+    "rate-limiter-flexible": "^2.1.13",
     "supertest": "^6.0.0",
     "validator": "^13.1.17"
   }
