@@ -7,7 +7,6 @@ const GarageOwnerModel= mongoose.model('GarageOwner', GarageOwnerSchema);
 module.exports = {
     createGarageOwner(value) {
         const result = GarageOwnerModel.create(value);
-
         if (result) {
             return result;
         } else {
