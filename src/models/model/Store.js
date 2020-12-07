@@ -29,9 +29,9 @@ module.exports = {
     },
 
     updateStore(value) {
-        const result = StoreModel.findByIdAndUpdate({
+        const result = StoreModel.findOneAndUpdate({
             _id: value._id
-        }, Store);
+        }, value, { "useFindAndModify": false });
 
         if (result) {
             return result;
@@ -104,6 +104,42 @@ module.exports = {
             };
     },
 
+    async updateOrderStatus(value) {
+        let result = null;
+       await StoreModel.findOne(
+            {_id: value._id},
+            {
+                orders: {$elemMatch: { $eq: value.orderId }}
+            }
+        ).populate('orders').then(store => { 
+            store.orders[0].status = value.status;
+            result = store.orders[0].save();
+        });
+        
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error with the getting Store"
+            };
+    },
+    
+    addOrder(value) {
+        const result = StoreModel.findOneAndUpdate(
+            { _id: value._id },
+            { $push: { orders: value.orderId } },
+            { "useFindAndModify": false }
+        );
+
+        if (result)
+        return result;
+    else
+        return {
+            error: "Error with the adding order to the Store"
+        };
+        
+    },
+
     deleteAllStore() {
         const result = StoreModel.deleteMany({});
 
@@ -112,6 +148,35 @@ module.exports = {
         else
             return {
                 error: "Error with the delete all Stores"
+            };
+    },
+
+    getStoresAssociatedWithGarageOwner(value) {
+        const result = StoreModel.find({
+            garageOwnerId: value.garageOwnerId
+        });
+
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error in getStoresAssociatedWithGarageOwner"
+            };
+    },
+
+    getOrderFromeStore(value) {
+        const result = StoreModel.findOne(
+            {_id: value._id},
+            {
+                orders: {$elemMatch: { $eq: value.orderId }}
+            }
+        );
+
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error in getOrderFromeStore"
             };
     }
 };

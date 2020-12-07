@@ -16,9 +16,9 @@ module.exports = {
     },
 
     updateContact(value) {
-        const result = ContactModel.findByIdAndUpdate({
+        const result = ContactModel.findOneAndUpdate({
             _id: value._id
-        }, Contact);
+        },  value, { "useFindAndModify": false });
 
         if (result) {
             return result;
