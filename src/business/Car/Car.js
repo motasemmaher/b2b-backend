@@ -17,6 +17,12 @@ module.exports =  class Car {
         return promiseResult;
     }
 
+    updateCar(carInfo)
+    {
+        const promiseResult = CarModel.updateCar(carInfo);
+        return promiseResult;
+    }
+
     deleteCar(carId)
     {
         const promiseResult = CarModel.deleteCar({_id:carId});

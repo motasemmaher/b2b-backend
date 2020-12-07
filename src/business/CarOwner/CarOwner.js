@@ -9,10 +9,27 @@ module.exports =  class CarOwner {
         return promiseResult;
     }
 
-    getAllCarOwners()
+    getCarOwnerByUserId(userId)
     {
-        const carOwnerPromise = CarOwnerModel.findAllCarOwners();
-        return carOwnerPromise;
+        const promiseResult = CarOwnerModel.getCarOwnerByUserId({user:userId});
+        return promiseResult;
     }
 
+    getAllCarOwners()
+    {
+        const promiseResult = CarOwnerModel.findAllCarOwners();
+        return promiseResult;
+    }
+
+    addCarToList(carOwnerId,carInfo)
+    {
+        const promiseResult = CarOwnerModel.addCarToList({_id:carOwnerId,carInfo:carInfo});
+        return promiseResult;
+    }
+
+    removeCarFromList(carOwnerId,carId)
+    {
+        const promiseResult = CarOwnerModel.removeCarFromList({_id:carOwnerId,carId:carId});
+        return promiseResult;
+    }
 }

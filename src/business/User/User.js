@@ -16,6 +16,12 @@ module.exports =  class User {
         return promiseResult;
     }
     
+    updateUser(userInfo)
+    {
+        const promiseResult = UserModel.updateUser(userInfo);
+        return promiseResult;
+    }
+
     getUserById(userId)
     {
         const promiseResult = UserModel.findUserById({userId:userId});

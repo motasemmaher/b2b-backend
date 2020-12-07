@@ -16,6 +16,11 @@ module.exports =  class GarageOwner {
         return promiseResult;
     }
 
+    getGarageOwnerByUserId(userId) {
+        const result = GarageOwnerModel.getGarageOwnerByUserId({userId: userId});
+        return result;
+    }
+
     acceptWaitingUser(userId)
     {
         const promiseResult = GarageOwnerModel.acceptWaitingUser({_id:userId});
@@ -34,5 +39,16 @@ module.exports =  class GarageOwner {
         return promiseResult;
     }
     
+    addStoreToList(garageOwnerId,storeInfo)
+    {
+        const promiseResult = GarageOwnerModel.addStoreToList({_id:garageOwnerId,storeInfo:storeInfo});
+        return promiseResult;
+    }
+
+    removeStoreFromList(garageOwnerId,storeId)
+    {
+        const promiseResult = GarageOwnerModel.removeStoreFromList({_id:garageOwnerId,storeId:storeId});
+        return promiseResult;
+    }
 }
 

@@ -90,6 +90,40 @@ module.exports = {
             return result;
         else
             return {error: "Error with getting all WaitingUsers"};
+    },
+    getGarageOwnerByUserId(value) {
+        const result = GarageOwnerModel.findOne({
+            user: value.userId
+        });
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error with the getting GarageOwner"
+            };
+    },
+    addStoreToList(value)
+    {
+        const result = GarageOwnerModel.findByIdAndUpdate(
+            { _id: value._id },
+            { $push: { stores: value.storeInfo } },
+            { "useFindAndModify": false }
+        );
+        if (result)
+            return result;
+        else
+            return { error: "Error with the adding store to stores list" };
+    },
+    removeStoreFromList(value)
+    {
+        const result = GarageOwnerModel.findByIdAndUpdate({ _id: value._id },
+            { $pull: { stores: value.storeId } },
+            { multi: true },
+        );
+        if (result)
+            return result;
+        else
+            return { error: "Error with the removing store from stores list" };
     }
     
 };

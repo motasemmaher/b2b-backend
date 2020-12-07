@@ -17,6 +17,8 @@ module.exports =
     createProduct(value)
     {
         //{name:value.name,price:value.price,image:value.image,categoryId:value.categoryId,productType:value.productType,description:value.description}
+        tags = value.tags.split(',');
+        value = {...value,tags:tags};
         const result = ProductModel.create(value);
         if(result)
             return result;
@@ -26,9 +28,11 @@ module.exports =
     ,
     updateProduct(value)
     {
+        tags = value.tags.split(',');
+        value = {...value,tags:tags};
         const result = ProductModel.findOneAndUpdate(
                 {_id:value._id},
-                {name:value.name,price:value.price,image:value.image,categoryId:value.categoryId,productType:value.productType,description:value.description}, 
+                value, 
                 {"useFindAndModify":false}
                 );
         if(result)

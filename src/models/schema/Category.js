@@ -14,7 +14,8 @@ const Category = new schema({
     products: [{
         type: schema.Types.ObjectId,
         ref: 'Product'
-    }]
+    }],
+    tags : [{type:String,required:true}]
 })
 
 module.exports = Category;

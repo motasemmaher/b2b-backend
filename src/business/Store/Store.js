@@ -17,6 +17,13 @@ module.exports =  class Store {
         return promiseResult;
     }
 
+    updateStore(storeInfo)
+    {
+        const promiseResult = StoreModel.updateStore(storeInfo);
+        return promiseResult;
+    }
+
+
     deleteStore(storeId)
     {
         const promiseResult = StoreModel.deleteStore({_id:storeId});
@@ -35,9 +42,15 @@ module.exports =  class Store {
         return promiseResult;
     }
 
-    getStoreByUserId(userId)
+    getStoresByUserId(userId)
     {
         const promiseResult = StoreModel.findStores({userId:userId});
+        return promiseResult;
+    }
+
+    getFullStoresByUserId(userId)
+    {
+        const promiseResult = StoreModel.findStoreByUserId({userId:userId});
         return promiseResult;
     }
 

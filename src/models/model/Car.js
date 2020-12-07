@@ -21,7 +21,8 @@ module.exports =
 
         const result = CarModel.findOneAndUpdate(
                         {_id:value._id},
-                        {userId:value.userId,model:value.model,make:value.make,year:value.year}, {"useFindAndModify":false}
+                        value,
+                         {"useFindAndModify":false}
                     );
      
            if(result)

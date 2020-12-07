@@ -2,10 +2,6 @@ const bcrypt = require('bcrypt')
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
-// const mongoose = require('mongoose');
-// const UserSchema = require("../../src/model/schema/User");
-// const User= mongoose.model('User', UserSchema);
-
 const User = require('../models/model/User');
 const GarageOwner = require('../models/model/GarageOwner');
 const CarOwner = require('../models/model/CarOwner');

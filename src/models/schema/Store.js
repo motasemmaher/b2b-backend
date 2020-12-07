@@ -70,7 +70,8 @@ const Store = new schema({
     warehouse: {
         type: schema.Types.ObjectId,
         ref: 'Warehouse'
-    }
+    },
+    tags : [{type:String,required:true}]
 
 });
 
