@@ -17,6 +17,12 @@ const Product = new schema({
         type: schema.Types.ObjectId,
         ref: 'Offer'
     },
+    isInStock:{
+        type:Boolean,
+        required:true,
+        default:true
+    }
+    ,
     tags : [{type:String,required:true}]
 })
 

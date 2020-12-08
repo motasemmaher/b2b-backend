@@ -73,9 +73,9 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 const cors = require('cors')
 const corsOptions = {
-    origin: 'http://localhost:4200',
+    origin: 'http://localhost:8100',
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+    optionsSuccessStatus: 200 // sFome legacy browsers (IE11, various SmartTVs) choke on 204
 }
 app.use(cors(corsOptions))
 
@@ -99,20 +99,6 @@ const moment = require('moment')
 const schedule = require('node-schedule');
 const fs = require('fs');
 const nodemailer = require('nodemailer');
-//const { userInfo } = require('os');
-
-
-
-app.put('/update-menu/:id', (req, res) => {
-    console.log("Inside put")
-
-    Menu.updateMenu({
-        _id: req.params.id,
-        temp: req.body.temp,
-    });
-    res.send("Updated Menu");
-});
-
 
 /*-------------------------------------------------Thaer's work start-------------------------------------------------*/
 
@@ -230,6 +216,7 @@ app.options('/store/:id/create-complaint/:submitterId'); //Create Complaint
 app.options('/view-complaints/:userId'); //View Complaints
 app.options('/view-complaints/complaint/:complaintId'); //View A Complaint
 
+
 function hashPassword(password)
 {
     const hash =  bcrypt.hashSync(password, 10);
@@ -266,34 +253,34 @@ app.post('/user/garage-owner/create',upload.single('image'),(req, res) => {
                         menu.linkMenu({_id:menuResult._id,storeId:storeResult._id});
                         res.send("Successfully created GarageOwner (waiting user)");
                         })
-                    .catch(garageOwnerError => {
+                    .catch(err => {
                     user.deleteUser(userResult._id);
                     menu.deleteMenu(menuResult._id);
                     warehouse.deleteWarehouse(warehouseResult._id);
                     store.deleteStore(storeResult._id);
-                    res.send("Error with creating GarageOwner: "+garageOwnerError);
+                    res.send("Error with creating GarageOwner: "+err);
                     });
                 })    
-                .catch(storeError =>{
+                .catch(err =>{
                 user.deleteUser(userResult._id);
                 menu.deleteMenu(menuResult._id);
                 warehouse.deleteWarehouse(warehouseResult._id);
-                res.send("Error with creating Store: "+storeError);
+                res.send("Error with creating Store: "+err);
                 });
             })
-            .catch( warehouseError =>{
+            .catch( err =>{
             user.deleteUser(userResult._id);
             menu.deleteMenu(menuResult._id);
-            res.send("Error with creating Warehouse: "+warehouseError);
+            res.send("Error with creating Warehouse: "+err);
             });
         })
-        .catch(menuError =>{
+        .catch(err =>{
         user.deleteUser(userResult._id);
-        res.send("Error with creating Menu: "+menuError);
+        res.send("Error with creating Menu: "+err);
         });
     })
-    .catch(userError =>{
-    res.send("Error with creating User: "+userError);
+    .catch(err =>{
+    res.send("Error with creating User: "+err);
     });
     }
 });
@@ -321,110 +308,148 @@ app.post('/user/car-owner/create', (req, res) => {
                    .then(carOwnerResult => {
                    res.send("Successfully created CarOwner");
                    })
-                   .catch(carOwnerError =>{
+                   .catch(err =>{
                    user.deleteUser(userResult._id);
                    car.deleteCar(carResult._id);
                    shoppingCart.deleteShoppingCart(shoppingCartResult._id);
-                   res.send("Error with creating CarOwner: "+carOwnerError);
+                   res.send("Error with creating CarOwner: "+err);
                    });
                })
-               .catch(shoppingCartError =>{
+               .catch(err =>{
                user.deleteUser(userResult._id);
                car.deleteCar(carResult._id);
-               res.send("Error with creating ShoppingCart: "+shoppingCartError);
+               res.send("Error with creating ShoppingCart: "+err);
                });
            })
-           .catch(carError => {
+           .catch(err => {
            user.deleteUser(userResult._id);    
-           res.send("Error with creating Car: "+carError);
+           res.send("Error with creating Car: "+err);
            });
         })
-        .catch(userError => {
-        res.send("Error with creating User: "+userError);
+        .catch(err => {
+        res.send("Error with creating User: "+err);
         });
     }    
 });
 
 //----------Create Category----------
 app.post('/store/:id/create-category',upload.single('image'),(req,res) => {
-    const categoryValidationResult = category.validateCategoryInfo({name:req.body.name});
-    if(typeof categoryValidationResult !== 'undefined')
-        res.send(categoryValidationResult.err);
-    else{
-        //Checking if there is a category with the provided name
-        const categoryPromiseResult = category.findCategoryByName(req.body.name);
-        categoryPromiseResult.then(categoryFindResult =>{
-
-            // If there aren't any categories with that name inside the store, begin the creating process
-            if (categoryFindResult == null || categoryFindResult.storeId != req.params.id)
+    store.getStoreById(req.params.id)
+    .then(getStoreResult => {
+        if(getStoreResult == null)
+            res.send({error:"Error! Didn't find a store with that id."})
+        else
+        {
+            const categoryValidationResult = category.validateCategoryInfo({name:req.body.name});
+            if(typeof categoryValidationResult !== 'undefined')
+                res.send(categoryValidationResult.err);
+            else
             {
-                //1- Creating category with the provided information
-                const createPromiseResult = category.createCategory({...req.body,storeId:req.params.id,image:req.file.path })
-                .then(categoryCreateResult => {
-                //2- Adding a ref for the new category to the store's menu
-                menu.addCategory(req.params.id,categoryCreateResult)
-                    .then(menuResult => {
-                    res.send(categoryCreateResult);
+                //Checking if there is a category with the provided name
+                category.findCategoryByName(req.body.name)
+                .then(categoryFindResult =>{
+                // If there aren't any categories with that name inside the store, begin the creating process
+                if (categoryFindResult == null || categoryFindResult.storeId != req.params.id)
+                {
+                    //1- Creating category with the provided information
+                    category.createCategory({...req.body,storeId:req.params.id,image:req.file.path })
+                    .then(categoryCreateResult => {
+                    //2- Adding a ref for the new category to the store's menu
+                    menu.addCategory(req.params.id,categoryCreateResult)
+                        .then(menuResult => {
+                        res.send(categoryCreateResult);
+                        })
+                        .catch(err => {
+                        category.removeCategory(categoryCreateResult._id);
+                        res.send({error:"Error updating menu.  "+err});
+                        });
                     })
-                    .catch(err => {
-                    category.removeCategory(categoryCreateResult._id);
-                    res.send({error:"Error updating menu.  "+err});
-                    });
+                    .catch(err => res.send({error:"Error creating category.  "+err}));
+                }
+                // Else it will a return a response that it already exists
+                else 
+                    res.send("A category with that name already exists");
                 })
-                .catch(err => res.send({error:"Error creating category.  "+err}));
+                .catch(err => res.send({error:"Error getting category Name.   "+err}));
             }
-            // Else it will a return a response that it already exists
-            else 
-                res.send("A category with that name already exists");
-        }).catch(err => res.send({error:"Error getting category Name.   "+err}));
-    }
+        }
+    })
+    .catch(err => res.send({error:"Error getting store id. "+err}));
 });
 
 //----------Update Category----------
 app.put('/store/:id/update-category/:categoryId',upload.single('image'),(req,res) => {
-    const validationResult = category.validateCategoryInfo({name:req.body.name});
-    if(typeof validationResult !== 'undefined')
-        res.send(validationResult.err);
-    else{
+    
+    store.getStoreById(req.params.id)
+    .then(getStoreResult => {
+    if(getStoreResult == null)
+        res.send({error:"Error! Didn't find a store with that id."});
+    else
+    {
         //Checking if the category exists by it's ID
-        const categoryPromiseResultId = category.findCategoryById(req.params.categoryId);
-        categoryPromiseResultId.then().catch(err => res.send("Error getting category id.    "+err));
-        //Checking if there is a category with the name that the user provided in the update information
-        const categoryPromiseResultName = category.findCategoryByName(req.body.name);
-        categoryPromiseResultName.then(categoryFindResult =>{
-            // If there aren't any categories with that name inside the store, begin the updating process
-            if (categoryFindResult == null || categoryFindResult.storeId != req.params.id)
-            { 
-                //1- Update the category with the ID with the new provided information
-                category.updateCategory({_id:req.params.categoryId,...req.body,image:req.file.path})
-                .then(categoryUpdateResult =>{
+        category.findCategoryById(req.params.categoryId)
+        .then(getCategoryResult => {
+        if(getCategoryResult == null)
+            res.send({error:"Error! Didn't find a cateory with that id."})
+        else
+        {
+            const validationResult = category.validateCategoryInfo({name:req.body.name});
+            if(typeof validationResult !== 'undefined')
+                res.send(validationResult.err);
+            else
+            {
+                //Checking if there is a category with the name that the user provided in the update information
+                category.findCategoryByName(req.body.name)
+                .then(categoryFindResult =>{
+                // If there aren't any categories with that name inside the store, begin the updating process
+                if (categoryFindResult == null || categoryFindResult.storeId != req.params.id)
+                { 
+                    //1- Update the category with the ID with the new provided information
+                    category.updateCategory({_id:req.params.categoryId,...req.body,image:req.file.path})
+                    .then(categoryUpdateResult =>{
                     //2- After the update finishes, find the updated category by its ID then return it to the user
                     category.findCategoryById(req.params.categoryId)
-                    .then(categoryFindResult => {
+                        .then(categoryFindResult => {
                         res.send(categoryFindResult);
+                        })
+                        .catch(err => res.send({error:"Error finding category.  "+err}))
                     })
-                    .catch(err => res.send({error:"Error finding category.  "+err}))
+                    .catch(err => res.send({error:"Error updating category.  "+err}));
+                }
+                // Else it will a return a response that it already exists
+                else    
+                    res.send("A category with that name already exists.");
                 })
-                .catch(err => res.send({error:"Error updating category.  "+err}));
+                .catch(err => res.send({error:"Error getting category name.    "+err}))
             }
-            // Else it will a return a response that it already exists
-            else    
-                res.send("A category with that name already exists");
-        }).catch(err => res.send("Error getting category name.    "+err))
+        }
+        })
+        .catch(err => res.send({error:"Error getting category id.  "+err}));
     }
+    })
+    .catch(err => res.send({error:"Error getting store id.  "+err}));
 });
 
 //----------Delete Category----------
 app.delete('/store/:id/delete-category/:categoryId',(req,res) => {
-    //Checking if the category exists by it's ID
-    const categoryPromiseResultId = category.findCategoryById(req.params.categoryId);
-    categoryPromiseResultId.then().catch(err => res.send("Error getting category id.    "+err));
-    //Startting the process of deleting the category
-    //1- Getting all the categories from the store's menu
-    menu.getAllCategories(req.params.id)
+    store.getStoreById(req.params.id)
+    .then(getStoreResult => {
+    if(getStoreResult == null)
+        res.send({error:"Error! Didn't find a store with that id."});
+    else
+    {
+        //Checking if the category exists by it's ID
+        category.findCategoryById(req.params.categoryId)
+        .then(getCategoryResult => {
+        if(getCategoryResult == null)
+            res.send({error:"Error! Didn't find a cateory with that id."})
+        else
+        {
+            //Startting the process of deleting the category
+            //1- Getting all the categories from the store's menu
+            menu.getAllCategories(req.params.id)
             .then(menuResult => {
             //2- Updating the categories list inside the store's list 
-            console.log("Menu result: \n"+menuResult.categories)   
             const index = menuResult.categories.indexOf(req.params.categoryId);
             menuResult.categories.splice(index,1);
             menu.updateMenu({storeId:menuResult.storeId,categories:menuResult.categories})
@@ -438,10 +463,10 @@ app.delete('/store/:id/delete-category/:categoryId',(req,res) => {
                         //5- Removing the products from the warehouse
                         warehouse.removeProductsFromWarehouse(req.params.id,req.params.categoryId)
                             .then(warehouseResult => {
-                                res.send("Deleted category and its products.");
+                                res.send("Deleted category");
                             })
                             .catch(err => res.send({error:"Error removing products from warehouse.  "+err}));
-                        })
+                        })  
                         .catch(err => res.send({error:"Error removing products of the category.  "+err}))
                     })
                     .catch(err => res.send({error:"Error removing products of the category.  "+err}));
@@ -449,146 +474,228 @@ app.delete('/store/:id/delete-category/:categoryId',(req,res) => {
                 .catch(err => res.send({error:"Error removing category from the menu.  "+err}));
             })
             .catch(err => res.send({error:"Error getting the categories of the menu.  "+err}));
+        }
+    })
+    .catch(err => res.send({error:"Error getting the category id.  "+err}));
+    }
+    })
+    .catch(err => res.send({error:"Error getting the store id.  "+err}));
 });
 
 //----------Create Product----------
 app.post('/store/:id/category/:categoryId/create-product',upload.single('image'),(req,res) => {
-    //Checking if the category exists by id
-    const categoryPromiseResultId = category.findCategoryById(req.params.categoryId);
-    categoryPromiseResultId.then().catch(err => res.send("Error getting category id.    "+err));
-    //Creating product
-    productInfo = {...req.body,image:req.file.path,categoryId:req.params.categoryId};
+    store.getStoreById(req.params.id)
+    .then(getStoreResult => {
+    if(getStoreResult == null)
+        res.send({error:"Error! Didn't find a store with that id."});
+    else
+    {
+        //Checking if the category exists by it's ID
+        category.findCategoryById(req.params.categoryId)
+        .then(getCategoryResult => {
+        if(getCategoryResult == null)
+            res.send({error:"Error! Didn't find a cateory with that id."})
+        else
+        {
+            //Creating product
+            productInfo = {...req.body,image:req.file.path,categoryId:req.params.categoryId};
 
-    const productValidationResult = product.validateProductInfo(productInfo);
-    const warehouseValidationResult = warehouse.validateWarehouseInfo({amount:req.body.amount});
+            const productValidationResult = product.validateProductInfo(productInfo);
+            const warehouseValidationResult = warehouse.validateWarehouseInfo({amount:req.body.amount});
     
-    if(typeof productValidationResult !== 'undefined')
-        res.send(productValidationResult.err);
-    else if(typeof warehouseValidationResult !== 'undefined')
-        res.send(warehouseValidationResult.err);
-    else{
-        product.createProduct(productInfo).then(productResult => {
-        //Adding a ref of the product to the category
-        category.addProduct(req.params.categoryId,productResult)
-            .then(categoryResult =>{
-            //Adding the product and its quantity to the warehouse
-            warehouse.addProduct(req.params.id,productResult._id,req.params.categoryId,req.body.amount)
-                .then(warehouseResult => {
-                res.send(productResult);
+            if(typeof productValidationResult !== 'undefined')
+                res.send(productValidationResult.err);
+            else if(typeof warehouseValidationResult !== 'undefined')
+                res.send(warehouseValidationResult.err);
+            else
+            {
+                product.createProduct(productInfo)
+                .then(productResult => {
+                //Adding a ref of the product to the category
+                category.addProduct(req.params.categoryId,productResult)
+                    .then(categoryResult =>{
+                    //Adding the product and its quantity to the warehouse
+                    warehouse.addProduct(req.params.id,productResult._id,req.params.categoryId,req.body.amount)
+                        .then(warehouseResult => {
+                        res.send(productResult);
+                        })
+                        .catch(err => {
+                        res.send({error:"Error updating warehouse. "+err})
+                        }); 
+                    })
+                    .catch(err => {
+                    res.send({error:"Error updating category. "+err})
+                    });
                 })
                 .catch(err => {
-                res.send({error:"Error updating warehouse. "+err})
+                res.send({error:"Error creating product. "+err})
                 });
-            })
-            .catch(err => {
-            res.send({error:"Error updating category. "+err})
-            });
-        })
-        .catch(err => {
-        res.send({error:"Error creating product. "+err})
-        });
+            }            
+        }
+        }).catch(err => res.send({error:"Error getting category id. "+err}));
     }
+    })
+    .catch(err => res.send({error:"Error getting store id. "+err}));
 });
 
 //----------Update Product----------
 app.put('/store/:id/category/:categoryId/update-product/:productId',upload.single('image'),(req,res) => {
-    productInfo = {...req.body,image:req.file.path};
-    const productValidationResult = product.validateProductInfo(productInfo);
-    const warehouseValidationResult = warehouse.validateWarehouseInfo({amount:req.body.amount});
-
-    if(typeof productValidationResult !== 'undefined')
-        res.send(productValidationResult.err);
-    else if(typeof warehouseValidationResult !== 'undefined')
-        res.send(warehouseValidationResult.err);
+    store.getStoreById(req.params.id)
+    .then(getStoreResult => {
+    if(getStoreResult == null)
+        res.send({error:"Error! Didn't find a store with that id."});
     else
     {
-        //Updating product
-        category.findCategoryByName(productInfo.categoryName)
-        .then(categoryFindByNameResult => {       
-        updatedProductInfo = {_id:req.params.productId,...productInfo,image:req.file.path,categoryId:categoryFindByNameResult._id}
-        product.updateProduct(updatedProductInfo)
-            .then(productResult =>{
-            if(categoryFindByNameResult._id != req.params.categoryId) 
-            {
-            category.removeProductFromCategory(req.params.categoryId,req.params.productId)
-                .then(removeProductFromCategoryResult => {
-                category.addProduct(updatedProductInfo.categoryId,productResult._id)
-                    .then(addProductTocategoryResult =>{
-                    warehouse.removeProductFromWarehouse(req.params.id,req.params.productId)
-                        .then(removeProductFromWarehouseResult => {
-                        warehouse.addProduct(req.params.id,req.params.productId,updatedProductInfo.categoryId,req.body.amount)
-                            .then(addProductToWarehouseResult =>{
-                            product.getProductById(req.params.productId)
-                                .then(productFindResult => {
-                                res.send(productFindResult);
-                                })
-                                .catch(err => res.send({error:"Error finding updated product.  "+err}))
-                            })
-                            .catch(err => {
-                            res.send({error:"Error adding product to warehouse. "+err})
-                            });
-                        })
-                        .catch(err => {
-                        res.send({error:"Error removing product from warehouse. "+err})
-                        });
-                    })
-                    .catch(err => {
-                    res.send({error:"Error adding product to category. "+err})
-                    });
-                })
-                .catch(err => {
-                res.send({error:"Error removing product from category. "+err})
-                }); 
-            } 
-            //wecan get rid of this if/else
+        //Checking if the category exists by it's ID
+        category.findCategoryById(req.params.categoryId)
+        .then(getCategoryResult => {
+        if(getCategoryResult == null)
+            res.send({error:"Error! Didn't find a category with that id."})
+        else
+        {
+            product.getProductById(req.params.productId)
+            .then(getProductResult => {
+            if(getProductResult == null)
+                res.send({error:"Error! Didn't find a produt with that id."})
             else
             {
-                warehouse.removeProductFromWarehouse(req.params.id,req.params.productId)
-                .then(removeProductResultFromWarehouse => {
-                warehouse.addProduct(req.params.id,req.params.productId,req.params.categoryId,req.body.amount)
-                    .then(addProductToWarehouseResult =>{
-                    product.getProductById(req.params.productId)
-                        .then(productFindResult => {
-                        res.send(productFindResult);
+                productInfo = {...req.body,image:req.file.path};
+                if(req.body.amount === 0)
+                    productInfo={...productInfo,isInStock:false};
+                
+                const productValidationResult = product.validateProductInfo(productInfo);
+                const warehouseValidationResult = warehouse.validateWarehouseInfo({amount:req.body.amount});
+                
+                if(typeof productValidationResult !== 'undefined')
+                    res.send(productValidationResult.err);
+                else if(typeof warehouseValidationResult !== 'undefined')
+                    res.send(warehouseValidationResult.err);
+                else
+                {
+                    //Updating product
+                    category.findCategoryByName(productInfo.categoryName)
+                    .then(categoryFindByNameResult => {       
+                    updatedProductInfo = {_id:req.params.productId,...productInfo,image:req.file.path,categoryId:categoryFindByNameResult._id}
+                    product.updateProduct(updatedProductInfo)
+                        .then(productResult =>{
+                        if(categoryFindByNameResult._id != req.params.categoryId) 
+                        {
+                            category.removeProductFromCategory(req.params.categoryId,req.params.productId)
+                            .then(removeProductFromCategoryResult => {
+                            category.addProduct(updatedProductInfo.categoryId,productResult._id)
+                                .then(addProductTocategoryResult =>{
+                                warehouse.removeProductFromWarehouse(req.params.id,req.params.productId)
+                                    .then(removeProductFromWarehouseResult => {
+                                    warehouse.addProduct(req.params.id,req.params.productId,updatedProductInfo.categoryId,req.body.amount)
+                                        .then(addProductToWarehouseResult =>{
+                                        product.getProductById(req.params.productId)
+                                            .then(productFindResult => {
+                                            res.send(productFindResult);
+                                            })
+                                            .catch(err => res.send({error:"Error finding updated product.  "+err}))
+                                        })
+                                        .catch(err => {
+                                        res.send({error:"Error adding product to warehouse. "+err})
+                                        });
+                                    })
+                                    .catch(err => {
+                                    res.send({error:"Error removing product from warehouse. "+err})
+                                    });
+                                })
+                                .catch(err => {
+                                res.send({error:"Error adding product to category. "+err})
+                                });
+                            })
+                            .catch(err => {
+                            res.send({error:"Error removing product from category. "+err})
+                            }); 
+                        } 
+                        //wecan get rid of this if/else
+                        else
+                        {
+                            warehouse.removeProductFromWarehouse(req.params.id,req.params.productId)
+                            .then(removeProductResultFromWarehouse => {
+                            warehouse.addProduct(req.params.id,req.params.productId,req.params.categoryId,req.body.amount)
+                                .then(addProductToWarehouseResult =>{
+                                product.getProductById(req.params.productId)
+                                    .then(productFindResult => {
+                                    res.send(productFindResult);
+                                    })
+                                    .catch(err => res.send({error:"Error finding updated product.  "+err}))
+                                })
+                                .catch(err => {
+                                res.send({error:"Error adding product to warehouse. "+err})
+                                });
+                            })
+                            .catch(err => {
+                            res.send({error:"Error removing product from warehouse. "+err})
+                            });
+                        }
                         })
-                        .catch(err => res.send({error:"Error finding updated product.  "+err}))
+                        .catch(err => {
+                        res.send({error:"Error updating product. "+err})
+                        }); 
                     })
-                    .catch(err => {
-                    res.send({error:"Error adding product to warehouse. "+err})
-                    });
-                })
-                .catch(err => {
-                res.send({error:"Error removing product from warehouse. "+err})
-                });
+                    .catch(err => res.send({error:"Couldn't find a category with that name. "+err}));
+                }
             }
             })
-            .catch(err => {
-            res.send({error:"Error updating product. "+err})
-            }); 
-    })
-    .catch(err => res.send("Couldn't find a category with that name"));
+            .catch(err => res.send({error:"Error getting product by id.    "+err}));
+        }
+        })
+        .catch(err => res.send({error:"Error getting category id. "+err}))
     }
+    })
+    .catch(err => res.send({error:"Error getting store id. "+err}));    
 });
 
 //----------Delete Product----------
 app.delete('/store/:id/category/:categoryId/delete-product/:productId',(req,res) => {
-    //Deleting product
-    product.removeProduct(req.params.productId)
-            .then(deleteProductResult => {
-            //2- Updating the products list inside the category's list 
-            //Removing product ref from the category
-            category.removeProductFromCategory(req.params.categoryId,req.params.productId)
-                .then(updateCategoryResult => {
-                //Updating the warehouse
-                warehouse.removeProductFromWarehouse(req.params.id,req.params.productId)
-                    .then(warehouseResult => {
-                    res.send("Deleted product and updated warehouse and category")
+    store.getStoreById(req.params.id)
+    .then(getStoreResult => {
+    if(getStoreResult == null)
+        res.send({error:"Error! Didn't find a store with that id."});
+    else
+    {
+        //Checking if the category exists by it's ID
+        category.findCategoryById(req.params.categoryId)
+        .then(getCategoryResult => {
+        if(getCategoryResult == null)
+            res.send({error:"Error! Didn't find a category with that id."})
+        else
+        {
+            product.getProductById(req.params.productId)
+            .then(getProductResult => {
+            if(getProductResult == null)
+                res.send({error:"Error! Didn't find a produt with that id."})
+            else
+            {
+                //Deleting product
+                product.removeProduct(req.params.productId)
+                .then(deleteProductResult => {
+                //2- Updating the products list inside the category's list 
+                //Removing product ref from the category
+                category.removeProductFromCategory(req.params.categoryId,req.params.productId)
+                    .then(updateCategoryResult => {
+                    //Updating the warehouse
+                    warehouse.removeProductFromWarehouse(req.params.id,req.params.productId)
+                        .then(warehouseResult => {
+                        res.send("Deleted product and updated warehouse and category")
+                        })
+                        .catch(err => res.send({error:"Error updating warehouse. "+err}));
                     })
-                    .catch(err => res.send({error:"Error updating warehouse. "+err}));
+                    .catch(err => res.send({error:"Error updating category. "+err}));
                 })
-                .catch(err => res.send({error:"Error updating category. "+err}));
+                .catch(err => res.send({error:"Error deleting product. "+err}));
+            }
             })
-            .catch(err => res.send({error:"Error deleting product. "+err}));
+            .catch(err => res.send({error:"Error getting product by id.    "+err}));
+        }
+        })
+        .catch(err => res.send({error:"Error getting category id. "+err}))
+    }
+    })
+    .catch(err => res.send({error:"Error getting store id. "+err}));    
 });
     
 /*
@@ -604,45 +711,108 @@ app.get('/stores',(req,res) => {
 //----------View a Store----------
 app.get('/stores/:storeId',(req,res) => {
     store.getStoreById(req.params.storeId)
-    .then(storesResult => {
-    res.send(storesResult);
+    .then(storeResult => {
+    if(storeResult == null)
+        res.send({error:"Error! Didn't find a store with thats id."});
+    else
+        res.send(storeResult);
     })
     .catch(err => res.send({error:"Error getting the store. "+err}));
 });
 */
 
-/*
+
 //----------View Categories of a store----------
 app.get('/store/:id/categories',(req,res) => {
-    //Getting the categories list from that menu
-    menu.getAllCategories(req.params.id).populate('categories','name , image')
-        .then(categoriesResult => {console.log(categoriesResult); res.send(categoriesResult)})
+    store.getStoreById(req.params.id)
+    .then(storeResult => {
+    if(storeResult == null)
+        res.send({error:"Error! Didn't find a store with thats id."});
+    else
+    {
+        //Getting the categories list from that menu
+        menu.getAllCategories(req.params.id).populate('categories','name , image')
+        .then(categoriesResult => res.send(categoriesResult))
         .catch(err => res.send({error:"Error getting categories of the requested store. "+err}));
+    }
+    })
+    .catch(err => res.send({error:"Error getting the store. "+err}));
+});
+/*
+//----------View a category----------
+app.get('/store/:id/category/:categoryId',(req,res) => {
+    store.getStoreById(req.params.storeId)
+    .then(getStoreResult => {
+    if(getStoreResult == null)
+        res.send({error:"Error! Didn't find a store with thats id."});
+    else
+    {
+        category.findCategoryById(req.params.categoryId).populate('products')
+        .then(categoryResult => {
+        if(categoryResult == null)
+            res.send({error:"Error! Didn't find a category with that id."});
+        else
+            res.send(categoryResult)
+        })
+        .catch(err => res.send({error:"Error getting the requested category. "+err}));
+    }
+    })
+    .catch(err => res.send({error:"Error getting the store. "+err}));
 });
 //----------View products of a category----------
 app.get('/store/:id/category/:categoryId/products',(req,res) => {
-    //Checking if the category exists by it's ID
-    const categoryPromiseResultId = category.findCategoryById(req.params.categoryId);
-    categoryPromiseResultId.then().catch(err => res.send("Error getting category id.    "+err));
-    //Getting the products of that category
-    category.getProductsOfCategory(req.params.categoryId)
-        .then(productsResult => res.send(productsResult))
-        .catch(err => res.send({error:"Error getting products of the requested category. "+err}));
+    store.getStoreById(req.params.storeId)
+    .then(getStoreResult => {
+    if(getStoreResult == null)
+        res.send({error:"Error! Didn't find a store with thats id."});
+    else
+    {
+        category.findCategoryById(req.params.categoryId)
+        .then(getCategoryResult => {
+        if(getCategoryResult == null)
+            res.send({error:"Error! Didn't find a category with that id."});
+        else
+        {
+            //Getting the products of that category
+            category.getProductsOfCategory(req.params.categoryId)
+            .then(productsResult => res.send(productsResult))
+            .catch(err => res.send({error:"Error getting products of the requested category. "+err}));
+        }
+        })
+        .catch({error:"Error getting caetgory id. "+err});
+    }
+    })
+    .catch(err => res.send({error:"Error getting the store. "+err}));
 });
 //----------View a product----------
 app.get('/store/:id/category/:categoryId/products/:productId',(req,res) => {
-    const categoryPromiseResultId = category.findCategoryById(req.params.categoryId);
-    categoryPromiseResultId.then().catch(err => res.send("Error getting category id.    "+err));
-
-    product.getProductById(req.params.productId)
-        .then(productsResult => res.send(productsResult))
-        .catch(err => res.send({error:"Error getting products of the requested category. "+err}));
-});
-//----------View a category----------
-app.get('/store/:id/category/:categoryId',(req,res) => {
-    category.findCategoryById(req.params.categoryId).populate('products')
-        .then(categoryResult => res.send(categoryResult))
-        .catch(err => res.send({error:"Error getting the requested category. "+err}));
+    
+    store.getStoreById(req.params.storeId)
+    .then(getStoreResult => {
+    if(getStoreResult == null)
+        res.send({error:"Error! Didn't find a store with thats id."});
+    else
+    {
+        category.findCategoryById(req.params.categoryId)
+        .then(getCategoryResult => {
+        if(getCategoryResult == null)
+            res.send({error:"Error! Didn't find a category with that id."});
+        else
+        {
+            product.getProductById(req.params.productId)
+            .then(productResult => {
+            if(productResult == null)
+                res.send({error:"Error! Didn't find a product with that id."});
+            else
+                res.send(productResult);
+            })
+            .catch(err => res.send({error:"Error getting products of the requested category. "+err}));
+        }
+        })
+        .catch({error:"Error getting caetgory id. "+err});
+    }
+    })
+    .catch(err => res.send({error:"Error getting the store. "+err}));
 });
 */
 
@@ -681,84 +851,111 @@ app.get('/admin/view-users',(req,res) => {
 
 //----------Accepting waiting user----------
 app.put('/admin/waiting-users/accept/:userId',(req,res) => {
-    user.acceptWaitingUser(req.params.userId)
-    .then(acceptanceResult => {
-        res.redirect('/admin/waiting-users');
+    user.getUserById(req.params.userId)
+    .then(getUserResult => {
+        if(getUserResult == null)
+            res.send({error:"Error! Didn't find a user with that id."});
+        else
+        {
+            user.acceptWaitingUser(req.params.userId)
+            .then(acceptanceResult => {
+            res.redirect('/admin/waiting-users');
+            })
+            .catch(err => res.send({error:"Error accepting the waiting user. "+err}));
+        }
     })
-    .catch(err => res.send({error:"Error accepting the waiting user. "+err}));
+    .catch(err => res.send({error:"Error getting user with that id. "+err}));
 });
 
 //----------Rejecting waiting user----------
 app.delete('/admin/waiting-users/reject/:userId',(req,res) => {
     userId = req.params.userId;
-    user.deleteUser(userId)
-    .then(deletingUserResult => {
-        garageOwner.deleteGarageOwnerByUserId(userId)
-        .then(deletingGarageOwnerResult => {
-            store.getStoresByUserId(userId)
-            .then(storeIds => {
-                menu.deleteMenuByStoreId(storeIds)
-                .then(deleteMenuResult => {
-                    warehouse.deleteWarehouseByStoreId(storeIds)
-                    .then(deleteWarehouseResult => {
-                    store.deleteStoreByUserId(userId)
-                        .then(deletingStoresResult => {
-                        res.redirect('/admin/waiting-users');
+    user.getUserById(userId)
+    .then(getUserResult => {
+        if(getUserResult == null)
+            res.send({error:"Error! Didn't find a user with that id."});
+        else
+        {
+            user.deleteUser(userId)
+            .then(deletingUserResult => {
+            garageOwner.deleteGarageOwnerByUserId(userId)
+                .then(deletingGarageOwnerResult => {
+                store.getStoresByUserId(userId)
+                    .then(storeIds => {
+                    menu.deleteMenuByStoreId(storeIds)
+                        .then(deleteMenuResult => {
+                        warehouse.deleteWarehouseByStoreId(storeIds)
+                            .then(deleteWarehouseResult => {
+                            store.deleteStoreByUserId(userId)
+                                .then(deletingStoresResult => {
+                                res.redirect('/admin/waiting-users');
+                                })
+                                .catch(err => res.send({error:"Error deleting the stores. "+err}));
+                            })
+                            .catch(err => res.send({error:"Error deleting the warehouse. "+err}));
+                        })
+                        .catch(err => res.send({error:"Error deleting the menu. "+err}));
                     })
-                        .catch(err => res.send({error:"Error deleting the stores. "+err}));
-                    })
-                    .catch(err => res.send({error:"Error deleting the warehouse. "+err}));
+                    .catch(err => res.send({error:"Error getting the stores. "+err}));
                 })
-                .catch(err => res.send({error:"Error deleting the menu. "+err}));
+                .catch(err => res.send({error:"Error deleting the garageOwner. "+err}));
             })
-            .catch(err => res.send({error:"Error getting the stores. "+err}));
-        })
-        .catch(err => res.send({error:"Error deleting the garageOwner. "+err}));
+            .catch(err => res.send({error:"Error rejecting the waiting user. "+err}));
+        }
     })
-    .catch(err => res.send({error:"Error rejecting the waiting user. "+err}));
+    .catch(err => res.send({error:"Error getting user with that id. "+err}));
 });
 
 //----------Remove user----------
 app.delete('/admin/view-users/delete/:userId',(req,res) => {
     userId = req.params.userId;
-    
-    user.deleteUser(userId)
-    .then(deletingUserResult => {
-        garageOwner.deleteGarageOwnerByUserId(userId)
-        .then(deletingGarageOwnerResult => {
-            store.getStoresByUserId(userId)
-            .then(storeIds => {
-                menu.deleteMenuByStoreId(storeIds)
-                .then(deleteMenuResult => {
-                    warehouse.deleteWarehouseByStoreId(storeIds)
-                    .then(deleteWarehouseResult => {
-                        category.getAllCategoriesInUserStores(storeIds)
-                        .then(categoryIds => {
-                        category.deleteCategoriesByStoreIds(storeIds)
-                            .then(deletedCategories => {
-                            product.removeProductsOfCategoriesId(categoryIds)
-                                .then(deletedProducts => {
-                                store.deleteStoreByUserId(userId)
-                                    .then(deletingStoresResult => {
-                                    res.send('Removed user');
+   
+    user.getUserById(req.params.userId)
+    .then(getUserResult => {
+        if(getUserResult == null)
+            res.send({error:"Error! Didn't find a user with that id."});
+        else
+        {
+            user.deleteUser(userId)
+            .then(deletingUserResult => {
+            garageOwner.deleteGarageOwnerByUserId(userId)
+                .then(deletingGarageOwnerResult => {
+                store.getStoresByUserId(userId)
+                    .then(storeIds => {
+                    menu.deleteMenuByStoreId(storeIds)
+                        .then(deleteMenuResult => {
+                        warehouse.deleteWarehouseByStoreId(storeIds)
+                            .then(deleteWarehouseResult => {
+                            category.getAllCategoriesInUserStores(storeIds)
+                                .then(categoryIds => {
+                                category.deleteCategoriesByStoreIds(storeIds)
+                                    .then(deletedCategories => {
+                                    product.removeProductsOfCategoriesId(categoryIds)
+                                        .then(deletedProducts => {
+                                        store.deleteStoreByUserId(userId)
+                                            .then(deletingStoresResult => {
+                                            res.send('Removed user');
+                                            })
+                                            .catch(err => res.send({error:"Error deleting the stores. "+err}));
+                                        })
+                                        .catch(err => res.send({error:"Error deleting the products of these categories. "+err}));
                                     })
-                                    .catch(err => res.send({error:"Error deleting the stores. "+err}));
+                                    .catch(err => res.send({error:"Error deleting caegoriesof these stores. "+err}));
                                 })
-                                .catch(err => res.send({error:"Error deleting the products of these categories. "+err}));
+                                .catch(err => res.send({error:"Error getting category ids of these stores. "+err}));    
                             })
-                            .catch(err => res.send({error:"Error deleting caegoriesof these stores. "+err}));
+                            .catch(err => res.send({error:"Error deleting the warehouse. "+err}));
                         })
-                        .catch(err => res.send({error:"Error getting category ids of these stores. "+err}));    
+                        .catch(err => res.send({error:"Error deleting the menu. "+err}));
                     })
-                    .catch(err => res.send({error:"Error deleting the warehouse. "+err}));
+                    .catch(err => res.send({error:"Error getting the stores. "+err}));
                 })
-                .catch(err => res.send({error:"Error deleting the menu. "+err}));
+                .catch(err => res.send({error:"Error deleting the garageOwner. "+err}));
             })
-            .catch(err => res.send({error:"Error getting the stores. "+err}));
-        })
-        .catch(err => res.send({error:"Error deleting the garageOwner. "+err}));
+            .catch(err => res.send({error:"Error rejecting the waiting user. "+err}));
+        }
     })
-    .catch(err => res.send({error:"Error rejecting the waiting user. "+err}));
+    .catch(err => res.send({error:"Error getting user with that id. "+err}));
 });
 */
 
@@ -768,20 +965,35 @@ app.delete('/admin/view-users/delete/:userId',(req,res) => {
 app.post('/store/:id/create-complaint/:submitterId',(req,res) => {
     store.getStoreById(req.params.id)
     .then(storeResult => {
-    message.createMessage(req.params.submitterId,req.body.message)
-    .then(messageResult => {
-        complaint.createComplaint(req.params.submitterId,messageResult,storeResult.userId,req.params.id)
-        .then(complaintResult => {
-        res.send(complaintResult);
-        //res.redirect('/store/'+req.params.id);
+    if(storeResult == null)
+        res.send({error:"Error! Didn't find a store with that id."});
+    else
+    {
+        user.findUserById(req.params.submitterId)
+        .then(getUserResult => {
+            if(getUserResult == null)
+                res.send({error:"Error! Didn't find a user with that is."})
+            else
+            {
+                message.createMessage(req.params.submitterId,req.body.message)
+                .then(messageResult => {
+                complaint.createComplaint(req.params.submitterId,messageResult,storeResult.userId,req.params.id)
+                    .then(complaintResult => {
+                    res.send(complaintResult);
+                    //res.redirect('/store/'+req.params.id);
+                    })
+                    .catch(err => res.send({error:"Error creating the complaint. "+err}));
+                })
+                .catch(err => res.send({error:"Error creating the message. "+err}));
+            }
         })
-        .catch(err => res.send({error:"Error creating the complaint. "+err}));
-    })
-    .catch(err => res.send({error:"Error creating the message. "+err}));
+        .catch(err => res.send({error:"Error getting the user. "+err}));    
+    }
     })
     .catch(err => res.send({error:"Error getting the store. "+err}));
 });
 
+//Authictication of user
 //----------View Complaints----------
 app.get('/view-complaints/:userId',(req,res) => {
     user.getUserById(req.params.userId)
@@ -807,15 +1019,19 @@ app.get('/view-complaints/:userId',(req,res) => {
     })
     .catch(err => res.send({error:"Error getting the user. "+err}));
 });
-
+*/
 //----------View A Complaint----------
 app.get('/view-complaints/complaint/:complaintId',(req,res) => {
     complaint.getComplaint(req.params.complaintId)
     .then(complaintResult => {
-        res.send(complaintResult);
+    if(complaintResult == null)
+        res.status(404).send({error:"Error! Didn't find a complaint with that id."});
+    else
+        res.status(200).send(complaintResult);
     })
-    .catch(err => res.send({error:"Error getting the complaint. "+err}));
+    .catch(err => res.status(404).send({error:"Error getting the complaint. "+err}));
 });
+/*
 */
 
 /*
@@ -997,17 +1213,17 @@ app.put('/user/:userId/manage-user-info',(req, res) => {
         .then(userResult => {
         res.send("Updated user information");
         })
-        .catch(err => res.send("Error with updating User. "+err));
+        .catch(err => res.send({error:"Error with updating User. "+err}));
     }
 });
 */
+
 /*
+MAY NEED PARAMS.ID VALIDATION FOR USERID IF NO ISAUTHINTICATED WAS USED 
 --------------------------------------Garage Owner--------------------------------------
 --------------------------------------Store--------------------------------------
-*/
 //----------View Garage Owner's stores----------
 app.get('/user/:userId/manage-garage-owner/stores',(req, res) => {
-    console.log(req.params.userId);
     store.getFullStoresByUserId(req.params.userId)
     .then(storesResult => {
         res.send(storesResult);
@@ -1044,65 +1260,78 @@ app.post('/user/:userId/manage-garage-owner/add-store',upload.single('image'),(r
                             //res.send(garageOwnerResult.stores).populate('stores').exec();
                             res.redirect(`/user/${userInfo}/manage-garage-owner/stores`);
                         })
-                        .catch(addingError => {
+                        .catch(err => {
                             store.deleteStore(storeResult._id);
                             menu.deleteMenu(menuResult._id);
                             warehouse.deleteWarehouse(warehouseResult._id);
-                            res.send("Error adding store to list: "+addingError);
+                            res.send({error:"Error adding store to list: "+err});
                         });
                     })
-                    .catch(garageOwnerError => {
+                    .catch(err => {
                         store.deleteStore(storeResult._id);
                         menu.deleteMenu(menuResult._id);
                         warehouse.deleteWarehouse(warehouseResult._id);
-                        res.send("Error with getting garageOwner: "+garageOwnerError);
+                        res.send({error:Error with getting garageOwner: "+err});
                     });
                     })  
-                    .catch(storeError =>{
+                    .catch(err =>{
                     menu.deleteMenu(menuResult._id);
                     warehouse.deleteWarehouse(warehouseResult._id);
-                    res.send("Error with creating Store: "+storeError);
+                    res.send({error:"Error with creating Store: "+err});
                     });
                 })
-                .catch( warehouseError =>{
+                .catch( err =>{
                 menu.deleteMenu(menuResult._id);
-                res.send("Error with creating Warehouse: "+warehouseError);
+                res.send({error:Error with creating Warehouse: "+err});
                 });
             })
-            .catch(menuError =>{
-            res.send("Error with creating Menu: "+menuError);
+            .catch(err =>{
+            res.send({error:"Error with creating Menu: "+err});
             });
     }
     
 });
 //----------Update Store----------
 app.put('/user/:userId/manage-garage-owner/update-store/:storeId',upload.single('image'),(req, res) => {
-
-    //const userInfo = req.user;
-    const userInfo = req.params.userId;
-    const body = req.body;    
-    const storeInfo = {_id:req.params.storeId,...body,image:req.file.path};
-
-    const storeValidationResult = store.validateStoreInfo(storeInfo);
-    
-    if(typeof storeValidationResult !== 'undefined')
-        res.send(storeValidationResult.err);
+    store.getStoreById(req.params.storeId)
+    .then(getStoreResult => {
+    if(getStoreResult == null)
+        res.send({error:"Error! Didn't find store with that id."});
     else
     {
-        store.updateStore(storeInfo)
-        .then(storeResult => {
-        res.redirect(`/user/${userInfo}/manage-garage-owner/stores`);
-        })
-        .catch(storeError => res.send("Error with updating Store: "+storeError));
+        //const userInfo = req.user;
+        const userInfo = req.params.userId;
+        const body = req.body;    
+        const storeInfo = {_id:req.params.storeId,...body,image:req.file.path};
+
+        const storeValidationResult = store.validateStoreInfo(storeInfo);
+        
+        if(typeof storeValidationResult !== 'undefined')
+            res.send(storeValidationResult.err);
+        else
+        {
+            store.updateStore(storeInfo)
+            .then(storeResult => {
+            res.redirect(`/user/${userInfo}/manage-garage-owner/stores`);
+            })
+            .catch(storeError => res.send({error:"Error with updating Store: "+storeError}));
+        }
     }
+    })
+    .catch(err => res.send({error:"Error getting store with that id.    "+err}));
 });
-/*
+
 //----------Delete Store----------
 app.delete('/user/:userId/manage-garage-owner/delete-store/:storeId',(req, res) => {
     const userId = req.params.userId;
     const storeId = req.params.storeId;
-
-    menu.deleteMenuByStoreId(storeId)
+    store.getStoreById(storeId)
+    .then(getStoreResult => {
+    if(getStoreResult == null)
+        res.send({error:"Error! Didn't find store with that id."});
+    else
+    {
+        menu.deleteMenuByStoreId(storeId)
         .then(deleteMenuResult => {
         warehouse.deleteWarehouseByStoreId(storeId)
             .then(deleteWarehouseResult => {
@@ -1135,6 +1364,9 @@ app.delete('/user/:userId/manage-garage-owner/delete-store/:storeId',(req, res) 
             .catch(err => res.send({error:"Error deleting the warehouse. "+err}));
         })
         .catch(err => res.send({error:"Error deleting the menu. "+err}));
+    }
+})
+.catch(err => res.send({error:"Error getting store with that id.    "+err}));
 });
 */
 
@@ -1180,47 +1412,65 @@ app.post('/user/:userId/manage-car-owner/add-car',(req, res) => {
             res.send("Error with creating CarOwner: "+err);
             });  
         })
-        .catch(err => res.send("Error with creating car: "+err));
+        .catch(err => res.send({error:"Error with creating car: "+err}));
     }    
 });
 //----------Update Car----------
 app.put('/user/:userId/manage-car-owner/update-car/:carId',(req, res) => {
-
-    //const userInfo = req.user;
-    const userInfo = req.params.userId;
-    carInfo = {_id:req.params.carId,...req.body.car};    
-    console.log(carInfo)
-    const carValidationResult = car.validateCarInfo(carInfo);
-    
-    if(typeof carValidationResult !== 'undefined')
-        res.send(carValidationResult.err);
+    car.getCarById(req.params.carId)
+    .then(getCarResult => {
+    if(getCarResult == null)
+        res.send({error:"Error! Didn't find a car with that id."})
     else
     {
-        car.updateCar(carInfo)
-        .then(carResult => {
-        res.redirect(`/user/${userInfo}/manage-car-owner/cars`);
-        })
-        .catch(err => res.send("Error with updating Car. "+storeError));
+        //const userInfo = req.user;
+        const userInfo = req.params.userId;
+        carInfo = {_id:req.params.carId,...req.body.car};    
+        const carValidationResult = car.validateCarInfo(carInfo);
+
+        if(typeof carValidationResult !== 'undefined')
+            res.send(carValidationResult.err);
+        else
+        {
+            car.updateCar(carInfo)
+            .then(carResult => {
+            res.redirect(`/user/${userInfo}/manage-car-owner/cars`);
+            })
+            .catch(err => res.send({error:"Error with updating Car. "+storeError}));
+        }
     }
+    })
+    .catch(err => res.send({error:"Error with getting car with that id. "+err}));
 });
 //----------Delete Car----------
 app.delete('/user/:userId/manage-car-owner/delete-car/:carId',(req, res) => {
-    const userId = req.params.userId;
     const carId = req.params.carId;
 
-    car.deleteCar(carId)
-    .then(carResult => {
-    carOwner.getCarOwnerByUserId(userId)
-        .then(carOwnerResult => {
-        carOwner.removeCarFromList(carOwnerResult._id,carId)
-            .then(removeResult => {
-            res.redirect(`/user/${userId}/manage-car-owner/cars`);
+    car.getCarById(carId)
+    .then(getCarResult => {
+    if(getCarResult == null)
+        res.send({error:"Error! Didn't find a car with that id."})
+    else
+    {
+        const userId = req.params.userId;
+    
+
+        car.deleteCar(carId)
+        .then(carResult => {
+        carOwner.getCarOwnerByUserId(userId)
+            .then(carOwnerResult => {
+            carOwner.removeCarFromList(carOwnerResult._id,carId)
+                .then(removeResult => {
+                res.redirect(`/user/${userId}/manage-car-owner/cars`);
+                })
+                .catch(err => res.send({error:"Error removing car from the carOwner. "+err}));
             })
-            .catch(err => res.send({error:"Error removing car from the carOwner. "+err}));
+            .catch(err => res.send({error:"Error getting carOwner. "+err}));
         })
-        .catch(err => res.send({error:"Error getting carOwner. "+err}));
+        .catch(err => res.send({error:"Error deleting the car. "+err}));
+    }
     })
-    .catch(err => res.send({error:"Error deleting the car. "+err}));
+    .catch(err => res.send({error:"Error with getting car with that id. "+err}));
 });
 */
 

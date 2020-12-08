@@ -17,7 +17,7 @@ const Store = new schema({
         type: String,
     },
 
-    storeName: {
+    name: {
         type: String,
         required: true,
         trim: true,
@@ -59,8 +59,10 @@ const Store = new schema({
         maxlength: 64
     },
 
-    location: {type: String,required: true,trim: true},
-
+    location: {
+        long: {type:String,required: true,trim: true},
+        lat: {type:String,required: true,trim: true},
+    },
     //menu: Menu,
     menu: {
         type: schema.Types.ObjectId,

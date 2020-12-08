@@ -73,7 +73,7 @@ module.exports = {
 
     findAllStores()
     {
-        const result = StoreModel.find({}).select('storeName , address , image');
+        const result = StoreModel.find({}).select('name , address , image');
         if (result) 
             return result;
         else 

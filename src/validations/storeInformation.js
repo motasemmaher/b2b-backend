@@ -4,7 +4,7 @@ module.exports = {
     
    validateStoreInfo(store)
    {
-       if(!validator.matches(store.storeName,/(^[A-Z a-z \d\s-_']{4,64}$)/))
+       if(!validator.matches(store.name,/(^[A-Z a-z \d\s-_']{4,64}$)/))
            return "invalid store name";
        /*
            Address validations

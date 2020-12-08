@@ -5,10 +5,10 @@ module.exports = {
    validateStoreInfo(store)
    {
        try{
-       console.log("Storename: "+store.storeName);
+       console.log("name: "+store.name);
        console.log("Description: "+store.description);
 
-       if(!validator.matches(store.storeName,/(^[A-Z a-z \d\s-_']{4,64}$)/))
+       if(!validator.matches(store.name,/(^[A-Z a-z \d\s-_']{4,64}$)/))
            return "invalid store name";
        /*
            Address validations

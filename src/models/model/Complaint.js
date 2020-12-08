@@ -32,7 +32,7 @@ module.exports =
         .populate('submitterId','fullName')
         .populate('message','messageBody')
         .populate('garageOwnerId','fullName')
-        .populate('garageId','storeName')
+        .populate('garageId','name')
         .exec();
         if(result)
         return result;
@@ -47,7 +47,7 @@ module.exports =
         .populate('submitterId','fullName')
         .populate('message','messageBody')
         .populate('garageOwnerId','fullName')
-        .populate('garageId','storeName')
+        .populate('garageId','name')
         .exec();
         if(result)
         return result;
