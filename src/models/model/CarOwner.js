@@ -85,4 +85,28 @@ module.exports = {
         else
             return {error: "Error with the getting all CarOwners"};
     }
+    ,
+    addCarToList(value)
+    {
+        const result = CarOwnerModel.findByIdAndUpdate(
+            { _id: value._id },
+            { $push: { cars: value.carInfo } },
+            { "useFindAndModify": false }
+        );
+        if (result)
+            return result;
+        else
+            return { error: "Error with the adding car to cars list" };
+    },
+    removeCarFromList(value)
+    {
+        const result = CarOwnerModel.findByIdAndUpdate({ _id: value._id },
+            { $pull: { cars: value.carId } },
+            { multi: true },
+        );
+        if (result)
+            return result;
+        else
+            return { error: "Error with the removing car from cars list" };
+    }
 };

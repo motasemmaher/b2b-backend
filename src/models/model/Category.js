@@ -9,7 +9,9 @@ module.exports =
 {
 
     createCategory(value) {
-        const result = CategoryModel.create({ name: value.name, image: value.image, storeId: value.storeId });
+        tags = value.tags.split(',');
+        value = {...value,tags:tags};
+        const result = CategoryModel.create(value);
         if (result)
             return result;
         else
@@ -17,9 +19,11 @@ module.exports =
     }
     ,
     updateCategory(value) {
+        tags = value.tags.split(',');
+        value = {...value,tags:tags};
         const result = CategoryModel.findOneAndUpdate(
             { _id: value._id },
-            { name: value.name, image: value.image },
+            value,
             { "useFindAndModify": false }
         );
         if (result)
@@ -64,10 +68,8 @@ module.exports =
             return { error: "Error with the adding product to the Category" };
     },
     removeProductFromCategory(value) {
-        console.log("pid: " + value.productId)
-        console.log("cid: " + value.categoryId)
-
-        const result = CategoryModel.update({ _id: value.categoryId },
+        //const result = CategoryModel.update({ _id: value.categoryId },
+        const result = CategoryModel.findOneAndUpdate({ _id: value.categoryId },
             { $pull: { products: value.productId } },
             { multi: true },
         );

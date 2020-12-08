@@ -4,6 +4,8 @@ const StoreModel= mongoose.model('Store', StoreSchema);
 
 module.exports = {
     createStore(value) {
+        tags = value.tags.split(',');
+        value = {...value,tags:tags};
         const result = StoreModel.create(value);
 
         if (result) {
@@ -29,9 +31,13 @@ module.exports = {
     },
 
     updateStore(value) {
-        const result = StoreModel.findByIdAndUpdate({
-            _id: value._id
-        }, Store);
+        tags = value.tags.split(',');
+        value = {...value,tags:tags};
+        const result = StoreModel.findByIdAndUpdate(
+            {_id: value._id},
+            value,
+            {"useFindAndModify":false}
+            );
 
         if (result) {
             return result;
@@ -45,7 +51,7 @@ module.exports = {
     deleteStore(value) {
         const result = StoreModel.findOneAndDelete({
             _id: value._id
-        });
+        }).then().catch();
 
         if (result) {
             return result;
@@ -93,9 +99,9 @@ module.exports = {
             return {error: "Error with the getting Store"};
     },
 
-    getStoreByUserId(value)
+    findStoreByUserId(value)
     {
-        const result = StoreModel.findBy({userId: value.userId});
+        const result = StoreModel.find({userId: value.userId});
         if (result)
             return result;
         else

@@ -15,9 +15,11 @@ module.exports = {
     },
 
     updateUser(value) {
-        const result = UserModel.findByIdAndUpdate({
-            _id: value._id
-        }, user);
+        const result = UserModel.findByIdAndUpdate(
+            {_id: value._id},
+            value,
+            { "useFindAndModify": false }
+            );
 
         if (result) {
             return result;
@@ -31,7 +33,7 @@ module.exports = {
     deleteUser(value) {
         const result = UserModel.findOneAndDelete({
             _id: value._id
-        });
+        }).then().catch();
 
         if (result) {
             return result;

@@ -23,7 +23,7 @@ module.exports =
                                     {_id:value._id},
                                     {storeId:value.storeId},
                                     {"useFindAndModify":false}
-                                );
+                                ).then().catch();
         if(result)
             return result;
         else
@@ -45,7 +45,7 @@ module.exports =
     ,
     deleteMenu(value)
     {
-        const result = MenuModel.findOneAndDelete({_id:value._id}).then(()=> console.log("Deleted menu")).catch(()=>console.log("Error with deleting menu"));
+        const result = MenuModel.findOneAndDelete({_id:value._id}).then().catch();
         if(result)
             return result;
         else

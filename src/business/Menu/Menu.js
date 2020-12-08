@@ -7,9 +7,26 @@ module.exports = class Menu{
 
     }
 
+    createMenu()
+    {
+        const promiseResult = MenuModel.createMenu();
+        return promiseResult;
+    }
+
+    deleteMenu(menuId)
+    {
+        const promiseResult = MenuModel.deleteMenu({_id:menuId});
+        return promiseResult;
+    }
+
+    linkMenu(info)
+    {
+        const promiseResult = MenuModel.linkMenu(info);
+        return promiseResult;
+    }
+
     addCategory(storeId,category)
     {
-        console.log("INSIDE ADD CATEGORY")
         const promiseResult = MenuModel.addCategory({storeId:storeId,category:category});
         return promiseResult;
     }

@@ -16,7 +16,8 @@ const Product = new schema({
     offer: {
         type: schema.Types.ObjectId,
         ref: 'Offer'
-    }
+    },
+    tags : [{type:String,required:true}]
 })
 
 module.exports = Product;

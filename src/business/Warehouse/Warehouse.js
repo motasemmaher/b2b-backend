@@ -7,6 +7,24 @@ module.exports = class Warehouse{
 
      }
 
+    createWarehouse()
+    {
+        const promiseResult = WarehouseModel.createWarehouse();
+        return promiseResult;
+    }
+
+    deleteWarehouse(warehouseId)
+    {
+        const promiseResult = WarehouseModel.deleteWarehouse({_id:warehouseId});
+        return promiseResult;
+    }
+
+    linkWarehouse(info)
+    {
+        const promiseResult = WarehouseModel.linkWarehouse(info);
+        return promiseResult;
+    }
+
     validateWarehouseInfo(warehouseInfo)
     {
         const validationResult = WarehouseValidation.validateWarehouseInfo(warehouseInfo);
