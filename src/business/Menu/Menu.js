@@ -3,9 +3,7 @@ const MenuModel = require('../../models/model/Menu');
 
 module.exports = class Menu{
 
-    constructor(){
-
-    }
+    constructor() {}
 
     createMenu()
     {

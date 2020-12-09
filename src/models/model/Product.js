@@ -122,6 +122,16 @@ module.exports =
             return {error:"Error with removing an offer to the product"};
     }
     ,
+    findProductsWithOffers(value)
+    {
+        const result = ProductModel.find({ categoryId:value.categoryId,offer: { $ne: null } }).populate("offer");
+        
+        if(result)
+            return result;
+        else
+            return {error:"Error with getting products with offers"};
+    }
+    ,
     expiredOffers()
     {
         today = addDays(0);

@@ -29,8 +29,8 @@ const Store = new schema({
         type: String,
         required: true,
         trim: true,
-        minLength: 4,
-        maxlength: 64
+        minLength: 5,
+        maxlength: 8
     },
 
     image: {type: String},
@@ -40,23 +40,23 @@ const Store = new schema({
         required: true,
         trim: true,
         minLength: 8,
-        maxlength: 1000 
+        maxlength: 512 
     },
 
-    opentime: {
+    openTime: {
         type: String,
         required: true,
         trim: true,
-        minLength: 8,
-        maxlength: 64
+        minLength: 7,
+        maxlength: 8
     },
 
-    closetime: {
+    closeTime: {
         type: String,
         required: true,
         trim: true,
-        minLength: 8,
-        maxlength: 64
+        minLength: 7,
+        maxlength: 8
     },
 
     location: {

@@ -1,9 +1,22 @@
 const OfferModel = require('../../models/model/Offer');
-
+const OfferValidation = require('./validate');
 module.exports = class Offer{ 
     
     constructor ()
     {}
+
+    validateOfferInfo(offer)
+    {
+        console.log("Inside offer");
+        console.log("discount: "+offer.discountRate);
+        console.log("duration: "+offer.duration);
+        console.log("new price: "+offer.newPrice);
+        //console.log("exiration: "+offer.expirationDate);
+
+        const validationResult = OfferValidation.validateOfferInfo(offer);
+        if(validationResult !== "pass")
+            return {err:"Error: "+validationResult};
+    }
 
     createOffer(discountRate,duration,newPrice)
     {

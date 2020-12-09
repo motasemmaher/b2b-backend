@@ -4,10 +4,7 @@ const CategoryValidation = require('./validate');
 
 module.exports = class Category{
 
-    constructor(categoryInfo)
-    {
-     
-    }
+    constructor() {}
     
     validateCategoryInfo(categoryInfo)
     {

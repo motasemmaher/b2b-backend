@@ -36,9 +36,9 @@ module.exports =  class Store {
         return promiseResult;
     }
 
-    getAllStores()
+    getAllStores(limit,skip)
     {
-        const promiseResult = StoreModel.findAllStores();
+        const promiseResult = StoreModel.findFullStores(limit,skip);
         return promiseResult;
     }
 

@@ -3,11 +3,16 @@ const WarehouseValidation = require('./validate');
 
 module.exports = class Warehouse{
 
-    constructor(){
+    constructor() {}
 
-     }
+    validateWarehouseInfo(warehouseInfo)
+    {
+        const validationResult = WarehouseValidation.validateWarehouseInfo(warehouseInfo);
+        if(validationResult !== "pass")
+            return {err:"Error: "+validationResult};
+    }
 
-    createWarehouse()
+     createWarehouse()
     {
         const promiseResult = WarehouseModel.createWarehouse();
         return promiseResult;
@@ -23,13 +28,6 @@ module.exports = class Warehouse{
     {
         const promiseResult = WarehouseModel.linkWarehouse(info);
         return promiseResult;
-    }
-
-    validateWarehouseInfo(warehouseInfo)
-    {
-        const validationResult = WarehouseValidation.validateWarehouseInfo(warehouseInfo);
-        if(validationResult !== "pass")
-            return {err:"Error: "+validationResult};
     }
 
     addProduct(storeId,productId,categoryId,amount)

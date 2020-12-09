@@ -1005,7 +1005,7 @@ app.post('/user/:userId/garage-owner/add-store',upload.single('image'),(req, res
     const userInfo = req.params.userId;
 
     const storeInfo = {name:req.body.name,address:req.body.address,description:req.body.description,
-                       opentime:req.body.opentime,closetime:req.body.closetime,location:req.body.location,
+                       openTime:req.body.openTime,closeTime:req.body.closeTime,location:req.body.location,
                        image:req.file.path,userId:userInfo};
     console.log(storeInfo)
     const storeValidationResult = store.validateStoreInfo(storeInfo);

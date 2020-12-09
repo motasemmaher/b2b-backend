@@ -3,17 +3,7 @@ const ProductValidation = require('./validate');
 
 module.exports = class Product{ 
 
-    /*
-    constructor ()
-    {
-        const promiseResult = ProductModel.createProduct(productInfo);
-        promiseResult.then(result => console.log("Created Product \n"+result));
-    }
-    */
-
-    
-    constructor (productInfo)
-    {}
+    constructor () {}
 
     validateProductInfo(productInfo)
     {
@@ -74,6 +64,12 @@ module.exports = class Product{
     removeOffer(offerId)
     {
         const promiseResult = ProductModel.removeOffer({offerId:offerId});
+        return promiseResult;
+    }
+
+    getProductsWithOffers(categoryId)
+    {
+        const promiseResult = ProductModel.findProductsWithOffers({categoryId:categoryId});
         return promiseResult;
     }
 

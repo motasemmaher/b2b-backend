@@ -44,7 +44,9 @@ const User = new schema({
 
     address: {
         type: String,
-        require: true
+        require: true,
+        minlength: 5,
+        maxlength: 8
     },
 
     role: {

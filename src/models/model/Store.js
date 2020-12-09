@@ -71,9 +71,9 @@ module.exports = {
             return {error: "Error with the delete Stores by userId"};
     },
 
-    findAllStores()
+    findFullStores(limit,skip)
     {
-        const result = StoreModel.find({}).select('name , address , image');
+        const result = StoreModel.find({}).select('name , address , image').skip(skip).limit(limit)//.pretty();
         if (result) 
             return result;
         else 

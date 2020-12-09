@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const schema = mongoose.Schema;
 
 const Product = new schema({
-    name: {type: String,required: true},
+    name: {type: String,required: true,minlength: 4,maxlength: 64},
     price: {type: Number,required: true},
     image: {type: String,required: true},
     categoryId: {
@@ -12,7 +12,7 @@ const Product = new schema({
         ref: 'Category'
     },
     productType: {type: String,required: true, enum: ["Part", "Accessory", "Service"]},
-    description: {type: String,required: true},
+    description: {type: String,required: true,minlength: 8,maxlength: 258},
     offer: {
         type: schema.Types.ObjectId,
         ref: 'Offer'

@@ -239,8 +239,8 @@ app.post('/user/garage-owner/create',upload.single('image'),(req, res) => {
         hashedPassword = hashPassword(userInfo.password);
         userInfo = {...userInfo,password:hashedPassword,role:"waitingUser"};
         
-        user.createUser(userInfo)
-        .then(userResult => {
+        user.cateUser(userInfo)
+        .then(usererResult => {
         menu.createMenu()
             .then(menuResult =>{
             warehouse.createWarehouse()
@@ -289,6 +289,7 @@ app.post('/user/car-owner/create', (req, res) => {
     
     userInfo = req.body.user;
     const carInfo = req.body.car;
+
     const userValidationResult = user.validateUserInfo(userInfo);
     const carValidationResult = car.validateCarInfo(carInfo);
     
@@ -378,8 +379,7 @@ app.post('/store/:id/create-category',upload.single('image'),(req,res) => {
 });
 
 //----------Update Category----------
-app.put('/store/:id/update-category/:categoryId',upload.single('image'),(req,res) => {
-    
+app.put('/store/:id/update-category/:categoryId',upload.single('image'),(req,res) => {  
     store.getStoreById(req.params.id)
     .then(getStoreResult => {
     if(getStoreResult == null)
@@ -698,10 +698,17 @@ app.delete('/store/:id/category/:categoryId/delete-product/:productId',(req,res)
     .catch(err => res.send({error:"Error getting store id. "+err}));    
 });
     
-/*
+
 //----------View Stores----------
 app.get('/stores',(req,res) => {
-    store.getAllStores()
+    let limit = parseInt(req.query.limit);
+    let skip = parseInt(req.query.skip);
+    if(limit == null || skip == null){
+        limit = 30;
+        skip = 0;
+    }
+    console.log("limit: "+limit+" skip: "+skip)
+    store.getAllStores(limit,skip)
     .then(storesResult => {
     res.send(storesResult);
     })
@@ -719,8 +726,6 @@ app.get('/stores/:storeId',(req,res) => {
     })
     .catch(err => res.send({error:"Error getting the store. "+err}));
 });
-*/
-
 
 //----------View Categories of a store----------
 app.get('/store/:id/categories',(req,res) => {
@@ -738,7 +743,6 @@ app.get('/store/:id/categories',(req,res) => {
     })
     .catch(err => res.send({error:"Error getting the store. "+err}));
 });
-/*
 //----------View a category----------
 app.get('/store/:id/category/:categoryId',(req,res) => {
     store.getStoreById(req.params.storeId)
@@ -759,6 +763,65 @@ app.get('/store/:id/category/:categoryId',(req,res) => {
     })
     .catch(err => res.send({error:"Error getting the store. "+err}));
 });
+
+//----------View products store----------
+app.get('/store/:id/products',(req,res) => {
+    store.getStoreById(req.params.id)
+    .then(getStoreResult => {
+    if(getStoreResult == null)
+        res.send({error:"Error! Didn't find a store with thats id."});
+    else
+    {
+        let allProducts = [];
+        menu.getAllCategories(req.params.id)
+        .then(categoriesResult => {
+            categoriesArray = categoriesResult.categories;
+            categoriesArray.forEach((categoryId,index,categoriesArray) => {
+            category.getProductsOfCategory(categoryId)
+            .then(productsResult => {
+            allProducts = allProducts.concat(productsResult);
+            if(index === categoriesArray.length - 1)
+                res.send(allProducts);
+            })
+            .catch(err => res.send({error:"Error getting products of the category. "+err}));
+        });
+        })
+        .catch(err => res.send({error:"Error getting categories of the menu. "+err}));
+    }
+    })
+    .catch(err => res.send({error:"Error getting the store. "+err}));
+});
+
+//----------View products with offers of a store----------
+app.get('/store/:id/offers',(req,res) => {
+    store.getStoreById(req.params.id)
+    .then(getStoreResult => {
+    if(getStoreResult == null)
+        res.send({error:"Error! Didn't find a store with thats id."});
+    else
+    {
+        let allOffers = [];
+        menu.getAllCategories(req.params.id)
+        .then(categoriesResult => {
+            categoriesArray = categoriesResult.categories;
+            categoriesArray.forEach((categoryId,index,categoriesArray) => {
+            product.getProductsWithOffers(categoryId)
+            .then(productsResult => {
+            console.log("productsResult: "+productsResult);
+            allOffers = allOffers.concat(productsResult);
+            console.log("all offers: "+allOffers);
+            if(index === categoriesArray.length - 1)
+                res.send(allOffers);
+            })
+            .catch(err => res.send({error:"Error getting products with offers. "+err}));
+        });
+        })
+        .catch(err => res.send({error:"Error getting categories of the menu. "+err}));
+    }
+    })
+    .catch(err => res.send({error:"Error getting the store. "+err}));
+});
+
 //----------View products of a category----------
 app.get('/store/:id/category/:categoryId/products',(req,res) => {
     store.getStoreById(req.params.storeId)
@@ -814,7 +877,6 @@ app.get('/store/:id/category/:categoryId/products/:productId',(req,res) => {
     })
     .catch(err => res.send({error:"Error getting the store. "+err}));
 });
-*/
 
 /*
 --------------------------------------User--------------------------------------
@@ -866,7 +928,9 @@ app.put('/admin/waiting-users/accept/:userId',(req,res) => {
     })
     .catch(err => res.send({error:"Error getting user with that id. "+err}));
 });
+*/
 
+/*
 //----------Rejecting waiting user----------
 app.delete('/admin/waiting-users/reject/:userId',(req,res) => {
     userId = req.params.userId;
@@ -888,10 +952,25 @@ app.delete('/admin/waiting-users/reject/:userId',(req,res) => {
                             .then(deleteWarehouseResult => {
                             store.deleteStoreByUserId(userId)
                                 .then(deletingStoresResult => {
-                                res.redirect('/admin/waiting-users');
+                                var mailOptions = {
+                                    from: 'b2b.report.generator@gmail.com',
+                                    to: deletingUserResult.email,
+                                    subject: `Regestration rejection`,
+                                    text: `Hello ${deletingUserResult.fullName},we are sadly to inform you that your request to create a garageowner 
+                                    account on b2b was rejected.`,
+                                };
+                                transporter.sendMail(mailOptions, function(error, info){
+                                if (error)
+                                    console.log(error);
+                                else
+                                {
+                                    console.log('Email sent: ' + info.response); 
+                                    res.redirect('/admin/waiting-users');
+                                }    
+                                });  
                                 })
                                 .catch(err => res.send({error:"Error deleting the stores. "+err}));
-                            })
+                            })    
                             .catch(err => res.send({error:"Error deleting the warehouse. "+err}));
                         })
                         .catch(err => res.send({error:"Error deleting the menu. "+err}));
@@ -934,7 +1013,22 @@ app.delete('/admin/view-users/delete/:userId',(req,res) => {
                                         .then(deletedProducts => {
                                         store.deleteStoreByUserId(userId)
                                             .then(deletingStoresResult => {
-                                            res.send('Removed user');
+                                            var mailOptions = {
+                                                from: 'b2b.report.generator@gmail.com',
+                                                to: deletingUserResult.email,
+                                                subject: `Regestration rejection`,
+                                                text: `Hello ${deletingUserResult.fullName},we are sadly to inform you that we have decided to delete your account
+                                                as a garageOwner due to violation on b2b police.`,
+                                            };
+                                            transporter.sendMail(mailOptions, function(error, info){
+                                            if (error)
+                                                console.log(error);
+                                            else
+                                            {
+                                                console.log('Email sent: ' + info.response); 
+                                                res.send('Removed user');
+                                            }    
+                                            });  
                                             })
                                             .catch(err => res.send({error:"Error deleting the stores. "+err}));
                                         })
@@ -957,6 +1051,7 @@ app.delete('/admin/view-users/delete/:userId',(req,res) => {
     })
     .catch(err => res.send({error:"Error getting user with that id. "+err}));
 });
+/*
 */
 
 /*
@@ -975,16 +1070,23 @@ app.post('/store/:id/create-complaint/:submitterId',(req,res) => {
                 res.send({error:"Error! Didn't find a user with that is."})
             else
             {
-                message.createMessage(req.params.submitterId,req.body.message)
-                .then(messageResult => {
-                complaint.createComplaint(req.params.submitterId,messageResult,storeResult.userId,req.params.id)
-                    .then(complaintResult => {
-                    res.send(complaintResult);
-                    //res.redirect('/store/'+req.params.id);
-                    })
+                messageBody = req.body.message;
+                const messageValidationResult = message.validateMessageInfo(messageBody);
+                if(typeof messageValidationResult !== 'undefined')
+                    res.send(messageValidationResult.err);
+                else
+                {
+                    message.createMessage(req.params.submitterId,messageBody)
+                    .then(messageResult => {
+                    complaint.createComplaint(req.params.submitterId,messageResult,storeResult.userId,req.params.id)
+                        .then(complaintResult => {
+                        res.send(complaintResult);
+                        //res.redirect('/store/'+req.params.id);
+                        })
                     .catch(err => res.send({error:"Error creating the complaint. "+err}));
-                })
-                .catch(err => res.send({error:"Error creating the message. "+err}));
+                    })
+                    .catch(err => res.send({error:"Error creating the message. "+err}));
+                }
             }
         })
         .catch(err => res.send({error:"Error getting the user. "+err}));    
@@ -1020,6 +1122,7 @@ app.get('/view-complaints/:userId',(req,res) => {
     .catch(err => res.send({error:"Error getting the user. "+err}));
 });
 */
+
 //----------View A Complaint----------
 app.get('/view-complaints/complaint/:complaintId',(req,res) => {
     complaint.getComplaint(req.params.complaintId)
@@ -1158,28 +1261,37 @@ const checkOffers = schedule.scheduleJob('0 * * * *', () => {
     })
     .catch(err => console.log("Error with getting expired offers. "+err));
 });
-
+*/
 //----------add Offer----------
 app.post('/store/:id/offers/add-offer',(req,res) => {
     productOffers = req.body.productOffers;
     productOffers.forEach(productOffer =>{
+
         newPrice = productOffer['price'] - (productOffer['price']*(productOffer['discountRate']/100));
-        offer.createOffer(productOffer['discountRate'],productOffer['duration'],newPrice)
-        .then(offerResult => {
+        const offerValidationResult = offer.validateOfferInfo({discountRate:productOffer['discountRate'],
+                                                               duration:productOffer['duration'],
+                                                               newPrice:newPrice});
+        if(typeof offerValidationResult !== 'undefined')
+            res.send(offerValidationResult.err);
+        else
+        {
+            
+            offer.createOffer(productOffer['discountRate'],productOffer['duration'],newPrice)
+            .then(offerResult => {
             product.addOffer(productOffer['productId'],offerResult)
-            .then(productResult => {
+                .then(productResult => {
                 res.send("Added offer successfuly");
-            })
-            .catch(err => 
-                {
-                    res.send({error:"Error with adding offer to product. "+err});
-                    offer.deleteOffer(offerResult._id);
+                })
+                .catch(err => {
+                res.send({error:"Error with adding offer to product. "+err});
+                offer.deleteOffer(offerResult._id);
                 });
-        })
-        .catch(err => res.send({error:"Error with creating offer. "+err}));
+            })
+            .catch(err => res.send({error:"Error with creating offer. "+err}));
+        }
     });    
 });
-
+/*
 //----------delete Offer----------
 app.delete('/store/:id/offers/delete-offer/:offerId',(req,res) => {
     product.removeOffer(req.params.offerId)
