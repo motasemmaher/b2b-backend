@@ -6,6 +6,18 @@ const ComplaintModel = mongoose.model('Complaint', ComplaintSchema);
 module.exports = 
 {
 
+    countAllComplaints()
+    {
+        const count = ComplaintModel.countDocuments({});
+        return count;
+    }
+    ,
+    countByGarageOwner(value)
+    {
+        const count = ComplaintModel.countDocuments({ garageOwnerId: value.garageOwnerId });
+        return count;
+    }
+    ,
     createComplaint(value)
     {
         const result = ComplaintModel.create({submitterId:value.submitterId,message:value.message,garageOwnerId:value.garageOwnerId,garageId:value.storeId});
@@ -27,10 +39,9 @@ module.exports =
     ,
     findGarageOwnerComplaints(value)
     {
-        //const result = ComplaintModel.find({garageOwnerId:value.garageOwnerId}).populate('submitterId').populate('message').populate('garageId').exec();;
-        const result = ComplaintModel.find({garageOwnerId:value.garageOwnerId})
+        const result = ComplaintModel.find({garageOwnerId:value.garageOwnerId}).skip(value.skip).limit(value.limit)
         .populate('submitterId','fullName')
-        .populate('message','messageBody')
+        .populate('message','data')
         .populate('garageOwnerId','fullName')
         .populate('garageId','name')
         .exec();
@@ -40,12 +51,11 @@ module.exports =
         return {error:"Error with finding the garageOwner's complaints"};  
     }
     ,
-    findAllComplaints()
+    findAllComplaints(value)
     {
-        //const result = ComplaintModel.find({}).populate('submitterId').populate('message').populate('garageOwnerId').populate('garageId').exec();
-        const result = ComplaintModel.find({}).lean()
+        const result = ComplaintModel.find({}).skip(value.skip).limit(value.limit)
         .populate('submitterId','fullName')
-        .populate('message','messageBody')
+        .populate('message','data')
         .populate('garageOwnerId','fullName')
         .populate('garageId','name')
         .exec();

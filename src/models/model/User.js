@@ -3,6 +3,26 @@ const UserSchema = require("../schema/User");
 const UserModel = mongoose.model('User', UserSchema);
 
 module.exports = {
+
+    exists(value)
+    {
+        const result = UserModel.findById({_id: value.userId},{id:1});
+        if (result)
+            return result;
+        else
+            return {error: "Error with the getting User"};
+    },
+
+    countByRole(value){
+        const count = UserModel.countDocuments({ role: value.role });
+        return count;
+    },
+
+    countAll(){
+        const count = UserModel.countDocuments({role: {$in: ['carOwner', 'garageOwner']}});
+        return count;
+    },
+
     createUser(value) {
         const result = UserModel.create(value);
         if (result) {

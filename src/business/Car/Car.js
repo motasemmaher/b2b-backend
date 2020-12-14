@@ -11,6 +11,18 @@ module.exports =  class Car {
             return {err:"Error: "+validationResult};
     }
 
+    exists(carId)
+    {
+        const promiseResult = CarModel.exists({carId:carId});
+        return promiseResult;
+    }
+
+    getCar(carId)
+    {
+        const promiseResult = CarModel.findCar({_id:carId});
+        return promiseResult;
+    }
+
     createCar(carInfo)
     {
         const promiseResult = CarModel.createCar(carInfo);

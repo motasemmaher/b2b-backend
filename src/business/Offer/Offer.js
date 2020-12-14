@@ -18,6 +18,12 @@ module.exports = class Offer{
             return {err:"Error: "+validationResult};
     }
 
+    exists(offerId)
+    {
+        const promiseResult = OfferModel.exists({offerId:offerId});
+        return promiseResult;
+    }
+
     createOffer(discountRate,duration,newPrice)
     {
         const promiseResult = OfferModel.createOffer({discountRate:discountRate,duration:duration,newPrice:newPrice});

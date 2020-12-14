@@ -15,9 +15,9 @@ module.exports =  class CarOwner {
         return promiseResult;
     }
 
-    getAllCarOwners()
+    getAllCarOwners(limit,skip)
     {
-        const promiseResult = CarOwnerModel.findAllCarOwners();
+        const promiseResult = CarOwnerModel.findAllCarOwners({limit:limit,skip:skip});
         return promiseResult;
     }
 

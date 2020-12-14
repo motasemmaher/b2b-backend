@@ -5,10 +5,9 @@ const schema = mongoose.Schema;
 
 const Category = new schema({
     name: {type: String,required: true,minlength: 2,maxlength: 64},
-    image: {type: String,required: true},
     storeId: {
         type: schema.Types.ObjectId,
-        ref: 'Product',
+        ref: 'Store',
         required: true
     },
     products: [{

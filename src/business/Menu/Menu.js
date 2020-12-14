@@ -35,7 +35,7 @@ module.exports = class Menu{
         return promiseResult;
     }
 
-    getAllCategories(storeId)
+    getAllCategories(storeId,limit,skip)
     {
         const promiseResult = MenuModel.getCategoriesOfMenu({storeId:storeId});
         return promiseResult;

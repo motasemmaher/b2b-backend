@@ -60,9 +60,14 @@ const Store = new schema({
     },
 
     location: {
-        long: {type:String,required: true,trim: true},
-        lat: {type:String,required: true,trim: true},
+        type:String,
+        required:true
     },
+    /*location: {
+        long: {type:String,required: true,trim: true},
+        lat: {type:String,required: true,trim: strue},
+    },
+    */
     //menu: Menu,
     menu: {
         type: schema.Types.ObjectId,

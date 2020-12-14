@@ -3,6 +3,24 @@ const UserValidation = require('./validate');
 module.exports =  class User {
     constructor() {}
 
+    exists(userId)
+    {
+        const promiseResult = UserModel.exists({userId:userId});
+        return promiseResult;
+    }
+
+    countByRole(role)
+    {
+        const promiseResult = UserModel.countByRole({role:role});
+        return promiseResult;
+    }
+
+    countAll()
+    {
+        const promiseResult = UserModel.countAll();
+        return promiseResult;
+    }
+
     validateUserInfo(userInfo)
     {
         const validationResult = UserValidation.validateUserInfo(userInfo);

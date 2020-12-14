@@ -2,12 +2,20 @@ const mongoose = require('mongoose')
 const CategorySchema = require("../schema/Category");
 ProductModel = require('../model/Product');
 
-CategoryModel = mongoose.model('Category', CategorySchema);
+const CategoryModel = mongoose.model('Category', CategorySchema);
 
 
 module.exports =
 {
-
+    exists(value)
+    {
+        const result = CategoryModel.findById({_id: value.categoryId},{id:1});
+        if (result)
+            return result;
+        else
+            return { error: "Error with the getting Category by id" };
+    }
+    ,
     createCategory(value) {
         tags = value.tags.split(',');
         value = {...value,tags:tags};

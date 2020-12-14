@@ -11,6 +11,24 @@ module.exports =  class Store {
             return {err:"Error: "+validationResult};
     }
 
+    exists(storeId)
+    {
+        const promiseResult = StoreModel.exists({storeId:storeId});
+        return promiseResult;
+    }
+
+    countAll()
+    {
+        const promiseResult = StoreModel.countAll();
+        return promiseResult;
+    }
+
+    countByGarageOwner(userId)
+    {
+        const promiseResult = StoreModel.countByGarageOwner({userId:userId});
+        return promiseResult;
+    }
+
     createStore(storeInfo)
     {
         const promiseResult = StoreModel.createStore(storeInfo);
@@ -48,9 +66,9 @@ module.exports =  class Store {
         return promiseResult;
     }
 
-    getFullStoresByUserId(userId)
+    getFullStoresByUserId(userId,limit,skip)
     {
-        const promiseResult = StoreModel.findStoreByUserId({userId:userId});
+        const promiseResult = StoreModel.findStoresByUserId({userId:userId,limit:limit,skip:skip});
         return promiseResult;
     }
 

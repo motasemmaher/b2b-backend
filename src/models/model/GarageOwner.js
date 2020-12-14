@@ -77,7 +77,7 @@ module.exports = {
     }
     ,
     findAllGarageOwners(value) {
-        const result = GarageOwnerModel.find({user : {$in:value.ids}}).populate('user').populate('stores').exec();
+        const result = GarageOwnerModel.find({user : {$in:value.ids}}).skip(value.skip).limit(value.limit).populate('user').populate('stores').exec();
         if (result)
             return result;
         else
@@ -85,7 +85,7 @@ module.exports = {
     }
     ,
     findWaitingUsers(value) {
-        const result = GarageOwnerModel.find({user : {$in:value.ids}}).populate('user').populate('stores').exec();
+        const result = GarageOwnerModel.find({user : {$in:value.ids}}).skip(value.skip).limit(value.limit).populate('user').populate('stores').exec();
         if (result)
             return result;
         else

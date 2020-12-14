@@ -78,8 +78,8 @@ module.exports = {
             };
     }
     ,
-    findAllCarOwners() {
-        const result = CarOwnerModel.find({}).populate('user').populate('cars').exec();
+    findAllCarOwners(value) {
+        const result = CarOwnerModel.find({}).skip(value.skip).limit(value.limit).populate('user').populate('cars').exec();
         if (result)
             return result;
         else

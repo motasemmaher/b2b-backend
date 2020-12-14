@@ -6,7 +6,7 @@ const User = new schema({
 
     fullName: {
         type: String,
-        minLength: 8,
+        minLength: 3,
         maxlength: 64,
         required: true,
         trim: true

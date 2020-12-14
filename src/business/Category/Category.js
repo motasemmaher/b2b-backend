@@ -5,6 +5,12 @@ const CategoryValidation = require('./validate');
 module.exports = class Category{
 
     constructor() {}
+
+    exists(categoryId)
+    {
+        const promiseResult = CategoryModel.exists({categoryId:categoryId});
+        return promiseResult;
+    }
     
     validateCategoryInfo(categoryInfo)
     {
@@ -19,9 +25,9 @@ module.exports = class Category{
         return promiseResult;
     }
 
-    getProductsOfCategory(categoryId)
+    getProductsOfCategory(categoryId,limit,skip,nameSort,priceSort)
     {
-        const promiseResult = ProductModel.getAllProducts({categoryId:categoryId});
+        const promiseResult = ProductModel.findProductsOfCategory({categoryId:categoryId,skip:skip,limit:limit,nameSort:nameSort,priceSort:priceSort});
         return promiseResult;
     }
 

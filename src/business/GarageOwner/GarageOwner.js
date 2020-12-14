@@ -10,9 +10,9 @@ module.exports =  class GarageOwner {
         return promiseResult;
     }
 
-    getWaitingUsers(ids)
+    getWaitingUsers(ids,limit,skip)
     {
-        const promiseResult = GarageOwnerModel.findWaitingUsers({ids:ids});
+        const promiseResult = GarageOwnerModel.findWaitingUsers({ids:ids,limit:limit,skip:skip});
         return promiseResult;
     }
 
@@ -33,9 +33,9 @@ module.exports =  class GarageOwner {
         return promiseResult;
     }
 
-    getAllGarageOwners(ids)
+    getAllGarageOwners(ids,limit,skip)
     {
-        const promiseResult = GarageOwnerModel.findAllGarageOwners({ids:ids});
+        const promiseResult = GarageOwnerModel.findAllGarageOwners({ids:ids,limit:limit,skip:skip});
         return promiseResult;
     }
     

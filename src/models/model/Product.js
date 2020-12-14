@@ -14,6 +14,15 @@ addDays = function(days)
 
 module.exports =
 {
+    exists(value)
+    {
+        const result = ProductModel.find({_id:value.productId},{id:1});
+        if(result)
+            return result;
+        else
+            return {error:"Error with the getting the  Product by uid."};
+    },
+
     createProduct(value)
     {
         //{name:value.name,price:value.price,image:value.image,categoryId:value.categoryId,productType:value.productType,description:value.description}
@@ -75,21 +84,35 @@ module.exports =
             return result;
         else
             return {error:"Error with the getting the  Product by uid."};
-    }
-    ,
-    getProduct(value)
+    },
+    findProductsOfCategory(value)
     {
-        const result = ProductModel.find({categoryId:value.categoryId});
-        if(result)
-            return result;
-        else
-            return {error:"Error with the getting the  Product"};
-    }
-    ,
-    getAllProducts(value)
-    {
-        const result = ProductModel.find({categoryId:value.categoryId})
-                                   .select('name price image description');
+        nameSort = value.nameSort;
+        priceSort = value.priceSort;
+        limit = value.limit;
+        skip = value.skip;
+        let result;
+
+        if(nameSort == 0 && priceSort == 0)
+            result = ProductModel.find({categoryId:value.categoryId})
+                                 .skip(skip).limit(limit)
+                                 .select('name price image description');
+        else if (nameSort == 0 && priceSort != 0)
+            result = ProductModel.find({categoryId:value.categoryId})
+                                 .skip(skip).limit(limit)
+                                 .sort({price:priceSort})
+                                 .select('name price image description');
+        else if (nameSort != 0 && priceSort == 0)
+            result = ProductModel.find({categoryId:value.categoryId})
+                                 .skip(skip).limit(limit)                     
+                                 .sort({name:nameSort})
+                                 .select('name price image description');
+        else if (nameSort != 0 && priceSort != 0)
+            result = ProductModel.find({categoryId:value.categoryId})
+                                 .skip(skip).limit(limit)
+                                 .sort({name:nameSort,price:priceSort})
+                                 .select('name price image description');  
+
         if(result)
             return result;
         else
@@ -124,7 +147,9 @@ module.exports =
     ,
     findProductsWithOffers(value)
     {
-        const result = ProductModel.find({ categoryId:value.categoryId,offer: { $ne: null } }).populate("offer");
+        const result = ProductModel.find({ storeId:value.storeId,offer: { $ne: null } })
+                                   .skip(value.skip).limit(value.limit)
+                                   .populate("offer");
         
         if(result)
             return result;
@@ -141,5 +166,61 @@ module.exports =
             return result;
         else
             return {error:"Error with getting expired offers"};
+    }
+    ,
+    findProductsOfStore(value)
+    {
+        nameSort = value.nameSort;
+        priceSort = value.priceSort;
+        limit = value.limit;
+        skip = value.skip;
+        let result;
+
+        if(nameSort == 0 && priceSort == 0)
+            result = ProductModel.find({storeId:value.storeId})
+                                 .skip(skip).limit(limit)
+                                 .populate('offer')
+                                 .select('name , price , image , offer');
+        else if (nameSort == 0 && priceSort != 0)
+            result = ProductModel.find({storeId:value.storeId})
+                                 .skip(skip).limit(limit)
+                                 .sort({price:priceSort})
+                                 .populate('offer')
+                                 .select('name , price , image , offer');    
+        else if (nameSort != 0 && priceSort == 0)
+            result = ProductModel.find({storeId:value.storeId})
+                                 .skip(skip).limit(limit)
+                                 .sort({name:nameSort})
+                                 .populate('offer')
+                                 .select('name , price , image , offer');    
+        else if (nameSort != 0 && priceSort != 0)
+            result = ProductModel.find({storeId:value.storeId})
+                                 .skip(skip).limit(limit)
+                                 .sort({name:nameSort,price:priceSort})
+                                 .populate('offer')
+                                 .select('name , price , image , offer');                                     
+        
+        if(result)
+            return result;
+        else
+            return {error:"Error with getting products of the store"};
+    }
+    ,
+    countByStore(value)
+    {
+        const count = ProductModel.countDocuments({ storeId: value.storeId });
+        return count;
+    }
+    ,
+    countByCategory(value)
+    {
+        const count = ProductModel.countDocuments({ categoryId: value.categoryId });
+        return count;
+    }
+    ,
+    countByOffers(value)
+    {
+        const count = ProductModel.countDocuments({ storeId:value.storeId,offer: { $ne: null } });
+        return count;
     }
 }

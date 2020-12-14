@@ -3,6 +3,28 @@ const StoreSchema = require("../schema/Store");
 const StoreModel= mongoose.model('Store', StoreSchema);
 
 module.exports = {
+    
+    exists(value)
+    {
+        const result = StoreModel.findById({_id: value.storeId},{id:1,userId:1});
+        if (result)
+            return result;
+        else
+            return {error: "Error with the getting Store"};
+    },
+
+    countByGarageOwner(value)
+    {
+        const count = StoreModel.countDocuments({ userId: value.userId });
+        return count;
+    },
+
+    countAll()
+    {
+        const count = StoreModel.countDocuments({});
+        return count;
+    },
+
     createStore(value) {
         tags = value.tags.split(',');
         value = {...value,tags:tags};
@@ -73,7 +95,7 @@ module.exports = {
 
     findFullStores(limit,skip)
     {
-        const result = StoreModel.find({}).select('name , address , image').skip(skip).limit(limit)//.pretty();
+        const result = StoreModel.find({}).select('name , address , image , openTime , closeTime').skip(skip).limit(limit)//.pretty();
         if (result) 
             return result;
         else 
@@ -99,9 +121,9 @@ module.exports = {
             return {error: "Error with the getting Store"};
     },
 
-    findStoreByUserId(value)
+    findStoresByUserId(value)
     {
-        const result = StoreModel.find({userId: value.userId});
+        const result = StoreModel.find({userId: value.userId}).skip(value.skip).limit(value.limit);
         if (result)
             return result;
         else

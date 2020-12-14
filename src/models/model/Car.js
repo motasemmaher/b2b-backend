@@ -6,6 +6,14 @@ const CarModel= mongoose.model('Car', CarSchema);
 module.exports = 
 {
 
+    exists(value)
+    {
+        const result = CarModel.exists({_id:value.carId},{id:1});
+        if(result)
+            return result;
+        else
+        return {error:"Error with the getting Car"};  
+    },
     createCar(value)
     {
         const result = CarModel.create({userId:value.userId,model:value.model,make:value.make,year:value.year});
@@ -41,7 +49,7 @@ module.exports =
         return {error:"Error with the delete Car"};  
     }
     ,
-    getCar(value)
+    findCar(value)
     {
         const result = CarModel.findById({_id:value._id});
         if(result)

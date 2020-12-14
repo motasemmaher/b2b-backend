@@ -5,6 +5,30 @@ module.exports = class Product{
 
     constructor () {}
 
+    exists(productId)
+    {
+        const promiseResult = ProductModel.exists({productId:productId});
+        return promiseResult;
+    }
+
+    countByStore(storeId)
+    {
+        const promiseResult = ProductModel.countByStore({storeId:storeId});
+        return promiseResult;
+    }
+
+    countByCategory(categoryId)
+    {
+        const promiseResult = ProductModel.countByCategory({categoryId:categoryId});
+        return promiseResult;
+    }
+
+    countByOffers(storeId)
+    {
+        const promiseResult = ProductModel.countByOffers({storeId:storeId});
+        return promiseResult;
+    }
+
     validateProductInfo(productInfo)
     {
         const validationResult = ProductValidation.validateProductInfo(productInfo);
@@ -67,9 +91,15 @@ module.exports = class Product{
         return promiseResult;
     }
 
-    getProductsWithOffers(categoryId)
+    getProductsWithOffers(storeId,limit,skip)
     {
-        const promiseResult = ProductModel.findProductsWithOffers({categoryId:categoryId});
+        const promiseResult = ProductModel.findProductsWithOffers({storeId:storeId,limit:limit,skip:skip});
+        return promiseResult;
+    }
+
+    getProductsOfStore(storeId,limit,skip,nameSort,priceSort)
+    {
+        const promiseResult = ProductModel.findProductsOfStore({storeId:storeId,limit:limit,skip:skip,nameSort:nameSort,priceSort:priceSort});
         return promiseResult;
     }
 
@@ -78,5 +108,6 @@ module.exports = class Product{
         const promiseResult = ProductModel.expiredOffers();
         return promiseResult;
     }
+
 
 }
