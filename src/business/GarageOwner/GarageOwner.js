@@ -1,54 +1,94 @@
 const GarageOwnerModel = require('../../models/model/GarageOwner');
 const User = require('../../business/User/User');
-
-module.exports =  class GarageOwner {
+module.exports = class GarageOwner {
     constructor() {}
 
-    createGarageOwner(garageOwnerInfo)
-    {
-        const promiseResult = GarageOwnerModel.createGarageOwner(garageOwnerInfo);
+    getWaitingUsers(ids, limit, skip) {
+        const promiseResult = GarageOwnerModel.findWaitingUsers({
+            ids: ids,
+            limit: limit,
+            skip: skip
+        });
         return promiseResult;
     }
 
-    getWaitingUsers(ids,limit,skip)
-    {
-        const promiseResult = GarageOwnerModel.findWaitingUsers({ids:ids,limit:limit,skip:skip});
+    acceptWaitingUser(userId) {
+        const promiseResult = GarageOwnerModel.acceptWaitingUser({
+            _id: userId
+        });
         return promiseResult;
     }
 
-    getGarageOwnerByUserId(userId) {
-        const result = GarageOwnerModel.getGarageOwnerByUserId({userId: userId});
+    deleteGarageOwnerByUserId(userId) {
+        const promiseResult = GarageOwnerModel.deleteGarageOwnerByUserId({
+            _id: userId
+        });
+        return promiseResult;
+    }
+
+    getAllGarageOwners(ids, limit, skip) {
+        const promiseResult = GarageOwnerModel.findAllGarageOwners({
+            ids: ids,
+            limit: limit,
+            skip: skip
+        });
+        return promiseResult;
+    }
+
+    addStoreToList(garageOwnerId, storeInfo) {
+        const promiseResult = GarageOwnerModel.addStoreToList({
+            _id: garageOwnerId,
+            storeInfo: storeInfo
+        });
+        return promiseResult;
+    }
+
+    removeStoreFromList(garageOwnerId, storeId) {
+        const promiseResult = GarageOwnerModel.removeStoreFromList({
+            _id: garageOwnerId,
+            storeId: storeId
+        });
+        return promiseResult;
+    }
+
+    createGarageOwner(GarageOwnerInfo) {
+        const result = GarageOwnerModel.createGarageOwner(GarageOwnerInfo);
         return result;
     }
 
-    acceptWaitingUser(userId)
-    {
-        const promiseResult = GarageOwnerModel.acceptWaitingUser({_id:userId});
-        return promiseResult;
+    updateGarageOwner(GarageOwnerId) {
+        const result = GarageOwnerModel.updateGarageOwner(GarageOwnerId);
+        return result;
     }
 
-    deleteGarageOwnerByUserId(userId)
-    {
-        const promiseResult = GarageOwnerModel.deleteGarageOwnerByUserId({_id:userId});
-        return promiseResult;
+    deleteGarageOwner(GarageOwnerId) {
+        const result = GarageOwnerModel.deleteGarageOwner(GarageOwnerId);
+        return result;
     }
 
-    getAllGarageOwners(ids,limit,skip)
-    {
-        const promiseResult = GarageOwnerModel.findAllGarageOwners({ids:ids,limit:limit,skip:skip});
-        return promiseResult;
-    }
-    
-    addStoreToList(garageOwnerId,storeInfo)
-    {
-        const promiseResult = GarageOwnerModel.addStoreToList({_id:garageOwnerId,storeInfo:storeInfo});
-        return promiseResult;
+    getGarageOwner(GarageOwnerId) {
+        const result = GarageOwnerModel.getGarageOwner(GarageOwnerId);
+        return result;
     }
 
-    removeStoreFromList(garageOwnerId,storeId)
-    {
-        const promiseResult = GarageOwnerModel.removeStoreFromList({_id:garageOwnerId,storeId:storeId});
-        return promiseResult;
+    getGarageOwnerByUserId(userId) {
+        const result = GarageOwnerModel.getGarageOwnerByUserId({
+            userId: userId
+        });
+        return result;
     }
-}
 
+    deleteAllGarageOwner() {
+        const result = GarageOwnerModel.deleteAllGarageOwner();
+        return result;
+    }
+
+    removeOrder(garageOwnerId, storeId, orderId) {
+        const result = GarageOwnerModel.removeOrder({
+            _id: garageOwnerId,
+            storeId: storeId,
+            orderId: orderId
+        });
+        return result;
+    }
+};

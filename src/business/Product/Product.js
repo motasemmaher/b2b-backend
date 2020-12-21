@@ -109,5 +109,14 @@ module.exports = class Product{
         return promiseResult;
     }
 
+    // added by thaer
+    searchProducts(searchText, limit, skip) {
+        const result = ProductModel.searchProducts({
+            searchText: searchText,
+            limit: limit,
+            skip: skip
+        });
+        return result;
+    }
 
 }

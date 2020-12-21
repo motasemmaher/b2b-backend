@@ -11,8 +11,10 @@ const Contact = new schema({
         unique: true
     },
     contacts: [{
-        type: schema.Types.ObjectId,
-        ref: 'User'
+        name: String,
+        _id: {
+            type: String
+        }
     }]
 });
 

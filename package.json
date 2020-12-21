@@ -28,6 +28,9 @@
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "rate-limiter-flexible": "^2.1.13",
+    "dotenv": "^8.2.0",
+    "jsonwebtoken": "^8.5.1",
+    "socket.io": "^3.0.4",
     "supertest": "^6.0.0",
     "validator": "^13.1.17"
   }

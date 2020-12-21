@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const ContactSchema = require("../schema/Contact");
-const ContactModel= mongoose.model('Contact', ContactSchema);
+const ContactModel = mongoose.model('Contact', ContactSchema);
+
 
 module.exports = {
     createContact(value) {
@@ -16,9 +17,18 @@ module.exports = {
     },
 
     updateContact(value) {
-        const result = ContactModel.findByIdAndUpdate({
-            _id: value._id
-        }, Contact);
+        const result = ContactModel.findOneAndUpdate({
+            ownerId: value.ownerId
+        }, {
+            $push: {
+                contacts: {
+                    name: value.Name,
+                    _id: value.otherUserId
+                }
+            }
+        }, {
+            "useFindAndModify": false
+        });
 
         if (result) {
             return result;
@@ -30,8 +40,8 @@ module.exports = {
     },
 
     deleteContact(value) {
-        const result = ContactModel.findOneAndDelete({
-            _id: value._id
+        const result = ContactModel.deleteOne({
+            ownerId: value.ownerId
         });
 
         if (result) {
@@ -47,6 +57,40 @@ module.exports = {
         const result = ContactModel.findById({
             _id: value._id
         });
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error with the getting Contact"
+            };
+    },
+
+    getContactByOwnerId(value) {
+        const result = ContactModel.findOne({
+            ownerId: value.ownerId
+        });
+
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error with the getting Contact"
+            };
+    },
+
+    getContactByOwnerIdAndSubContactId(value) {
+        const result = ContactModel.findOne({
+            $and: [{
+                ownerId: value.ownerId
+            }, {
+                contacts: {
+                    $elemMatch: {
+                        _id: value.subcontactId
+                    }
+                }
+            }]
+        });
+        
         if (result)
             return result;
         else

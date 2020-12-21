@@ -78,7 +78,17 @@ const Store = new schema({
         type: schema.Types.ObjectId,
         ref: 'Warehouse'
     },
-    tags : [{type:String,required:true}]
+    tags : [{type:String,required:true}],
+
+    orders: [{
+        type: schema.Types.ObjectId,
+        ref: 'Order'
+    }],
+
+    garageOwnerId: {
+        type: schema.Types.ObjectId,
+        ref: 'GarageOwner'
+    },
 
 });
 

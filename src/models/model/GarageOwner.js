@@ -16,9 +16,9 @@ module.exports = {
     },
 
     updateGarageOwner(value) {
-        const result = GarageOwnerModel.findByIdAndUpdate({
+        const result = GarageOwnerModel.findOneAndUpdate({
             _id: value._id
-        }, GarageOwner);
+        }, value, { "useFindAndModify": false });
 
         if (result) {
             return result;
@@ -124,6 +124,52 @@ module.exports = {
             return result;
         else
             return { error: "Error with the removing store from stores list" };
-    }
+    },
     
+    deleteAllGarageOwner() {
+        const result = GarageOwnerModel.deleteMany({});
+
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error with the delete all GarageOwners"
+            };
+    },
+
+    getStore() {
+        const result = GarageOwnerModel.findOne({
+            
+        });
+
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error with the getStore in GarageOwners"
+            };
+    },
+
+    async removeOrder(value) {
+        let result = null;
+        await GarageOwnerModel.findOne({_id: value._id}, {stores: {$elemMatch:  { $eq: value.storeId }}})
+        .populate('stores')
+        .then(owner => {
+            let index = owner.stores[0].orders.indexOf(value.orderId);
+            if(index >= 0 ) {
+                owner.stores[0].orders.splice(index, 1);
+                result = owner.stores[0].save();
+            }           
+            // console.log(owner.stores[0].orders.splice(index, 1));
+            // result = Promise.resolve(owner);
+        });
+
+        if (result)
+        return result;
+    else
+        return {
+            error: "Error with the removeOrder in GarageOwners"
+        };
+    }
+
 };

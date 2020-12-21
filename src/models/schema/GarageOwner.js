@@ -14,7 +14,11 @@ const GarageOwner = new schema({
         type: schema.Types.ObjectId,
         ref: 'Store'
     }],
-    isVerified: {type: Boolean}
+    isVerified: {type: Boolean},
+    reportId: {
+        type: schema.Types.ObjectId,
+        ref: 'Report'
+    }
 });
 
 module.exports = GarageOwner;

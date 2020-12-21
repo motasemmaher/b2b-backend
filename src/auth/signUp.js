@@ -36,7 +36,6 @@ const storeInformationValidator = require('../validations/storeInformation');
 const carInformationValidator = require('../validations/carInformation');
 
 
-
 function hashPassword(password)
 {
     const hash =  bcrypt.hashSync(password, 10);

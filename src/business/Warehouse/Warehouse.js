@@ -54,4 +54,20 @@ module.exports = class Warehouse{
         const promiseResult = WarehouseModel.deleteWarehouseByStoreId({storeIds:storeIds});
         return promiseResult;
     }
+    
+    // added by thaer
+    getWarehouse(warehouseId) {
+        const promiseResult = WarehouseModel.getWarehouse({_id: warehouseId});
+        return promiseResult;
+    }
+
+    getProductFromWarehouse(warehouseId, productId) {
+        const promiseResult = WarehouseModel.getProductFromWarehouse({_id: warehouseId, productId: productId});
+        return promiseResult;
+    }
+
+    decreaseAmaountOfProduct(warehouseId, productId, quantity) {
+        const promiseResult = WarehouseModel.decreaseAmaountOfProduct({_id: warehouseId, productId: productId, quantity: quantity});
+        return promiseResult;
+    }
 }

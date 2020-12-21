@@ -16,9 +16,12 @@ module.exports = {
     },
 
     updateOrder(value) {
-        const result = OrderModel.findByIdAndUpdate({
+        const result = OrderModel.findOneAndUpdate({
             _id: value._id
-        }, Order);
+        }, value, {
+            "useFindAndModify": false,
+            new: true
+        });
 
         if (result) {
             return result;
@@ -55,6 +58,18 @@ module.exports = {
             };
     },
 
+    getCarOwnerByOrderId(value) {
+        const result = OrderModel.findOne({
+            carOwnerId: value.carOwnerId
+        });
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error in getCarOwnerByOrderId"
+            };
+    },
+
     deleteAllOrder() {
         const result = OrderModel.deleteMany({});
 
@@ -63,6 +78,36 @@ module.exports = {
         else
             return {
                 error: "Error with the delete all Orders"
+            };
+    },
+
+    getOrdersByStoreId(value) {
+        const result = OrderModel.find({
+            storeId: value.storeId,
+        }).limit(value.limit).skip(value.skip);
+
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error in getOrdersByStoreId function"
+            };
+    },
+
+    getOrdersByStoreIdAndStatus(value) {
+        const result = OrderModel.find({
+            $and: [{
+                storeId: value.storeId,
+            }, {
+                status: value.status
+            }]
+        }).limit(value.limit).skip(value.skip);
+
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error in getOrdersByStoreIdAndStatus function"
             };
     }
 };

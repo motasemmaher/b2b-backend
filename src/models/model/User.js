@@ -4,22 +4,33 @@ const UserModel = mongoose.model('User', UserSchema);
 
 module.exports = {
 
-    exists(value)
-    {
-        const result = UserModel.findById({_id: value.userId},{id:1});
+    exists(value) {
+        const result = UserModel.findById({
+            _id: value.userId
+        }, {
+            id: 1
+        });
         if (result)
             return result;
         else
-            return {error: "Error with the getting User"};
+            return {
+                error: "Error with the getting User"
+            };
     },
 
-    countByRole(value){
-        const count = UserModel.countDocuments({ role: value.role });
+    countByRole(value) {
+        const count = UserModel.countDocuments({
+            role: value.role
+        });
         return count;
     },
 
-    countAll(){
-        const count = UserModel.countDocuments({role: {$in: ['carOwner', 'garageOwner']}});
+    countAll() {
+        const count = UserModel.countDocuments({
+            role: {
+                $in: ['carOwner', 'garageOwner']
+            }
+        });
         return count;
     },
 
@@ -35,11 +46,13 @@ module.exports = {
     },
 
     updateUser(value) {
-        const result = UserModel.findByIdAndUpdate(
-            {_id: value._id},
-            value,
-            { "useFindAndModify": false }
-            );
+        const result = UserModel.findByIdAndUpdate({
+                _id: value._id
+            },
+            value, {
+                "useFindAndModify": false
+            }
+        );
 
         if (result) {
             return result;
@@ -65,11 +78,27 @@ module.exports = {
     },
 
     findUserById(value) {
-        const result = UserModel.findById({_id: value.userId});
+        const result = UserModel.findById({
+            _id: value.userId
+        });
         if (result)
             return result;
         else
-            return {error: "Error with the getting User"};
+            return {
+                error: "Error with the getting User"
+            };
+    },
+
+    getUser(value) {
+        const result = UserModel.findById({
+            _id: value._id
+        });
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error with the getting User"
+            };
     },
 
     findUserByUsername(username) {
@@ -92,24 +121,36 @@ module.exports = {
         else
             return {
                 error: "Error with the delete all Users"
-            };
+            };        
     },
 
-    findAllUsersIdOfARole(value)
-    {
-        const result = UserModel.find({role:value.role},{_id:1});
+    findAllUsersIdOfARole(value) {
+        const result = UserModel.find({
+            role: value.role
+        }, {
+            _id: 1
+        });
         if (result)
             return result;
         else
-            return {error: "Error with finding the ids of all users in that role."};
-    }
-    ,
-    acceptWaitingUser(value)
-    {
-        const result = UserModel.findOneAndUpdate({_id:value._id},{role:'garageOwner'},{ "useFindAndModify": false });
+            return {
+                error: "Error with finding the ids of all users in that role."
+            };
+    },
+    
+    acceptWaitingUser(value) {
+        const result = UserModel.findOneAndUpdate({
+            _id: value._id
+        }, {
+            role: 'garageOwner'
+        }, {
+            "useFindAndModify": false
+        });
         if (result)
             return result;
         else
-            return {error: "Error with accepting WaitingUser"};
+            return {
+                error: "Error with accepting WaitingUser"
+            };
     }
 };

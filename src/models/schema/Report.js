@@ -1,17 +1,15 @@
 const mongoose = require('mongoose');
 
-const Order = require('./Order');
-
 const schema = mongoose.Schema;
 
 const Report = new schema({
-    totalIncome: {type: Number},
-    listOfSoldItem: [{
+    totalIncome: {type: Number, default: 0},
+    listOfSoldItems: [{
         type: schema.Types.ObjectId,
         ref: 'Order'
     }],
-    numberOfGarageOwners: {type: Number},
-    numberOfCarOwners: {type: Number}
+    numberOfGarageOwners: {type: Number, default: 0},
+    numberOfCarOwners: {type: Number, default: 0}
 });
 
 module.exports = Report;

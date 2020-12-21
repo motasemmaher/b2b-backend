@@ -64,4 +64,19 @@ module.exports =  class User {
         return promiseResult;
     }
 
-}
+    // added by thaer
+    getUser(userId) {
+        const result = UserModel.getUser(userId);
+        return result;
+    }
+
+    findUserByUsername(username) {
+        const result = UserModel.findUserByUsername(username);
+        return result;
+    }
+
+    deleteAllUser() {
+        const result = UserModel.deleteAllUser();
+        return result;
+    }
+}; 

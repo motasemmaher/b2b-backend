@@ -100,6 +100,40 @@ module.exports =
         return result;
         else
         return {error:"Error with the removing product from warehouse"};
+    },
+
+    // added by thaer
+    getWarehouse(value) {
+        const result = WarehouseModel.findById({_id: value._id});
+        if(result)
+            return result;
+        else
+            return {error:"Error with the finding Warehouse"};
+    },
+
+    getProductFromWarehouse(value) {
+        const result = WarehouseModel.findOne({_id: value._id}, {storage: {$elemMatch: {productId: value.productId}}});
+        if(result)
+            return result;
+        else
+            return {error:"Error with the finding Warehouse"};
+    },
+
+    async decreaseAmaountOfProduct(value) {
+        let result = null;
+        await WarehouseModel.findOne({_id: value._id}, {storage: {$elemMatch: {productId: value.productId}}})
+        .then(warehouse => {
+            if(warehouse.storage[0].amount >= value.quantity) {
+                warehouse.storage[0].amount -= value.quantity;
+                result = warehouse.save();
+            }
+        });
+        // console.log(value);
+        
+        if(result)
+            return result;
+        else
+            return {error:"Error with the finding Warehouse"};
     }
 
 }

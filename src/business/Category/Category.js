@@ -72,11 +72,18 @@ module.exports = class Category{
         const promiseResult = CategoryModel.findCategoryByName({name:categoryName});
         return promiseResult;
     }
-
+   
     removeProductFromCategory(categoryId,productId)
     {
         const promiseResult = CategoryModel.removeProductFromCategory({categoryId:categoryId,productId:productId});
         return promiseResult;
     }
 
+     // added by thaer
+     searchCategories(searchText) {
+        const result = CategoryModel.searchCategories({
+            searchText: searchText
+        });
+        return result;
+    }
 }
