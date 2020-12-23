@@ -8,8 +8,12 @@ const Report = new schema({
         type: schema.Types.ObjectId,
         ref: 'Order'
     }],
-    numberOfGarageOwners: {type: Number, default: 0},
-    numberOfCarOwners: {type: Number, default: 0}
+    listOfCancelItems: [{
+        type: schema.Types.ObjectId,
+        ref: 'Order'
+    }],
+    // numberOfGarageOwners: {type: Number, default: 0},
+    // numberOfCarOwners: {type: Number, default: 0}
 });
 
 module.exports = Report;
