@@ -9,7 +9,7 @@ module.exports =
 {
     exists(value)
     {
-        const result = CategoryModel.findById({_id: value.categoryId},{id:1});
+        const result = CategoryModel.exists({_id: value.categoryId},{id:1});
         if (result)
             return result;
         else
@@ -40,7 +40,7 @@ module.exports =
             return { error: "Error with the update Category" };
     }
     ,
-    deleteCategory(value) {
+    removeCategory(value) {
         const result = CategoryModel.findOneAndDelete({ _id: value._id });
         if (result)
             return result;

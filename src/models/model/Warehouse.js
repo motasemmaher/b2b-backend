@@ -101,5 +101,16 @@ module.exports =
         else
         return {error:"Error with the removing product from warehouse"};
     }
+    ,
+    //For Testing
+    findWarehouse(value)
+    {
+        const result = WarehouseModel.findById({_id:value.warehouseId});
+        if(result)
+            return result;
+        else
+            return {error:"Error with the removing product from warehouse"};
+    }
+    
 
 }

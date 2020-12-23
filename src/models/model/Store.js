@@ -13,15 +13,21 @@ module.exports = {
             return {error: "Error with the getting Store"};
     },
 
+    countAll()
+    {
+        const count = StoreModel.countDocuments({});
+        return count;
+    },
+
     countByGarageOwner(value)
     {
         const count = StoreModel.countDocuments({ userId: value.userId });
         return count;
     },
 
-    countAll()
+    countBySameAddress(value)
     {
-        const count = StoreModel.countDocuments({});
+        const count = StoreModel.countDocuments({ address: value.address });
         return count;
     },
 
@@ -100,6 +106,15 @@ module.exports = {
             return result;
         else 
             return {error: "Error with the finding all Stores"};
+    },
+
+    findSameAddressStores(value,limit,skip)
+    {
+        const result = StoreModel.find({address:value.address}).select('name , address , image , openTime , closeTime').skip(skip).limit(limit)//.pretty();
+        if (result) 
+            return result;
+        else 
+            return {error: "Error with the finding same address Stores"};
     },
 
     deleteStoreByUserId(value)

@@ -32,4 +32,11 @@ module.exports =  class CarOwner {
         const promiseResult = CarOwnerModel.removeCarFromList({_id:carOwnerId,carId:carId});
         return promiseResult;
     }
+
+    //ONLY FOR TESTING
+    deleteCarOwner(carOwnerId)
+    {
+        const promiseResult = CarOwnerModel.deleteCarOwner({_id:carOwnerId});
+        return promiseResult;
+    }
 }

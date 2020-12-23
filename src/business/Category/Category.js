@@ -37,9 +37,9 @@ module.exports = class Category{
         return promiseResult;
     }
 
-    removeCategory(categoryId)
+    deleteCategory(categoryId)
     {
-        const promiseResult = CategoryModel.deleteCategory({_id:categoryId});
+        const promiseResult = CategoryModel.removeCategory({_id:categoryId});
         return promiseResult;
     }
 

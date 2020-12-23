@@ -12,7 +12,7 @@ module.exports = class Warehouse{
             return {err:"Error: "+validationResult};
     }
 
-     createWarehouse()
+    createWarehouse()
     {
         const promiseResult = WarehouseModel.createWarehouse();
         return promiseResult;
@@ -52,6 +52,14 @@ module.exports = class Warehouse{
     deleteWarehouseByStoreId(storeIds)
     {
         const promiseResult = WarehouseModel.deleteWarehouseByStoreId({storeIds:storeIds});
+        return promiseResult;
+    }
+
+    //For Testing
+
+    getWarehouse(warehouseId)
+    {
+        const promiseResult = WarehouseModel.findWarehouse({warehouseId:warehouseId});
         return promiseResult;
     }
 }

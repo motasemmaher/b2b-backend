@@ -2,10 +2,10 @@ process.env.NODE_ENV = 'test';
 
 const expect = require('chai').expect;
 const request = require('supertest');
-const app = require('../../../index'); 
-const connection = require('../../../connect');
+const app = require('../../../../index'); 
+const connection = require('../../../../connect');
 const mongoose = require('mongoose');
-const CarModel = require('../../../src/models/model/Car');
+const CarModel = require('../../../models/model/Car');
 
 userId="USERID: 2"; model="BMW"; make="X6"; year=2022;
 

@@ -13,7 +13,13 @@ module.exports = class Message
 
     createMessage(userId,messageBody)
     {
-        const messagePromise = MessageModel.createMessage({userId:userId,messageBody,messageBody});
-        return messagePromise;
+        const promiseResult = MessageModel.createMessage({userId:userId,messageBody:messageBody});
+        return promiseResult;
+    }
+
+    deleteMessage(messageId)
+    {
+        const promiseResult = MessageModel.deleteMessage({_id:messageId});
+        return promiseResult;
     }
 }

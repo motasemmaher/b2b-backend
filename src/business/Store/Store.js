@@ -29,6 +29,12 @@ module.exports =  class Store {
         return promiseResult;
     }
 
+    countBySameAddress(address)
+    {
+        const promiseResult = StoreModel.countBySameAddress({address:address});
+        return promiseResult;
+    }
+
     createStore(storeInfo)
     {
         const promiseResult = StoreModel.createStore(storeInfo);
@@ -72,6 +78,12 @@ module.exports =  class Store {
         return promiseResult;
     }
 
+    getSameAddressStores(address,limit,skip)
+    {
+        const promiseResult = StoreModel.findSameAddressStores({address:address,limit:limit,skip:skip});
+        return promiseResult;
+    }
+    
     deleteStoreByUserId(userId)
     {
         const promiseResult = StoreModel.deleteStoreByUserId({userId:userId});
