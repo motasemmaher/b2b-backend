@@ -53,6 +53,7 @@ const Complaint = require('./src/business/Complaint/Complaint');
 const Message = require('./src/business/Message/Message');
 const Offer = require('./src/business/Offer/Offer');
 const Car = require('./src/business/Car/Car');
+const Permissions = require('./src/business/Perminssions/Perminssions');
 
 // validation by thaer
 const orderInformationValidator = require('./src/validations/orderInformation');
@@ -78,7 +79,7 @@ const chat = new Chat();
 const report = new Report();
 const order = new Order();
 const cartItem = new CartItem();
-
+const permissions = new Permissions();
 
 //Setting-up path for the static files
 app.use('./public', express.static('uploads'));
@@ -147,13 +148,16 @@ app.post('/user/login', (req, res, next) => {
                 return res.send(loginInfo);
             }
             if (loginInfo.user !== null) {
-                return res.send({
+                return res.status(200).send({
+                    auth: true,
+                    token: loginInfo.token,
                     user: {
                         _id: loginInfo.user._id,
                         username: loginInfo.user.username,
                         role: loginInfo.user.role
                     }
                 });
+
             } else {
                 return res.status(400).send({
                     Error: 'Invalid username or password'
@@ -1019,6 +1023,7 @@ app.delete('/stores/:storeId/delete-category/:categoryId', userAuthenticated, (r
 
 
 //Product CORS
+app.options('/products/:productId?');//View Products and View a Product
 app.options('/stores/:storeId/products/:productId?'); //View Products of store and View a Product of a Store
 app.options('/stores/:storeId/category/:categoryId/products/:productId?'); //View Products of a store and View a Product of a Category
 app.options('/stores/:storeId/category/:categoryId/create-product'); //Create Product
@@ -2329,53 +2334,40 @@ const reportTransporter = nodemailer.createTransport({
     }
 });
 //----------Send garage owner report----------
-/*
+
 const garageOwnerReport = schedule.scheduleJob('0 0 1 * *', () => {
-    
-        user.getAllUsersIdOfARole('garageOwner')
+    user.getAllUsersIdOfARole('garageOwner')
         .then(garageOwners => {
-        garageOwners.forEach(garageOwnerId => {
-            user.getUserById(garageOwnerId._id)
-                .then(garageOwner => {
-                store.getFullStoresByUserId(garageOwner._id)
-                .then(storesList => {
-                    storesArray = storesList;
-                    storesArray.forEach((store,index,storesArray) => {
-                    category.getProductsOfCategory(categoryId)
-                    .then(productsResult => {
-                    allProducts = allProducts.concat(productsResult);
-                        if(index  === categoriesArray.length - 1 )
-                        res.send(allProducts);
+            garageOwners.forEach(garageOwnerId => {
+                user.getUserById(garageOwnerId._id)
+                    .then(garOwner => {
+                        garageOwner.getGarageOwnerByUserId(garageOwnerId._id).then(retrivedgarageOwner => {
+                            report.getReport(retrivedgarageOwner.reportId).then(retrivedReport => {
+                                reportForGarageOwner = `Total Income this month ${retrivedReport.totalIncome}\nNumber of delivered orders ${retrivedReport.listOfSoldItems.length}\nNumber of cancel orders ${retrivedReport.listOfCancelItems.length}`;
+                                var mailOptions = {
+                                    from: 'b2b.report.generator@gmail.com',
+                                    to: garOwner.email,
+                                    subject: `Month:${new Date().getMonth()+1}/${new Date().getFullYear()} Report`,
+                                    text: `Hello ${garOwner.fullName}, this is the report for the current month.\n${reportForGarageOwner}\nBest wishes, B2B team`,
+                                };
+                                reportTransporter.sendMail(mailOptions, function (error, info) {
+                                    if (error)
+                                        console.log(error);
+                                    else {
+                                        report.clearReport(retrivedReport._id).then(clearedReport => {
+                                            console.log('Email sent: ' + info.response);
+                                        });
+                                    }
+                                });
+                            });
+                        });
                     })
-                    .catch(err => res.send({error:"Error getting products of the category. "+err}));
-                    });
-                })
-                .catch(err => console.log("Error in generating report -Geting stores- ! "+err));
-                var mailOptions = {
-                    from: 'b2b.report.generator@gmail.com',
-                    to: garageOwner.email,
-                    subject: `Month:${new Date().getMonth()+1}/${new Date().getFullYear()} Report`,
-                    text: `Hello ${garageOwner.fullName},this is the report for the current month.\nBest wishes, B2B team`,
-                    attachments : [
-                        {
-                            filename: `report#${new Date().getMonth()+1}/${new Date().getFullYear()}.txt`,  
-                            path: './public/report.txt'
-                        }]
-                    };
-                    reportTransporter.sendMail(mailOptions, function(error, info){
-                    if (error)
-                        console.log(error);
-                    else
-                        console.log('Email sent: ' + info.response); 
-                    });  
-                })
-                .catch(err => console.log("Error in generating report -Geeting garage owner by id- ! "+err));    
+                    .catch(err => console.log("Error in generating report -Geeting garage owner by id- ! " + err));
             })
         })
-        .catch(err => console.log("Error in generating report -Geting garage owners- ! "+err));
-    });            
+        .catch(err => console.log("Error in generating report -Geting garage owners- ! " + err));
 });
-*/
+
 //----------Send admin report----------
 const adminReport = schedule.scheduleJob('0 0 1 * *', () => {
 
@@ -2385,13 +2377,13 @@ const adminReport = schedule.scheduleJob('0 0 1 * *', () => {
                 .then(carOwners => {
                     user.getAllUsersIdOfARole('waitingUser')
                         .then(waitingUsers => {
-                            report = `#of Garage Owners: ${garageOwners.length}\n#of Car Owners: ${carOwners.length}\n#of Waiting Users: ${waitingUsers.length}\n`;
+                            reportForAdmin = `#of Garage Owners: ${garageOwners.length}\n#of Car Owners: ${carOwners.length}\n#of Waiting Users: ${waitingUsers.length}\n`;
                             user.getAllUsersIdOfARole('admin')
                                 .then(admins => {
                                     admins.forEach(adminId => {
                                         user.getUserById(adminId._id)
                                             .then(admin => {
-                                                fs.writeFile("./public/admin-report.txt", report, (err) => {
+                                                fs.writeFile("./public/admin-report.txt", reportForAdmin, (err) => {
                                                     if (err)
                                                         return console.log(err);
                                                 });
@@ -2433,6 +2425,67 @@ const adminReport = schedule.scheduleJob('0 0 1 * *', () => {
             error: "Error getting all the garage owners. " + err
         }));
 });
+
+app.get('/products/:productId?',(req,res) => {
+    let nameSort = parseInt(req.query.nameSort);
+    let priceSort = parseInt(req.query.priceSort);
+    let skip = req.query.skip;
+    let limit = req.query.limit;
+    const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);
+    skip = limitAndSkipValues.skip;
+    limit = limitAndSkipValues.limit;
+
+    if (nameSort == null)
+        nameSort = 0;
+    if (priceSort == null)
+        priceSort = 0;
+    
+    if(req.params.productId == null)
+    {
+        product.getAllProducts(limit,skip,nameSort,priceSort)
+        .then(productResults => {
+        product.countAll()
+            .then(countResult => {
+            productsArray = productResults;
+            productsArray.forEach((productResult,index,productsArray) => {
+                imageToBase64(productResult.image)
+                .then(base64Image => {
+                productResult.image = base64Image;       
+                if(index  === productsArray.length - 1)
+                    res.send({productsCountByStore:countResult,products:productsArray});
+                })
+                .catch(err => {
+                    console.log({error:"Error converting image.    "+err})
+                    if (!res.headersSent)
+                    res.send({count:countResult,products:productsArray});
+                });  
+                }) //End of foreach
+            })
+            .catch((err => res.send({error:"Error getting count of all products. "+err})));
+        })
+        .catch(err => res.send({error:"Error getting all products. "+err}));
+    }
+    else
+    {
+        product.getProductById(req.params.productId)
+            .then(productResult => {    
+            if(productResult == null)
+                res.send({error:"Error! Didn't find a product with that id."});
+            else
+            {
+                imageToBase64(productResult.image)
+                .then((base64Image) => {
+                    product.image = base64Image;
+                res.send(productResult);
+                })
+                .catch(err => res.send({error:"Error converting image.    "+err}));
+            }
+            })
+            .catch(err => res.send({error:"Error getting products of the requested category. "+err}));
+    }
+ 
+});
+
 
 //--------------------Chat--------------------\\
 let userForChat = new Set();
@@ -2585,33 +2638,12 @@ var chatIO = io.of('/user/chat/start')
 
 //---------get shoppingcart---------------\\
 app.get('/shoppingcart', userAuthenticated, (req, res) => {
-    console.log(req.msuser);
-    if (!req.query.limit && !req.query.skip) {
-        return res.status(400).send({
-            Error: 'skip and limit must exist'
-        });
-    }
-    const limitAndSkipValidater = limitAndSkipValidation.validateLimitAndSkip(req.query.limit, req.query.skip);
-    if (limitAndSkipValidater !== 'pass') {
-        return res.status(400).send({
-            Error: limitAndSkipValidater
-        });
-    }
+    let skip = req.query.skip;
+    let limit = req.query.limit;
+    const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);
 
-    const skip = parseInt(req.query.skip);
-    const limit = parseInt(req.query.limit);
-
-    if (skip < 0) {
-        return res.status(400).send({
-            Error: 'skip must be equal or more than zero'
-        });
-    }
-
-    if (limit <= 0) {
-        return res.status(400).send({
-            Error: 'limit must be more than zero'
-        });
-    }
+    skip = limitAndSkipValues.skip;
+    limit = limitAndSkipValues.limit;
 
     const userInfo = req.user;
     if (userInfo.role === 'carOwner') {
@@ -3009,27 +3041,12 @@ app.get('/store/:storeId/orders', userAuthenticated, (req, res) => {
     const storeId = req.params.storeId;
     const status = req.query.status;
 
-    const limitAndSkipValidater = limitAndSkipValidation.validateLimitAndSkip(req.query.limit, req.query.skip);
-    if (limitAndSkipValidation.validateLimitAndSkip(req.query.limit, req.query.skip) !== 'pass') {
-        return res.status(400).send({
-            Error: limitAndSkipValidater
-        });
-    }
+    let skip = req.query.skip;
+    let limit = req.query.limit;
+    const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);
 
-    const skip = parseInt(req.query.skip);
-    const limit = parseInt(req.query.limit);
-
-    if (skip < 0) {
-        return res.status(400).send({
-            Error: 'skip must be equal or more than zero'
-        });
-    }
-
-    if (limit <= 0) {
-        return res.status(400).send({
-            Error: 'limit must be more than zero'
-        });
-    }
+    skip = limitAndSkipValues.skip;
+    limit = limitAndSkipValues.limit;
 
     if (userInfo.role === 'garageOwner') {
         garageOwner.getGarageOwnerByUserId(userInfo._id).then(garageOwnerInfo => {
@@ -3126,7 +3143,7 @@ app.put('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
         garageOwner.getGarageOwnerByUserId(userInfo._id).then(gaOwner => {
             order.getOrder(orderId).then(retrivedOrder => {
                 if (retrivedOrder.status === "pending") {
-                    if ((date.getTime() - retrivedOrder.date.getTime()) <= 3600000) {
+                    if ((date.getTime() - retrivedOrder.date.getTime()) >= 3600000) {
                         if (status === 'delivered') {
                             store.updateOrderStatus(storeId, orderId, status)
                                 .then(storeOrder => {
@@ -3157,7 +3174,11 @@ app.put('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
                         } else if (status === 'cancel') {
                             store.updateOrderStatus(storeId, orderId, status)
                                 .then(storeOrder => {
-                                    res.status(200).send(storeOrder);
+                                    report.addCancelOrder(gaOwner.reportId, orderId).then(updatedReport => {
+                                        res.status(200).send(storeOrder);
+                                    }).catch(err => {
+                                        res.status(501).send('Error in the report');
+                                    });
                                 }).catch(err => {
                                     res.status(404).send('Store Or order does not exist');
                                 });
@@ -3183,6 +3204,7 @@ app.put('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
     }
 });
 
+//---------------delete this------------\\
 app.post('/create/report', (req, res) => {
     report.createReport(req.body).then(createdReport => {
         res.send(createdReport);
@@ -3244,44 +3266,17 @@ function escapeRegex(text) {
 
 //---------------------search in (stores or products)---------------------\\
 app.get('/search', (req, res) => {
-    // let reg = new RegExp(/^\d+$/);
-    // if (!reg.test(req.query.skip) || !reg.test(req.query.limit)) {
-    //     return res.status(400).send({
-    //         Error: 'limit and skip must exists and be numbers'
-    //     });
-    // }
-
     let skip = req.query.skip;
     let limit = req.query.limit;
-    // console.log(limit, skip, "limit and skip");
     const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);
 
     skip = limitAndSkipValues.skip;
     limit = limitAndSkipValues.limit;
-    // console.
-    const search = req.query.search;    
+    const search = req.query.search;
     const fliter = req.query.fliter;
-
-    // if (skip < 0) {
-    //     return res.status(400).send({
-    //         Error: 'skip must be equal or more than zero'
-    //     });
-    // }
-
-    // if (limit <= 0) {
-    //     // limit = 10;
-    //     return res.status(400).send({
-    //         Error: 'limit must be more than zero'
-    //     });
-    // }
 
     if (search) {
         const regex = new RegExp(escapeRegex(search), 'gi');
-        // const sStore = store.searchStores(regex, limit, skip);
-        // const sProduct = product.searchProducts(regex, limit, skip);
-        // searchResult.push(sStore);
-        // searchResult.push(sProduct);
-
         if (fliter === 'stores') {
             store.searchStores(regex, limit, skip).then(storesSearchResult => {
                 if (storesSearchResult.length <= 0) {
@@ -3314,18 +3309,68 @@ app.get('/search', (req, res) => {
             });
         }
 
-        // console.log(searchResult);
-        // Promise.all(searchResult).then(value => {
-        //     res.send({                
-        //         value
-        //     });
-        // });
-
     } else {
         res.status(404).send({
             Error: 'There is no result'
         });
     }
+});
+
+app.get('/perminssions', (req, res) => {
+    const role = req.query.role;
+    if (role === 'admin' || role === 'carOwner' || role === 'garageOwner' || role === 'waitingUser') {
+        permissions.findPermissions(role).then(permission => {
+            res.send(permission);
+        });
+    } else {
+        res.status(400).send({
+            Error: 'role must be one those (admin or carOwner or garageOwner or waitingUser)'
+        });
+    }
+});
+
+app.put('/perminssions/role/:role/add/:permission', (req, res) => {
+    const role = req.params.role;
+    const permission = req.params.permission;
+    if(!permission) {
+        return res.status(400).send({
+            Error: 'error in permission param'
+        });
+    }
+    if (role === 'admin' || role === 'carOwner' || role === 'garageOwner' || role === 'waitingUser') {
+        permissions.addPermission(role, permission)
+    } else {
+        res.status(400).send({
+            Error: 'role must be one those (admin or carOwner or garageOwner or waitingUser)'
+        });
+    }
+});
+
+app.put('/perminssions/autoAdding', (req, res) => {
+    const prom = [];
+    const arrPermissionCarOwner = ['createCarOwner', 'login', 'manageAccount', 'viewProduct', 'placeOrder',
+        'maintainOrder', 'submitComplaint', 'chat', 'sos', 'viewStores'
+    ];
+    const arrPermissionGarageOwner = ['createGarageOwner', 'login', 'manageAccount', 'insertProduct',
+        'viewProduct', 'updateProduct', 'deleteProduct', 'viewCategory', 'updateCategory', 'deleteCategory',
+        'chat', 'manageOffers', 'viewComplaints'
+    ];
+    const arrPermissionAdmin = ['addUser', 'removeUser', 'viewUsers', 'viewComplaints'];
+0000
+    arrPermissionCarOwner.forEach((item, index) => {
+        prom.push(permissions.addPermission('carOwner', item));
+    });
+    arrPermissionGarageOwner.forEach((item, index) => {
+        prom.push(permissions.addPermission('garageOwner', item));
+    });
+    arrPermissionAdmin.forEach((item, index) => {
+        prom.push(permissions.addPermission('admin', item));
+    });
+    Promise.all(prom).then(values => {
+        res.send(values);
+    }).catch(err => {
+        res.status(400).send({Error: 'Error in autoAdding'});
+    });
 });
 
 // app.get('/deleteallorders', (req, res) => {

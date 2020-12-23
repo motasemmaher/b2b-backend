@@ -301,6 +301,50 @@ module.exports = {
         return count;
     },
 
+    countAllProducts()
+    {
+        const count = ProductModel.countDocuments({});
+        return count;
+    },
+
+    findAllProducts(value)
+    {
+        nameSort = value.nameSort;
+        priceSort = value.priceSort;
+        limit = value.limit;
+        skip = value.skip;
+        let result;
+
+        if(nameSort == 0 && priceSort == 0)
+            result = ProductModel.find({})
+                                 .skip(skip).limit(limit)
+                                 .populate('offer')
+                                 .select('name , price , image , offer');
+        else if (nameSort == 0 && priceSort != 0)
+            result = ProductModel.find({})
+                                 .skip(skip).limit(limit)
+                                 .sort({price:priceSort})
+                                 .populate('offer')
+                                 .select('name , price , image , offer');    
+        else if (nameSort != 0 && priceSort == 0)
+            result = ProductModel.find({})
+                                 .skip(skip).limit(limit)
+                                 .sort({name:nameSort})
+                                 .populate('offer')
+                                 .select('name , price , image , offer');    
+        else if (nameSort != 0 && priceSort != 0)
+            result = ProductModel.find({})
+                                 .skip(skip).limit(limit)
+                                 .sort({name:nameSort,price:priceSort})
+                                 .populate('offer')
+                                 .select('name , price , image , offer');                                     
+        
+        if(result)
+            return result;
+        else
+            return {error:"Error with getting all products"};
+    },    
+
     // added by thaer
     searchProducts(value) {
         const result = ProductModel.find({

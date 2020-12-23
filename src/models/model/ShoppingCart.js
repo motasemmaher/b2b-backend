@@ -134,7 +134,8 @@ module.exports = {
                 'totalBill': 0
             }
         }, {
-            multi: true
+            multi: true,
+            "useFindAndModify": false
         });
 
         if (result)

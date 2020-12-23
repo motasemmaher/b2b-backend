@@ -34,4 +34,14 @@ module.exports = class Report{
         const result = ReportModel.addOrder({_id: reportId, orderId: orderId});
         return result;
     }
+
+    addCancelOrder(reportId, orderId) {
+        const result = ReportModel.addCancelOrder({_id: reportId, orderId: orderId});
+        return result;
+    }
+
+    clearReport(reportId) {
+        const result = ReportModel.clearReport({_id: reportId});  
+        return result;
+    }
 }

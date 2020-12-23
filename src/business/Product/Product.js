@@ -11,6 +11,12 @@ module.exports = class Product{
         return promiseResult;
     }
 
+    countAll()
+    {
+        const promiseResult = ProductModel.countAllProducts();
+        return promiseResult;
+    }
+    
     countByStore(storeId)
     {
         const promiseResult = ProductModel.countByStore({storeId:storeId});
@@ -97,6 +103,18 @@ module.exports = class Product{
         return promiseResult;
     }
 
+    getProductsWithOffers(storeId,limit,skip)
+    {
+        const promiseResult = ProductModel.findProductsWithOffers({storeId:storeId,limit:limit,skip:skip});
+        return promiseResult;
+    }
+
+    getAllProducts(limit,skip,nameSort,priceSort)
+    {
+        const promiseResult = ProductModel.findAllProducts({limit:limit,skip:skip,nameSort:nameSort,priceSort:priceSort});
+        return promiseResult;
+    }
+    
     getProductsOfStore(storeId,limit,skip,nameSort,priceSort)
     {
         const promiseResult = ProductModel.findProductsOfStore({storeId:storeId,limit:limit,skip:skip,nameSort:nameSort,priceSort:priceSort});

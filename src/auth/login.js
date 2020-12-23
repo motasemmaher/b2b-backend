@@ -166,7 +166,8 @@ module.exports = {
                             req.session.token = token;
                             // req.user = user;
                             loginInfo =  {
-                                user: user
+                                user: user,
+                                token
                             };
                         }
                        

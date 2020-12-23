@@ -13,7 +13,7 @@ module.exports = {
                 const verified = jwt.verify(token, process.env.token_pass, {
                     expiresIn: '1h'
                 })
-                console.log(verified); 
+                // console.log(verified); 
                 req.user = verified;
                 
                 return next();

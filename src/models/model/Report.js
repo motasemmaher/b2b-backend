@@ -72,7 +72,7 @@ module.exports = {
             report.totalIncome = 0;
             await report.listOfSoldItems.forEach(async (element, index) => {
                 await OrderModel.getOrder(element).populate('shoppingCart').then(retrivedOrder => {
-                    if(index === report.listOfSoldItems.length - 1) {
+                    if (index === report.listOfSoldItems.length - 1) {
                         result = report.save();
                     }
                     report.totalIncome += retrivedOrder.shoppingCart.totalBill;
@@ -86,5 +86,44 @@ module.exports = {
             return {
                 error: "Error with the adding order to the Report"
             };
+    },
+
+    async addCancelOrder(value) {
+        let result = null;
+        await ReportModel.findOne({
+            _id: value._id
+        }).then(report => {
+            report.listOfCancelItems.push(value.orderId);
+            result = report.save();
+        });
+
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error with the adding cancel order to the Report"
+            };
+    },
+
+    clearReport(value) {
+        const result = ReportModel.findOneAndUpdate({
+            _id: value._id
+        }, {
+            $set: {
+                'totalIncome': 0,
+                'listOfSoldItems': [],
+                'listOfCancelItems': []
+            }
+        }, {
+            multi: true,
+            "useFindAndModify": false
+        });
+
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error in clearReport function"
+            };        
     }
 }
