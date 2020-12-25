@@ -2988,7 +2988,7 @@ app.put('/maintain/order/:orderId', userAuthenticated, (req, res) => {
             order.getOrder(orderId).then(retrivedOrder => {
                 if (retrivedOrder.status === 'pending') {
                     if (cOwner._id.equals(retrivedOrder.carOwnerId)) {
-                        if ((date.getTime() - retrivedOrder.date.getTime()) <= 3600000) {
+                        if ((date.getTime() - retrivedOrder.date.getTime()) >= 3600000) {
                             retrivedOrder.deliveryAddress = deliveryAddress;
                             retrivedOrder.phoneNumber = phoneNumber;
                             order.updateOrder(retrivedOrder).then(updatedOrder => {
