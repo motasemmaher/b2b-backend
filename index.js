@@ -53,7 +53,7 @@ const Complaint = require('./src/business/Complaint/Complaint');
 const Message = require('./src/business/Message/Message');
 const Offer = require('./src/business/Offer/Offer');
 const Car = require('./src/business/Car/Car');
-const Permissions = require('./src/business/Perminssions/Perminssions');
+const Permissions = require('./src/business/Permissions/Permissions');
 
 // validation by thaer
 const orderInformationValidator = require('./src/validations/orderInformation');
@@ -1023,7 +1023,7 @@ app.delete('/stores/:storeId/delete-category/:categoryId', userAuthenticated, (r
 
 
 //Product CORS
-app.options('/products/:productId?');//View Products and View a Product
+app.options('/products/:productId?'); //View Products and View a Product
 app.options('/stores/:storeId/products/:productId?'); //View Products of store and View a Product of a Store
 app.options('/stores/:storeId/category/:categoryId/products/:productId?'); //View Products of a store and View a Product of a Category
 app.options('/stores/:storeId/category/:categoryId/create-product'); //Create Product
@@ -2426,7 +2426,7 @@ const adminReport = schedule.scheduleJob('0 0 1 * *', () => {
         }));
 });
 
-app.get('/products/:productId?',(req,res) => {
+app.get('/products/:productId?', (req, res) => {
     let nameSort = parseInt(req.query.nameSort);
     let priceSort = parseInt(req.query.priceSort);
     let skip = req.query.skip;
@@ -2439,51 +2439,58 @@ app.get('/products/:productId?',(req,res) => {
         nameSort = 0;
     if (priceSort == null)
         priceSort = 0;
-    
-    if(req.params.productId == null)
-    {
-        product.getAllProducts(limit,skip,nameSort,priceSort)
-        .then(productResults => {
-        product.countAll()
-            .then(countResult => {
-            productsArray = productResults;
-            productsArray.forEach((productResult,index,productsArray) => {
-                imageToBase64(productResult.image)
-                .then(base64Image => {
-                productResult.image = base64Image;       
-                if(index  === productsArray.length - 1)
-                    res.send({productsCountByStore:countResult,products:productsArray});
-                })
-                .catch(err => {
-                    console.log({error:"Error converting image.    "+err})
-                    if (!res.headersSent)
-                    res.send({count:countResult,products:productsArray});
-                });  
-                }) //End of foreach
+
+    if (req.params.productId == null) {
+        product.getAllProducts(limit, skip, nameSort, priceSort)
+            .then(productResults => {
+                product.countAll()
+                    .then(countResult => {
+                        // productsArray = productResults;
+                        return res.status(200).send({
+                            products: countResult
+                        });
+                        // .forEach((productResult,index,productsArray) => {
+                        //     imageToBase64(productResult.image)
+                        //     .then(base64Image => {
+                        //     productResult.image = base64Image;       
+                        //     if(index  === productsArray.length - 1)
+                        //         res.send({productsCountByStore:countResult,products:productsArray});
+                        //     })
+                        //     .catch(err => {
+                        //         console.log({error:"Error converting image.    "+err})
+                        //         if (!res.headersSent)
+                        //         res.send({count:countResult,products:productsArray});
+                        //     });  
+                        //     }) //End of foreach
+                    })
+                // .catch((err => res.send({error:"Error getting count of all products. "+err})));
             })
-            .catch((err => res.send({error:"Error getting count of all products. "+err})));
-        })
-        .catch(err => res.send({error:"Error getting all products. "+err}));
-    }
-    else
-    {
+            .catch(err => res.send({
+                error: "Error getting all products. " + err
+            }));
+    } else {
         product.getProductById(req.params.productId)
-            .then(productResult => {    
-            if(productResult == null)
-                res.send({error:"Error! Didn't find a product with that id."});
-            else
-            {
-                imageToBase64(productResult.image)
-                .then((base64Image) => {
-                    product.image = base64Image;
-                res.send(productResult);
-                })
-                .catch(err => res.send({error:"Error converting image.    "+err}));
-            }
+            .then(productResult => {
+                if (productResult == null)
+                    res.send({
+                        error: "Error! Didn't find a product with that id."
+                    });
+                else {
+                    imageToBase64(productResult.image)
+                        .then((base64Image) => {
+                            product.image = base64Image;
+                            res.send(productResult);
+                        })
+                        .catch(err => res.send({
+                            error: "Error converting image.    " + err
+                        }));
+                }
             })
-            .catch(err => res.send({error:"Error getting products of the requested category. "+err}));
+            .catch(err => res.send({
+                error: "Error getting products of the requested category. " + err
+            }));
     }
- 
+
 });
 
 
@@ -2704,10 +2711,10 @@ app.get('/shoppingcart/cartItem/:cartItemId', userAuthenticated, (req, res) => {
 });
 
 //------------------add cartItem to shoppingcart by car owner-----------------\\
-app.post('/shoppingcart/addcart', userAuthenticated, (req, res) => {
-    const productId = req.body.productId;
+app.post('/shoppingcart/addcart/storeId/:storeId/productId/:productId', userAuthenticated, (req, res) => {
+    const productId = req.params.productId;
+    const storeId = req.params.storeId;
     const date = req.body.date;
-    const storeId = req.body.storeId;
     const userInfo = req.user;
 
     const isValidQuantity = cartItemInformationValidator.validateCartItemInfo({
@@ -2779,25 +2786,29 @@ app.post('/shoppingcart/addcart', userAuthenticated, (req, res) => {
 });
 
 //------------remove cartitem by car owner-----------\\
-app.delete('/shoppingcart/removecartitem', userAuthenticated, (req, res) => {
-    const cartItemId = req.body.cartItemId;
-    const shoppingCartId = req.body.shoppingCartId;
-    shoppingCart.removeCartItem(shoppingCartId, cartItemId).then(updatedShoppingCart => {
-        cartItem.deleteCartItem({
-            _id: cartItemId
-        }).then(deletedCartItem => {
-            res.status(200).send(updatedShoppingCart);
+app.delete('/shoppingcart/removecartitem/:cartItemId', userAuthenticated, (req, res) => {
+    const cartItemId = req.params.cartItemId;
+
+    cartItem.getCartItem(cartItemId).then(retrivedCartItem => {
+        shoppingCart.removeCartItem(retrivedCartItem.shoppingCart, cartItemId).then(updatedShoppingCart => {
+            cartItem.deleteCartItem({
+                _id: cartItemId
+            }).then(deletedCartItem => {
+                res.status(200).send(updatedShoppingCart);
+            }).catch(err => {
+                res.status(501).send(err);
+            });
         }).catch(err => {
             res.status(501).send(err);
         });
     }).catch(err => {
-        res.status(501).send(err);
-    });
+        res.status(404).send({error: 'there is no cartItem in this id'});
+    });    
 });
 
 //------------update cartitem by car owner-----------\\
-app.put('/shoppingcart/updatecartitem', userAuthenticated, (req, res) => {
-    const cartItemId = req.body.cartItemId;
+app.put('/shoppingcart/updatecartitem/:cartItemId', userAuthenticated, (req, res) => {
+    const cartItemId = req.params.cartItemId;
 
     const isValidQuantity = cartItemInformationValidator.validateCartItemInfo({
         quantity: req.body.quantity.toString()
@@ -2811,22 +2822,21 @@ app.put('/shoppingcart/updatecartitem', userAuthenticated, (req, res) => {
 
     const quantity = parseInt(req.body.quantity.toString());
 
-
     if (quantity <= 0) {
         return res.status(400).send({
             Error: 'Quantity must be more than Zero'
         });
     }
 
-    cartItem.getCartItem(cartItemId).then(retrivedCartItem => {
-        store.getStore({
-            _id: retrivedCartItem.storeId
-        }).then(storeInfo => {
+    cartItem.getCartItem(cartItemId).then(retrivedCartItem => {        
+        store.getStore(retrivedCartItem.storeId).then(storeInfo => {
+            console.log(storeInfo);
             warehouse.getProductFromWarehouse(
                 storeInfo.warehouse, retrivedCartItem.product
             ).populate({
                 path: 'storage.productId'
             }).then(warehouseInfo => {
+                // console.log(warehouseInfo);
                 if (warehouseInfo.storage[0].amount >= quantity) {
                     const totalPrice = warehouseInfo.storage[0].productId.price * quantity;
                     if (totalPrice > 0) {
@@ -2854,7 +2864,7 @@ app.put('/shoppingcart/updatecartitem', userAuthenticated, (req, res) => {
                 res.status(501).send(err);
             });
         }).catch(err => {
-            res.status(501).send(err);
+            res.status(404).send({error: 'store is not exists'});
         });
     });
 
@@ -3332,7 +3342,7 @@ app.get('/perminssions', (req, res) => {
 app.put('/perminssions/role/:role/add/:permission', (req, res) => {
     const role = req.params.role;
     const permission = req.params.permission;
-    if(!permission) {
+    if (!permission) {
         return res.status(400).send({
             Error: 'error in permission param'
         });
@@ -3356,7 +3366,7 @@ app.put('/perminssions/autoAdding', (req, res) => {
         'chat', 'manageOffers', 'viewComplaints'
     ];
     const arrPermissionAdmin = ['addUser', 'removeUser', 'viewUsers', 'viewComplaints'];
-0000
+
     arrPermissionCarOwner.forEach((item, index) => {
         prom.push(permissions.addPermission('carOwner', item));
     });
@@ -3369,7 +3379,9 @@ app.put('/perminssions/autoAdding', (req, res) => {
     Promise.all(prom).then(values => {
         res.send(values);
     }).catch(err => {
-        res.status(400).send({Error: 'Error in autoAdding'});
+        res.status(400).send({
+            Error: 'Error in autoAdding'
+        });
     });
 });
 

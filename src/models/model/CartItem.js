@@ -91,7 +91,6 @@ module.exports = {
     },
 
     getCartItemAssociatedWithShoppingCartId(value) {
-        console.log(value);
         const result = CartItemModel.findOne({
             $and: [{
                     _id: value._id
