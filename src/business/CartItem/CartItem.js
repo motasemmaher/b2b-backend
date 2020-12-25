@@ -27,7 +27,7 @@ module.exports = class CartItem {
     }
 
     getCartItem(cartItemId) {
-        const result = CartItemModel.getCartItem(cartItemId);
+        const result = CartItemModel.getCartItem({_id: cartItemId});
         return result;
     }
 
