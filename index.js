@@ -83,8 +83,9 @@ const permissions = new Permissions();
 //Setting-up path for the static files
 app.use('./public', express.static('uploads'));
 //Setting-up req body parser
-app.use(bodyParser.json({ limit: true }));
+app.use(bodyParser.json({ limit: '5mb', extended: true }));
 app.use(bodyParser.urlencoded({
+    limit: '5mb',
     extended: true
 }))
 //Setting-up CORS options
