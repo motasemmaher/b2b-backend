@@ -23,7 +23,6 @@ require('dotenv').config()
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 
-app.use(bodyParser.json());
 //Setting-up session and authintication
 app.use(session({
     secret: process.env.SECRET,
@@ -47,7 +46,7 @@ const CartItem = require('./src/business/CartItem/CartItem');
 const Order = require('./src/business/Order/Order');
 const GarageOwner = require('./src/business/GarageOwner/GarageOwner');
 const Contact = require('./src/business/Contact/Contact');
-const Chat = require('./src/business/Chat/Chat');
+// const Chat = require('./src/business/Chat/Chat');
 const Report = require('./src/business/Report/Report');
 const Complaint = require('./src/business/Complaint/Complaint');
 const Message = require('./src/business/Message/Message');
@@ -75,7 +74,7 @@ const offer = new Offer();
 const car = new Car();
 const shoppingCart = new ShoppingCart();
 const contact = new Contact();
-const chat = new Chat();
+// const chat = new Chat();
 const report = new Report();
 const order = new Order();
 const cartItem = new CartItem();
@@ -84,17 +83,17 @@ const permissions = new Permissions();
 //Setting-up path for the static files
 app.use('./public', express.static('uploads'));
 //Setting-up req body parser
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: true }));
 app.use(bodyParser.urlencoded({
     extended: true
 }))
 //Setting-up CORS options
-const corsOptions = {
-    origin: 'http://localhost:8100',
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    optionsSuccessStatus: 200
-}
-app.use(cors(corsOptions))
+// const corsOptions = {
+//     origin: 'http://localhost:8100',
+//     methods: "*",
+//     optionsSuccessStatus: 200
+// }
+app.use(cors())
 
 
 /*-------------------------------------------------Thaer's work start-------------------------------------------------*/
@@ -272,16 +271,16 @@ app.post('/user/garage-owner/create', upload.single('image'), (req, res) => {
                         warehouse.createWarehouse()
                             .then(warehouseResult => {
                                 store.createStore({
-                                        ...storeInfo,
-                                        userId: userResult._id,
-                                        menu: menuResult,
-                                        warehouse: warehouseResult
-                                    }) //,image:req.file.path
+                                    ...storeInfo,
+                                    userId: userResult._id,
+                                    menu: menuResult,
+                                    warehouse: warehouseResult
+                                }) //,image:req.file.path
                                     .then(storeResult => {
                                         garageOwner.createGarageOwner({
-                                                user: userResult,
-                                                stores: [storeResult]
-                                            })
+                                            user: userResult,
+                                            stores: [storeResult]
+                                        })
                                             .then(garageOwnerResult => {
                                                 warehouse.linkWarehouse({
                                                     _id: warehouseResult._id,
@@ -352,10 +351,10 @@ app.post('/user/car-owner/create', (req, res) => {
                         shoppingCart.createShoppingCart()
                             .then(shoppingCartResult => {
                                 carOwner.createCarOwner({
-                                        user: userResult,
-                                        cars: [carResult],
-                                        shoppingCart: shoppingCartResult._id
-                                    })
+                                    user: userResult,
+                                    cars: [carResult],
+                                    shoppingCart: shoppingCartResult._id
+                                })
                                     .then(carOwnerResult => {
                                         res.send("Successfully created CarOwner");
                                     })
@@ -818,9 +817,9 @@ app.post('/stores/:storeId/create-category', userAuthenticated, (req, res) => {
                                 if (categoryFindResult == null || categoryFindResult.storeId != storeId) {
                                     //1- Creating category with the provided information
                                     category.createCategory({
-                                            ...categoryInfo,
-                                            storeId: storeId
-                                        })
+                                        ...categoryInfo,
+                                        storeId: storeId
+                                    })
                                         .then(categoryCreateResult => {
                                             //2- Adding a ref for the new category to the store's menu
                                             menu.addCategory(storeId, categoryCreateResult)
@@ -898,9 +897,9 @@ app.put('/stores/:storeId/update-category/:categoryId', userAuthenticated, (req,
                                             if (categoryFindResult == null || categoryFindResult.storeId != storeId) {
                                                 //1- Update the category with the ID with the new provided information
                                                 category.updateCategory({
-                                                        _id: categoryId,
-                                                        ...categoryInfo
-                                                    })
+                                                    _id: categoryId,
+                                                    ...categoryInfo
+                                                })
                                                     .then(categoryUpdateResult => {
                                                         //2- After the update finishes, find the updated category by its ID then return it to the user
                                                         category.findCategoryById(categoryId)
@@ -971,9 +970,9 @@ app.delete('/stores/:storeId/delete-category/:categoryId', userAuthenticated, (r
                                         const index = menuResult.categories.indexOf(categoryId);
                                         menuResult.categories.splice(index, 1);
                                         menu.updateMenu({
-                                                storeId: menuResult.storeId,
-                                                categories: menuResult.categories
-                                            })
+                                            storeId: menuResult.storeId,
+                                            categories: menuResult.categories
+                                        })
                                             .then(updateMenuResult => {
                                                 //3- Removing the category    
                                                 category.removeCategory(categoryId)
@@ -1507,27 +1506,28 @@ app.get('/stores/:storeId?', (req, res) => {
                 store.countAll()
                     .then(countResult => {
                         storesArray = storesResult;
-                        storesArray.forEach((storeResult, index, storesArray) => {
-                            imageToBase64(storeResult.image)
-                                .then(base64Image => {
-                                    storeResult.image = base64Image;
-                                    if (index === storesArray.length - 1)
-                                        res.send({
-                                            count: countResult,
-                                            stores: storesArray
-                                        });
-                                })
-                                .catch(err => {
-                                    console.log({
-                                        error: "Error converting image.    " + err
-                                    })
-                                    if (!res.headersSent)
-                                        res.send({
-                                            count: countResult,
-                                            stores: storesArray
-                                        });
-                                });
-                        }) //End of foreach
+                        res.send({
+                            count: countResult,
+                            stores: storesResult
+                        });
+                        // storesArray.forEach((storeResult, index, storesArray) => {
+                        //     imageToBase64(storeResult.image)
+                        //         .then(base64Image => {
+                        //             storeResult.image = base64Image;
+                        //             if (index === storesArray.length - 1)
+                                       
+                        //         })
+                        //         .catch(err => {
+                        //             console.log({
+                        //                 error: "Error converting image.    " + err
+                        //             })
+                        //             if (!res.headersSent)
+                        //                 res.send({
+                        //                     count: countResult,
+                        //                     stores: storesArray
+                        //                 });
+                        //         });
+                        // }) //End of foreach
                     })
                     .catch(err => {
                         res.send({
@@ -1546,14 +1546,15 @@ app.get('/stores/:storeId?', (req, res) => {
                         error: "Error! Didn't find a store with thats id."
                     });
                 else {
-                    imageToBase64(storeResult.image)
-                        .then((base64Image) => {
-                            storeResult.image = base64Image;
-                            res.send(storeResult);
-                        })
-                        .catch(err => res.send({
-                            error: "Error converting image.    " + err
-                        }));
+                    res.send(storeResult);
+                    // imageToBase64(storeResult.image)
+                    //     .then((base64Image) => {
+                    //         storeResult.image = base64Image;
+                    //         res.send(storeResult);
+                    //     })
+                    //     .catch(err => res.send({
+                    //         error: "Error converting image.    " + err
+                    //     }));
                 }
             })
             .catch(err => res.send({
@@ -1581,27 +1582,31 @@ app.get('/user/manage-garage-owner/stores', userAuthenticated, (req, res) => {
                 store.countByGarageOwner(loggedUser._id)
                     .then(countResult => {
                         storesArray = storesResult;
-                        storesArray.forEach((storeResult, index, storesArray) => {
-                            imageToBase64(storeResult.image)
-                                .then(base64Image => {
-                                    storeResult.image = base64Image;
-                                    if (index === storesArray.length - 1)
-                                        res.send({
-                                            count: countResult,
-                                            stores: storesArray
-                                        });
-                                })
-                                .catch(err => {
-                                    console.log({
-                                        error: "Error converting image.    " + err
-                                    });
-                                    if (!res.headersSent)
-                                        res.send({
-                                            count: countResult,
-                                            stores: storesArray
-                                        });
-                                });
-                        }) //End of foreach
+                        res.send({
+                            count: countResult,
+                            stores: storesResult
+                        });
+                        // storesArray.forEach((storeResult, index, storesArray) => {
+                        //     imageToBase64(storeResult.image)
+                        //         .then(base64Image => {
+                        //             storeResult.image = base64Image;
+                        //             if (index === storesArray.length - 1)
+                        //                 res.send({
+                        //                     count: countResult,
+                        //                     stores: storesArray
+                        //                 });
+                        //         })
+                        //         .catch(err => {
+                        //             console.log({
+                        //                 error: "Error converting image.    " + err
+                        //             });
+                        //             if (!res.headersSent)
+                        //                 res.send({
+                        //                     count: countResult,
+                        //                     stores: storesArray
+                        //                 });
+                        //         });
+                        // }) //End of foreach
                     })
                     .catch(err => res.send({
                         error: "Error with getting count of garage owner's stores.  " + err
@@ -1637,10 +1642,10 @@ app.post('/user/manage-garage-owner/add-store', userAuthenticated, upload.single
                     warehouse.createWarehouse()
                         .then(warehouseResult => {
                             store.createStore({
-                                    ...storeInfo,
-                                    menu: menuResult,
-                                    warehouse: warehouseResult
-                                })
+                                ...storeInfo,
+                                menu: menuResult,
+                                warehouse: warehouseResult
+                            })
                                 .then(storeResult => {
                                     warehouse.linkWarehouse({
                                         _id: warehouseResult._id,
@@ -2347,7 +2352,7 @@ const garageOwnerReport = schedule.scheduleJob('0 0 1 * *', () => {
                                 var mailOptions = {
                                     from: 'b2b.report.generator@gmail.com',
                                     to: garOwner.email,
-                                    subject: `Month:${new Date().getMonth()+1}/${new Date().getFullYear()} Report`,
+                                    subject: `Month:${new Date().getMonth() + 1}/${new Date().getFullYear()} Report`,
                                     text: `Hello ${garOwner.fullName}, this is the report for the current month.\n${reportForGarageOwner}\nBest wishes, B2B team`,
                                 };
                                 reportTransporter.sendMail(mailOptions, function (error, info) {
@@ -2390,10 +2395,10 @@ const adminReport = schedule.scheduleJob('0 0 1 * *', () => {
                                                 var mailOptions = {
                                                     from: 'b2b.report.generator@gmail.com',
                                                     to: admin.email,
-                                                    subject: `Admin,Month:${new Date().getMonth()+1}/${new Date().getFullYear()} Report`,
+                                                    subject: `Admin,Month:${new Date().getMonth() + 1}/${new Date().getFullYear()} Report`,
                                                     text: `Hello ${admin.fullName},this is the report for the current month.\nBest wishes, B2B team`,
                                                     attachments: [{
-                                                        filename: `admin-report#${new Date().getMonth()+1}/${new Date().getFullYear()}.txt`,
+                                                        filename: `admin-report#${new Date().getMonth() + 1}/${new Date().getFullYear()}.txt`,
                                                         path: './public/admin-report.txt'
                                                     }]
                                                 };
@@ -2429,25 +2434,27 @@ const adminReport = schedule.scheduleJob('0 0 1 * *', () => {
 app.get('/products/:productId?', (req, res) => {
     let nameSort = parseInt(req.query.nameSort);
     let priceSort = parseInt(req.query.priceSort);
-    let skip = req.query.skip;
-    let limit = req.query.limit;
-    const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);
-    skip = limitAndSkipValues.skip;
-    limit = limitAndSkipValues.limit;
-
-    if (nameSort == null)
-        nameSort = 0;
-    if (priceSort == null)
-        priceSort = 0;
-
+  
     if (req.params.productId == null) {
+        let skip = req.query.skip;
+        let limit = req.query.limit;
+        const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);
+        skip = limitAndSkipValues.skip;
+        limit = limitAndSkipValues.limit;
+    
+        if (nameSort == null)
+            nameSort = 0;
+        if (priceSort == null)
+            priceSort = 0;
+    
         product.getAllProducts(limit, skip, nameSort, priceSort)
             .then(productResults => {
                 product.countAll()
                     .then(countResult => {
                         // productsArray = productResults;
                         return res.status(200).send({
-                            products: countResult
+                            count: countResult,
+                            products: productResults,
                         });
                         // .forEach((productResult,index,productsArray) => {
                         //     imageToBase64(productResult.image)
@@ -2476,14 +2483,15 @@ app.get('/products/:productId?', (req, res) => {
                         error: "Error! Didn't find a product with that id."
                     });
                 else {
-                    imageToBase64(productResult.image)
-                        .then((base64Image) => {
-                            product.image = base64Image;
-                            res.send(productResult);
-                        })
-                        .catch(err => res.send({
-                            error: "Error converting image.    " + err
-                        }));
+                    return res.send(productResult);
+                    // imageToBase64(productResult.image)
+                    //     .then((base64Image) => {
+                    //         product.image = base64Image;
+                    //         res.send(productResult);
+                    //     })
+                    //     .catch(err => res.send({
+                    //         error: "Error converting image.    " + err
+                    //     }));
                 }
             })
             .catch(err => res.send({
@@ -2802,8 +2810,8 @@ app.delete('/shoppingcart/removecartitem/:cartItemId', userAuthenticated, (req, 
             res.status(501).send(err);
         });
     }).catch(err => {
-        res.status(404).send({error: 'there is no cartItem in this id'});
-    });    
+        res.status(404).send({ error: 'there is no cartItem in this id' });
+    });
 });
 
 //------------update cartitem by car owner-----------\\
@@ -2828,7 +2836,7 @@ app.put('/shoppingcart/updatecartitem/:cartItemId', userAuthenticated, (req, res
         });
     }
 
-    cartItem.getCartItem(cartItemId).then(retrivedCartItem => {        
+    cartItem.getCartItem(cartItemId).then(retrivedCartItem => {
         store.getStore(retrivedCartItem.storeId).then(storeInfo => {
             console.log(storeInfo);
             warehouse.getProductFromWarehouse(
@@ -2864,7 +2872,7 @@ app.put('/shoppingcart/updatecartitem/:cartItemId', userAuthenticated, (req, res
                 res.status(501).send(err);
             });
         }).catch(err => {
-            res.status(404).send({error: 'store is not exists'});
+            res.status(404).send({ error: 'store is not exists' });
         });
     });
 
@@ -3229,37 +3237,37 @@ app.delete('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
 
     if (userInfo.role === 'garageOwner') {
         garageOwner.getGarageOwnerByUserId(userInfo._id).then(owner => {
-                garageOwner.removeOrder(owner._id, storeId, orderId).then(updateGarageOwner => {
-                        order.getOrder(orderId).then(orderInfo => {
-                                carOwner.removeOrder(orderInfo.carOwnerId, orderId).then(updateCarOwner => {
-                                        order.deleteOrder(orderId).then(deletedOrder => {
-                                                shoppingCart.deleteShoppingCart(deletedOrder.shoppingCart).then(deletedShoppingCart => {
-                                                    cartItem.deleteAllCartItemsAssociatedWithShoppingCartId(deletedOrder.shoppingCart).then(deletedCartItem => {
-                                                        res.status(200).send(deletedOrder);
-                                                    }).catch(err => {
-                                                        res.status(501).send("Error in deleting");
-                                                    });
-                                                }).catch(err => {
-                                                    res.status(501).send("Error in deleting");
-                                                });
-                                            })
-                                            .catch(err => {
-                                                res.status(501).send("Error in deleting");
-                                            });
-                                    })
-                                    .catch(err => {
-                                        res.status(501).send("Error in deleting");
-                                    });
-
-                            })
+            garageOwner.removeOrder(owner._id, storeId, orderId).then(updateGarageOwner => {
+                order.getOrder(orderId).then(orderInfo => {
+                    carOwner.removeOrder(orderInfo.carOwnerId, orderId).then(updateCarOwner => {
+                        order.deleteOrder(orderId).then(deletedOrder => {
+                            shoppingCart.deleteShoppingCart(deletedOrder.shoppingCart).then(deletedShoppingCart => {
+                                cartItem.deleteAllCartItemsAssociatedWithShoppingCartId(deletedOrder.shoppingCart).then(deletedCartItem => {
+                                    res.status(200).send(deletedOrder);
+                                }).catch(err => {
+                                    res.status(501).send("Error in deleting");
+                                });
+                            }).catch(err => {
+                                res.status(501).send("Error in deleting");
+                            });
+                        })
                             .catch(err => {
                                 res.status(501).send("Error in deleting");
                             });
                     })
+                        .catch(err => {
+                            res.status(501).send("Error in deleting");
+                        });
+
+                })
                     .catch(err => {
                         res.status(501).send("Error in deleting");
                     });
             })
+                .catch(err => {
+                    res.status(501).send("Error in deleting");
+                });
+        })
             .catch(err => {
                 res.status(501).send("Error in deleting");
             });
