@@ -18,7 +18,7 @@ const {
 } = require('rate-limiter-flexible');
 
 const maxWrongAttemptsFromIPperDay = 1000;
-const maxConsecutiveFailsByUsernameAndIP = 3;
+const maxConsecutiveFailsByUsernameAndIP = 100000000000;
 
 const mongoConn = mongoose.connection;
 
@@ -106,86 +106,21 @@ module.exports = {
                         }
                     }
                 }
-            }
-            if (user.role === 'waitingUser') {
-                try {
-                    await Promise.all([
-                        limiterConsecutiveFailsByUsernameAndIP.consume(usernameIPkey),
-                        limiterSlowBruteByIP.consume(req.ip)
-                    ])
-
-                    loginInfo = {
-                        user: null,                        
-                    };
-                } catch (rlRejected) {
-                    if (rlRejected instanceof RateLimiterRes) {
-                        loginInfo = {
-                            user: null,                            
-                            blockFor: {
-                                statusCode: 429,
-                                retrySecs: Math.round(rlRejected.msBeforeNext / 1000) || 1
-                            }
-                        };
-                    } else {
-                        loginInfo = {
-                            rlRejected: rlRejected
-                        }
-                    }
-                }
-            }
-            
-           const matched =  await bcrypt.compare(password, user.password);
-            // , async (err, matched) => {
-                // if (err) throw err;
-                if (matched) {
-                    if (resUsernameAndIP !== null && resUsernameAndIP.consumedPoints > 0) {
-                        // Reset on successful authorisation
-                        try {
-                            await limiterConsecutiveFailsByUsernameAndIP.delete(usernameIPkey);
-                        } catch (err) {
-                            // handle err only when other than memory limiter used
-                        }
-                    }
-
-                    // by ms
-                    const payload = {
-                        _id: user._id,
-                        username: user.username,
-                        role: user.role
-                    }
-                    // console.log(user._id);
-                    const token = await jwt.sign(payload, process.env.token_pass, {
-                        expiresIn: '1h'
-                    });
-                    console.log(token);
-                    //  (err, token) => {
-                        // if (err) return {
-                        //     user: null,                            
-                        // });
-                        if(token) {
-                            req.session.token = token;
-                            // req.user = user;
-                            loginInfo =  {
-                                user: user,
-                                token
-                            };
-                        }
-                       
-                    // });
-                } else {
+            } else {
+                if (user.role === 'waitingUser') {
                     try {
                         await Promise.all([
                             limiterConsecutiveFailsByUsernameAndIP.consume(usernameIPkey),
                             limiterSlowBruteByIP.consume(req.ip)
                         ])
-
+    
                         loginInfo = {
-                            user: null,                            
+                            user: null,                        
                         };
                     } catch (rlRejected) {
                         if (rlRejected instanceof RateLimiterRes) {
                             loginInfo = {
-                                user: null,
+                                user: null,                            
                                 blockFor: {
                                     statusCode: 429,
                                     retrySecs: Math.round(rlRejected.msBeforeNext / 1000) || 1
@@ -194,11 +129,78 @@ module.exports = {
                         } else {
                             loginInfo = {
                                 rlRejected: rlRejected
-                            };
+                            }
                         }
                     }
                 }
-               
+                
+               const matched =  await bcrypt.compare(password, user.password);
+                // , async (err, matched) => {
+                    // if (err) throw err;
+                    if (matched) {
+                        if (resUsernameAndIP !== null && resUsernameAndIP.consumedPoints > 0) {
+                            // Reset on successful authorisation
+                            try {
+                                await limiterConsecutiveFailsByUsernameAndIP.delete(usernameIPkey);
+                            } catch (err) {
+                                // handle err only when other than memory limiter used
+                            }
+                        }
+    
+                        // by ms
+                        const payload = {
+                            _id: user._id,
+                            username: user.username,
+                            role: user.role
+                        }
+                        // console.log(user._id);
+                        const token = await jwt.sign(payload, process.env.token_pass, {
+                            expiresIn: '1h'
+                        });
+                        console.log(token);
+                        //  (err, token) => {
+                            // if (err) return {
+                            //     user: null,                            
+                            // });
+                            if(token) {
+                                req.session.token = token;
+                                // req.user = user;
+                                loginInfo =  {
+                                    user: user,
+                                    token
+                                };
+                            }
+                           
+                        // });
+                    } else {
+                        try {
+                            await Promise.all([
+                                limiterConsecutiveFailsByUsernameAndIP.consume(usernameIPkey),
+                                limiterSlowBruteByIP.consume(req.ip)
+                            ])
+    
+                            loginInfo = {
+                                user: null,                            
+                            };
+                        } catch (rlRejected) {
+                            if (rlRejected instanceof RateLimiterRes) {
+                                loginInfo = {
+                                    user: null,
+                                    blockFor: {
+                                        statusCode: 429,
+                                        retrySecs: Math.round(rlRejected.msBeforeNext / 1000) || 1
+                                    }
+                                };
+                            } else {
+                                loginInfo = {
+                                    rlRejected: rlRejected
+                                };
+                            }
+                        }
+                    }
+                   
+            }
+            
             // });
         }).catch(err => {
             console.log(err);
