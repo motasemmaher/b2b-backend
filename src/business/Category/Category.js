@@ -9,6 +9,7 @@ module.exports = class Category{
     exists(categoryId)
     {
         const promiseResult = CategoryModel.exists({categoryId:categoryId});
+        promiseResult.then((res) => console.log(res))
         return promiseResult;
     }
     

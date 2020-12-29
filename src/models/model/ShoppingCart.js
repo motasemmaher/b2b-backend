@@ -75,7 +75,7 @@ module.exports = {
 
     async addCartItem(value) {
         let result = null;
-
+        console.log
         await ShoppingCartModel.findOne({
             _id: value._id
         }).populate('Items').then(updatedShoppingCart => {
