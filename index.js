@@ -104,19 +104,19 @@ app.use(cors())
 // app.use(passport.session());
 
 
-app.post('/user/garage-owner/create', (req, res) => {
-    const user = req.body.user;
-    const store = req.body.store;
+// app.post('/user/garage-owner/create', (req, res) => {
+//     const user = req.body.user;
+//     const store = req.body.store;
 
-    SignUp.createGarageOwner(res, user, store);
-});
+//     SignUp.createGarageOwner(res, user, store);
+// });
 
-app.post('/user/car-owner/create', (req, res) => {
-    const user = req.body.user;
-    const car = req.body.car;
+// app.post('/user/car-owner/create', (req, res) => {
+//     const user = req.body.user;
+//     const car = req.body.car;
 
-    SignUp.createCarOwner(res, user, car);
-});
+//     SignUp.createCarOwner(res, user, car);
+// });
 
 app.put('/update-menu/:id', (req, res) => {
     console.log("Inside put")
@@ -229,16 +229,16 @@ app.delete('/user/logout', (req, res) => {
 // });
 
 //log-in & log-out CORS
-app.options('/user/login');
-app.options('/user/logout');
+app.options('*');
+// app.options('/user/logout');
 
 
 
 
 
-//Sign-up CORS
-app.options('/user/garage-owner/create'); //Creating garageOwner
-app.options('/user/car-owner/create'); //Creating carOwner
+// //Sign-up CORS
+// app.options('/user/garage-owner/create'); //Creating garageOwner
+// app.options('/user/car-owner/create'); //Creating carOwner
 //----------Hashing password----------
 function hashPassword(password) {
     const hash = bcrypt.hashSync(password, 10);
@@ -348,7 +348,7 @@ app.post('/user/car-owner/create', (req, res) => {
             .then(userResult => {
                 car.createCar(carInfo)
                     .then(carResult => {
-                        shoppingCart.createShoppingCart()
+                        shoppingCart.createShoppingCart({})
                             .then(shoppingCartResult => {
                                 carOwner.createCarOwner({
                                     user: userResult,
@@ -388,12 +388,12 @@ app.post('/user/car-owner/create', (req, res) => {
 
 
 //User CORS
-app.options('/admin/waiting-users'); //View waiting users
-app.options('/admin/view-users'); //View user
-app.options('/admin/waiting-users/accept/:userId'); //Accepting waiting user
-app.options('/admin/waiting-users/reject/:userId'); //Rejecting waiting user
-app.options('/admin/view-users/delete/:userId'); //Remove user
-app.options('/user/:userId/manage-user-info'); //Update User information
+// app.options('/admin/waiting-users'); //View waiting users
+// app.options('/admin/view-users'); //View user
+// app.options('/admin/waiting-users/accept/:userId'); //Accepting waiting user
+// app.options('/admin/waiting-users/reject/:userId'); //Rejecting waiting user
+// app.options('/admin/view-users/delete/:userId'); //Remove user
+// app.options('/user/:userId/manage-user-info'); //Update User information
 const hrTransporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -738,10 +738,10 @@ app.put('/user/manage-user-info', userAuthenticated, (req, res) => {
 
 
 //Category CORS
-app.options('/stores/:storeId/categories/:categoryId?'); //View Categories of a store and View a Category
-app.options('/stores/:storeId/create-category'); //Create Category
-app.options('/stores/:storeId/update-category/:categoryId'); //Update Category
-app.options('/stores/:storeId/delete-category/:categoryId'); //Delete Category
+// app.options('/stores/:storeId/categories/:categoryId?'); //View Categories of a store and View a Category
+// app.options('/stores/:storeId/create-category'); //Create Category
+// app.options('/stores/:storeId/update-category/:categoryId'); //Update Category
+// app.options('/stores/:storeId/delete-category/:categoryId'); //Delete Category
 //----------getAllCategoriesIssue---------------
 //----------View Categories of a store and View a Category----------
 app.get('/stores/:storeId/categories/:categoryId?', (req, res) => {
@@ -787,6 +787,7 @@ app.get('/stores/:storeId/categories/:categoryId?', (req, res) => {
 //----------Create Category----------
 app.post('/stores/:storeId/create-category', userAuthenticated, (req, res) => {
     loggedUser = req.user;
+
     storeId = req.params.storeId;
 
     if (loggedUser.role !== "garageOwner")
@@ -1022,12 +1023,12 @@ app.delete('/stores/:storeId/delete-category/:categoryId', userAuthenticated, (r
 
 
 //Product CORS
-app.options('/products/:productId?'); //View Products and View a Product
-app.options('/stores/:storeId/products/:productId?'); //View Products of store and View a Product of a Store
-app.options('/stores/:storeId/category/:categoryId/products/:productId?'); //View Products of a store and View a Product of a Category
-app.options('/stores/:storeId/category/:categoryId/create-product'); //Create Product
-app.options('/stores/:storeId/category/:categoryId/update-product/:productId'); //Update Product
-app.options('/stores/:storeId/category/:categoryId/delete-product/:productId'); //Delete Product
+// app.options('/products/:productId?'); //View Products and View a Product
+// app.options('/stores/:storeId/products/:productId?'); //View Products of store and View a Product of a Store
+// app.options('/stores/:storeId/category/:categoryId/products/:productId?'); //View Products of a store and View a Product of a Category
+// app.options('/stores/:storeId/category/:categoryId/create-product'); //Create Product
+// app.options('/stores/:storeId/category/:categoryId/update-product/:productId'); //Update Product
+// app.options('/stores/:storeId/category/:categoryId/delete-product/:productId'); //Delete Product
 //----------getAllCategoriesIssue---------------
 //----------View products store and View Product----------
 app.get('/stores/:storeId/products/:productId?', (req, res) => {
@@ -1158,7 +1159,7 @@ app.get('/stores/:storeId/category/:categoryId/products/:productId?', (req, res)
         }));
 });
 //----------Create Product----------
-app.post('/stores/:storeId/category/:categoryId/create-product', userAuthenticated, upload.single('image'), (req, res) => {
+app.post('/stores/:storeId/category/:categoryId/create-product', userAuthenticated, (req, res) => {
     loggedUser = req.user;
     storeId = req.params.storeId;
     categoryId = req.params.categoryId;
@@ -1189,10 +1190,9 @@ app.post('/stores/:storeId/category/:categoryId/create-product', userAuthenticat
                                 productInfo = {
                                     ...req.body,
                                     storeId: storeId,
-                                    image: req.file.path,
+                                    // image: req.file.path,
                                     categoryId: categoryId
                                 };
-
                                 const productValidationResult = product.validateProductInfo(productInfo);
                                 const warehouseValidationResult = warehouse.validateWarehouseInfo({
                                     amount: req.body.amount
@@ -1486,11 +1486,11 @@ app.delete('/stores/:storeId/category/:categoryId/delete-product/:productId', us
 
 
 //Store CORS
-app.options('/stores/:storeId?'); //View Stores and View a Store
-app.options('/user/:userId/manage-garage-owner/stores'); //View garageOwner's Stores
-app.options('/user/:userId/manage-garage-owner/add-store'); //Add Store
-app.options('/user/:userId/manage-garage-owner/update-store/:storeId'); //Update Store
-app.options('/user/:userId/manage-garage-owner/delete-store/:storeId'); //Delete Store
+// app.options('/stores/:storeId?'); //View Stores and View a Store
+// app.options('/user/:userId/manage-garage-owner/stores'); //View garageOwner's Stores
+// app.options('/user/:userId/manage-garage-owner/add-store'); //Add Store
+// app.options('/user/:userId/manage-garage-owner/update-store/:storeId'); //Update Store
+// app.options('/user/:userId/manage-garage-owner/delete-store/:storeId'); //Delete Store
 //----------View Stores and View a store----------
 app.get('/stores/:storeId?', (req, res) => {
     let limit = parseInt(req.query.limit);
@@ -1515,7 +1515,7 @@ app.get('/stores/:storeId?', (req, res) => {
                         //         .then(base64Image => {
                         //             storeResult.image = base64Image;
                         //             if (index === storesArray.length - 1)
-                                       
+
                         //         })
                         //         .catch(err => {
                         //             console.log({
@@ -1563,7 +1563,8 @@ app.get('/stores/:storeId?', (req, res) => {
     }
 });
 //----------View Garage Owner's stores----------
-app.get('/user/manage-garage-owner/stores', userAuthenticated, (req, res) => {
+// app.options('/user/manage-garage-owner/stores'); //View garageOwner's Stores
+app.get('/user/manage-garage-owner/stores', userAuthenticated, (req, res, next) => {
     const loggedUser = req.user;
     let limit = parseInt(req.query.limit);
     let skip = parseInt(req.query.skip);
@@ -1587,7 +1588,7 @@ app.get('/user/manage-garage-owner/stores', userAuthenticated, (req, res) => {
                             stores: storesResult
                         });
                         // storesArray.forEach((storeResult, index, storesArray) => {
-                        //     imageToBase64(storeResult.image)
+                        //     imageToBase64(stdforeResult.image)
                         //         .then(base64Image => {
                         //             storeResult.image = base64Image;
                         //             if (index === storesArray.length - 1)
@@ -1833,10 +1834,10 @@ app.delete('/user/manage-garage-owner/delete-store/:storeId', userAuthenticated,
 
 
 //Car CORS
-app.options('/user/:userId/manage-car-owner/cars'); //View carOwner's Cars
-app.options('/user/:userId/manage-car-owner/add-car'); //Add Car
-app.options('/user/:userId/manage-car-owner/update-car/:carId'); //Update Car
-app.options('/user/:userId/manage-car-owner/delete-car/:carId'); //Delete Car
+// app.options('/user/:userId/manage-car-owner/cars'); //View carOwner's Cars
+// app.options('/user/:userId/manage-car-owner/add-car'); //Add Car
+// app.options('/user/:userId/manage-car-owner/update-car/:carId'); //Update Car
+// app.options('/user/:userId/manage-car-owner/delete-car/:carId'); //Delete Car
 //----------View Car Owner's cars----------
 app.get('/user/manage-car-owner/cars/:carId?', userAuthenticated, (req, res) => {
     loggedUser = req.user;
@@ -2018,9 +2019,9 @@ app.delete('/user/manage-car-owner/delete-car/:carId', userAuthenticated, (req, 
 
 
 //Offer CORS
-app.options('/stores/:storeId/offers'); //View offers of a Store
-app.options('/stores/:storeId/offers/add-offer'); //Add Offer
-app.options('/stores/:storeId/offers/delete-offer/:offerId'); //Delete Offer
+// app.options('/stores/:storeId/offers'); //View offers of a Store
+// app.options('/stores/:storeId/offers/add-offer'); //Add Offer
+// app.options('/stores/:storeId/offers/delete-offer/:offerId'); //Delete Offer
 //----------Clear Offers----------
 const checkOffers = schedule.scheduleJob('0 * * * *', () => {
     console.log("CHECKING OFFERS");
@@ -2201,8 +2202,8 @@ app.delete('/stores/:storeId/offers/delete-offer/:offerId', userAuthenticated, (
 
 
 //Complaint CORS
-app.options('/stores/:storeId/create-complaint/:submitterId'); //Create Complaint
-app.options('/view-complaints/:userId'); //View Complaints
+// app.options('/stores/:storeId/create-complaint/:submitterId'); //Create Complaint
+// app.options('/view-complaints/:userId'); //View Complaints
 //app.options('/view-complaints/complaint/:complaintId'); //View A Complaint
 //----------Create Complaint----------
 app.post('/stores/:storeId/create-complaint', userAuthenticated, (req, res) => {
@@ -2434,19 +2435,19 @@ const adminReport = schedule.scheduleJob('0 0 1 * *', () => {
 app.get('/products/:productId?', (req, res) => {
     let nameSort = parseInt(req.query.nameSort);
     let priceSort = parseInt(req.query.priceSort);
-  
+
     if (req.params.productId == null) {
         let skip = req.query.skip;
         let limit = req.query.limit;
         const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);
         skip = limitAndSkipValues.skip;
         limit = limitAndSkipValues.limit;
-    
+
         if (nameSort == null)
             nameSort = 0;
         if (priceSort == null)
             priceSort = 0;
-    
+
         product.getAllProducts(limit, skip, nameSort, priceSort)
             .then(productResults => {
                 product.countAll()
@@ -2652,7 +2653,7 @@ var chatIO = io.of('/user/chat/start')
     });
 
 //---------get shoppingcart---------------\\
-app.get('/shoppingcart', userAuthenticated, (req, res) => {
+app.get('/shopping-cart', userAuthenticated, (req, res) => {
     let skip = req.query.skip;
     let limit = req.query.limit;
     const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);
@@ -2665,7 +2666,7 @@ app.get('/shoppingcart', userAuthenticated, (req, res) => {
         carOwner.getCarOwnerByUserId({
             user: userInfo._id
         }).populate('shoppingCart').then(carOwnerInfo => {
-            cartItem.getCartItemsAssociatedWithShoppingCartId(carOwnerInfo.shoppingCart._id, limit, skip)
+            cartItem.getCartItemsAssociatedWithShoppingCartId(carOwnerInfo.shoppingCart._id, limit, skip).populate('product')
                 .then(retrivedCartItems => {
                     res.send({
                         shoppingCart: {
@@ -2690,7 +2691,7 @@ app.get('/shoppingcart', userAuthenticated, (req, res) => {
 });
 
 //---------get cartItem from shoppingcart (back here)---------------\\
-app.get('/shoppingcart/cartItem/:cartItemId', userAuthenticated, (req, res) => {
+app.get('/shopping-cart/cart-item/:cartItemId', userAuthenticated, (req, res) => {
     const userInfo = req.user;
     const cartItemId = req.params.cartItemId;
 
@@ -2719,7 +2720,7 @@ app.get('/shoppingcart/cartItem/:cartItemId', userAuthenticated, (req, res) => {
 });
 
 //------------------add cartItem to shoppingcart by car owner-----------------\\
-app.post('/shoppingcart/addcart/storeId/:storeId/productId/:productId', userAuthenticated, (req, res) => {
+app.post('/shopping-cart/add-cart/:storeId/:productId', userAuthenticated, (req, res) => {
     const productId = req.params.productId;
     const storeId = req.params.storeId;
     const date = req.body.date;
@@ -2794,7 +2795,7 @@ app.post('/shoppingcart/addcart/storeId/:storeId/productId/:productId', userAuth
 });
 
 //------------remove cartitem by car owner-----------\\
-app.delete('/shoppingcart/removecartitem/:cartItemId', userAuthenticated, (req, res) => {
+app.delete('/shopping-cart/remove-cart-item/:cartItemId', userAuthenticated, (req, res) => {
     const cartItemId = req.params.cartItemId;
 
     cartItem.getCartItem(cartItemId).then(retrivedCartItem => {
@@ -2815,7 +2816,7 @@ app.delete('/shoppingcart/removecartitem/:cartItemId', userAuthenticated, (req, 
 });
 
 //------------update cartitem by car owner-----------\\
-app.put('/shoppingcart/updatecartitem/:cartItemId', userAuthenticated, (req, res) => {
+app.put('/shopping-cart/update-cart-item/:cartItemId', userAuthenticated, (req, res) => {
     const cartItemId = req.params.cartItemId;
 
     const isValidQuantity = cartItemInformationValidator.validateCartItemInfo({
@@ -2838,7 +2839,6 @@ app.put('/shoppingcart/updatecartitem/:cartItemId', userAuthenticated, (req, res
 
     cartItem.getCartItem(cartItemId).then(retrivedCartItem => {
         store.getStore(retrivedCartItem.storeId).then(storeInfo => {
-            console.log(storeInfo);
             warehouse.getProductFromWarehouse(
                 storeInfo.warehouse, retrivedCartItem.product
             ).populate({
@@ -2879,7 +2879,7 @@ app.put('/shoppingcart/updatecartitem/:cartItemId', userAuthenticated, (req, res
 });
 
 //--------------------checkout Order (place Order)--------------------\\
-app.post('/shoppingcart/checkout', userAuthenticated, (req, res) => {
+app.post('/shopping-cart/checkout', userAuthenticated, (req, res) => {
 
     const userInfo = req.user;
     const deliveryAddress = req.body.deliveryAddress;

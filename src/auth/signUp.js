@@ -125,6 +125,7 @@ module.exports =
         hashedPassword = hashPassword(userInfo.password);
         userInfo = {...userInfo,password:hashedPassword};
 
+        console.log('asds')
         if(userInfoResult === "pass")
             if(carInfoResult === "pass")
             {
