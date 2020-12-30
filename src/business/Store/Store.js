@@ -30,7 +30,14 @@ module.exports = class Store {
         return promiseResult;
     }
 
-    createStore(storeInfo) {
+    countBySameAddress(address)
+    {
+        const promiseResult = StoreModel.countBySameAddress({address:address});
+        return promiseResult;
+    }
+
+    createStore(storeInfo)
+    {
         const promiseResult = StoreModel.createStore(storeInfo);
         return promiseResult;
     }
@@ -55,8 +62,9 @@ module.exports = class Store {
         return promiseResult;
     }
 
-    getAllStores(limit, skip) {
-        const promiseResult = StoreModel.findFullStores(limit, skip);
+    getAllStores(limit,skip)
+    {
+        const promiseResult = StoreModel.findFullStores({limit:limit,skip:skip});
         return promiseResult;
     }
 
@@ -76,10 +84,15 @@ module.exports = class Store {
         return promiseResult;
     }
 
-    deleteStoreByUserId(userId) {
-        const promiseResult = StoreModel.deleteStoreByUserId({
-            userId: userId
-        });
+    getSameAddressStores(address,limit,skip)
+    {
+        const promiseResult = StoreModel.findSameAddressStores({address:address,limit:limit,skip:skip});
+        return promiseResult;
+    }
+    
+    deleteStoreByUserId(userId)
+    {
+        const promiseResult = StoreModel.deleteStoreByUserId({userId:userId});
         return promiseResult;
     }
 

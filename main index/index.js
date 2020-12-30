@@ -435,7 +435,7 @@ app.delete('/store/:id/delete-category/:categoryId',(req,res) => {
                 category.removeCategory(req.params.categoryId)
                     .then(categoryResult =>{
                     //4- Removing the products inside that category    
-                    product.removeProductsOfCategory(req.params.categoryId)
+                    product.deleteProductsOfCategory(req.params.categoryId)
                         .then(productsResult =>{
                         //5- Removing the products from the warehouse
                         warehouse.removeProductsFromWarehouse(req.params.id,req.params.categoryId)
@@ -578,7 +578,7 @@ app.put('/store/:id/category/:categoryId/update-product/:productId',upload.singl
 //----------Delete Product----------
 app.delete('/store/:id/category/:categoryId/delete-product/:productId',(req,res) => {
     //Deleting product
-    product.removeProduct(req.params.productId)
+    product.deleteProduct(req.params.productId)
             .then(deleteProductResult => {
             //2- Updating the products list inside the category's list 
             //Removing product ref from the category
@@ -741,7 +741,7 @@ app.delete('/admin/view-users/delete/:userId',(req,res) => {
                         .then(categoryIds => {
                         category.deleteCategoriesByStoreIds(storeIds)
                             .then(deletedCategories => {
-                            product.removeProductsOfCategoriesId(categoryIds)
+                            product.deleteProductsOfCategoriesId(categoryIds)
                                 .then(deletedProducts => {
                                 store.deleteStoreByUserId(userId)
                                     .then(deletingStoresResult => {

@@ -12,7 +12,7 @@ module.exports = class Warehouse{
             return {err:"Error: "+validationResult};
     }
 
-     createWarehouse()
+    createWarehouse()
     {
         const promiseResult = WarehouseModel.createWarehouse();
         return promiseResult;

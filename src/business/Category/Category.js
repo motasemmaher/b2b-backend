@@ -26,9 +26,9 @@ module.exports = class Category{
         return promiseResult;
     }
 
-    getProductsOfCategory(categoryId,limit,skip,nameSort,priceSort)
+    getProductsOfCategory(categoryId,type,limit,skip,nameSort,priceSort)
     {
-        const promiseResult = ProductModel.findProductsOfCategory({categoryId:categoryId,skip:skip,limit:limit,nameSort:nameSort,priceSort:priceSort});
+        const promiseResult = ProductModel.findProductsOfCategory({categoryId,type,skip,limit,nameSort,priceSort});
         return promiseResult;
     }
 
@@ -38,9 +38,9 @@ module.exports = class Category{
         return promiseResult;
     }
 
-    removeCategory(categoryId)
+    deleteCategory(categoryId)
     {
-        const promiseResult = CategoryModel.deleteCategory({_id:categoryId});
+        const promiseResult = CategoryModel.removeCategory({_id:categoryId});
         return promiseResult;
     }
 

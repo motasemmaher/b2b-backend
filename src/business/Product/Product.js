@@ -12,15 +12,23 @@ module.exports = class Product {
         return promiseResult;
     }
 
-    countAll() {
-        const promiseResult = ProductModel.countAllProducts();
+    countAll(type)
+    {
+        const promiseResult = ProductModel.countAllProducts({type});
         return promiseResult;
     }
 
-    countByStore(storeId) {
-        const promiseResult = ProductModel.countByStore({
-            storeId: storeId
-        });
+    countByStore(storeId,type)
+    {
+        console.log("Inside buisness")
+        console.log(type)
+        const promiseResult = ProductModel.countByStore({storeId,type});
+        return promiseResult;
+    }
+
+    countByCategory(categoryId,type)
+    {
+        const promiseResult = ProductModel.countByCategory({categoryId,type});
         return promiseResult;
     }
 
@@ -56,25 +64,17 @@ module.exports = class Product {
         return promiseResult;
     }
 
-    removeProduct(productId) {
-        const promiseResult = ProductModel.deleteProduct({
-            _id: productId
-        });
+    deleteProduct(productId)
+    {
+        const promiseResult = ProductModel.deleteProduct({_id:productId});
         return promiseResult;
     }
-
-    removeProductsOfCategory(categoryId) {
+    
+    deleteProductsOfCategory(categoryId)
+    {
         const promiseResult = ProductModel.deleteProducts(categoryId);
         return promiseResult;
-    }
-
-    removeProductsOfCategoriesId(categoriesIds) {
-        console.log("Inside roduct class: " + categoriesIds);
-        const promiseResult = ProductModel.deleteProductsOfCategoriesId({
-            categoriesIds: categoriesIds
-        });
-        return promiseResult;
-    }
+    }    
 
     getProductById(productId) {
         const promiseResult = ProductModel.findProductById({
@@ -87,6 +87,11 @@ module.exports = class Product {
         const promiseResult = ProductModel.getProduct({
             categoryId: categoryId
         });
+        return promiseResult;
+    }
+    deleteProductsOfCategoriesId(categoriesIds)
+    {
+        const promiseResult = ProductModel.deleteProductsOfCategoriesId({categoriesIds:categoriesIds});
         return promiseResult;
     }
 
@@ -133,14 +138,15 @@ module.exports = class Product {
         return promiseResult;
     }
 
-    getProductsOfStore(storeId, limit, skip, nameSort, priceSort) {
-        const promiseResult = ProductModel.findProductsOfStore({
-            storeId: storeId,
-            limit: limit,
-            skip: skip,
-            nameSort: nameSort,
-            priceSort: priceSort
-        });
+    getAllProducts(type,limit,skip,nameSort,priceSort)
+    {
+        const promiseResult = ProductModel.findAllProducts({type,limit,skip,nameSort,priceSort});
+        return promiseResult;
+    }
+
+    getProductsOfStore(storeId,type,limit,skip,nameSort,priceSort)
+    {
+        const promiseResult = ProductModel.findProductsOfStore({storeId,type,limit,skip,nameSort,priceSort});
         return promiseResult;
     }
 

@@ -3,14 +3,10 @@ const StoreSchema = require("../schema/Store");
 const StoreModel = mongoose.model('Store', StoreSchema);
 
 module.exports = {
-
-    exists(value) {
-        const result = StoreModel.findById({
-            _id: value.storeId
-        }, {
-            id: 1,
-            userId: 1
-        });
+    
+    exists(value)
+    {
+        const result = StoreModel.findOne({_id: value.storeId},{id:1,userId:1});
         if (result)
             return result;
         else
@@ -19,15 +15,21 @@ module.exports = {
             };
     },
 
-    countByGarageOwner(value) {
-        const count = StoreModel.countDocuments({
-            userId: value.userId
-        });
+    countAll()
+    {
+        const count = StoreModel.countDocuments({});
         return count;
     },
 
-    countAll() {
-        const count = StoreModel.countDocuments({});
+    countByGarageOwner(value)
+    {
+        const count = StoreModel.countDocuments({ userId: value.userId });
+        return count;
+    },
+
+    countBySameAddress(value)
+    {
+        const count = StoreModel.countDocuments({ address: value.address });
         return count;
     },
 
@@ -44,24 +46,6 @@ module.exports = {
         } else {
             return {
                 error: "Error with the creation Store"
-            };
-        }
-    },
-
-    makeCopy(value) {
-        const result = StoreModel.findByIdAndUpdate({
-            _id: value._id
-        }, {
-            storeIdCopy: value.storeIdCopy
-        }, {
-            "useFindAndModify": false
-        });
-
-        if (result) {
-            return result;
-        } else {
-            return {
-                error: "Error with the update Store copy"
             };
         }
     },
@@ -119,9 +103,10 @@ module.exports = {
             };
     },
 
-    findFullStores(limit, skip) {
-        const result = StoreModel.find({}).select('name , address , image , openTime , closeTime').skip(skip).limit(limit) //.pretty();
-        if (result)
+    findFullStores(value)
+    {
+        const result = StoreModel.find({}).select('name , address , image , openTime , closeTime').skip(value.skip).limit(value.limit)//.pretty();
+        if (result) 
             return result;
         else
             return {
@@ -129,10 +114,18 @@ module.exports = {
             };
     },
 
-    deleteStoreByUserId(value) {
-        const result = StoreModel.deleteMany({
-            userId: value.userId
-        });
+    findSameAddressStores(value)
+    {
+        const result = StoreModel.find({address:value.address}).select('name , address , image , openTime , closeTime').skip(value.skip).limit(value.limit)//.pretty();
+        if (result) 
+            return result;
+        else 
+            return {error: "Error with the finding same address Stores"};
+    },
+
+    deleteStoreByUserId(value)
+    {
+        const result = StoreModel.deleteMany({userId: value.userId});
 
         if (result)
             return result;

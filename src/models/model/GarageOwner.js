@@ -13,8 +13,8 @@ module.exports = {
                 error: "Error with the creation GarageOwner"
             };
         }
-    },
-
+    }
+    ,
     updateGarageOwner(value) {
         const result = GarageOwnerModel.findOneAndUpdate({
             _id: value._id
@@ -29,8 +29,8 @@ module.exports = {
                 error: "Error with the update GarageOwner"
             };
         }
-    },
-
+    }
+    ,
     deleteGarageOwner(value) {
         const result = GarageOwnerModel.findOneAndDelete({
             _id: value._id
@@ -43,7 +43,8 @@ module.exports = {
                 error: "Error with the delete GarageOwner"
             };
         }
-    },
+    }
+    ,
     deleteGarageOwnerByUserId(value) {
         const result = GarageOwnerModel.findOneAndDelete({
             user: value._id
@@ -99,10 +100,9 @@ module.exports = {
         if (result)
             return result;
         else
-            return {
-                error: "Error with getting all WaitingUsers"
-            };
-    },
+            return {error: "Error with getting all WaitingUsers"};
+    }
+    ,
     getGarageOwnerByUserId(value) {
         const result = GarageOwnerModel.findOne({
             user: value.userId
@@ -204,5 +204,15 @@ module.exports = {
                 error: "Error with the removeOrder in GarageOwners"
             };
     }
-
+    /*
+    ,
+    acceptWaitingUser(value)
+    {
+        const result = GarageOwnerModel.findOneAndUpdate({user:value._id},{role:'garageOwner'},{ "useFindAndModify": false });
+        if (result)
+            return result;
+        else
+            return {error: "Error with accepting WaitingUser"};
+    }
+    */
 };

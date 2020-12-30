@@ -107,5 +107,11 @@ module.exports = class CarOwner {
         });
         return result;
     }
-
+    
+    //ONLY FOR TESTING
+    deleteCarOwner(carOwnerId)
+    {
+        const promiseResult = CarOwnerModel.deleteCarOwner({_id:carOwnerId});
+        return promiseResult;
+    }
 }

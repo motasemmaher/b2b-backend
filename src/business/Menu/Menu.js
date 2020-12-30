@@ -33,7 +33,7 @@ module.exports = class Menu{
         return promiseResult;
     }
 
-    getAllCategories(storeId,limit,skip)
+    getAllCategories(storeId)
     {
         const promiseResult = MenuModel.getCategoriesOfMenu({storeId:storeId});
         return promiseResult;
@@ -45,4 +45,10 @@ module.exports = class Menu{
         return promiseResult;
     }
 
+    //FOR TESTING
+    getMenu(menuId)
+    {
+        const promiseResult = MenuModel.findMenu({_id:menuId});
+        return promiseResult;
+    }
 }

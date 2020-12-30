@@ -4,12 +4,9 @@ const UserModel = mongoose.model('User', UserSchema);
 
 module.exports = {
 
-    exists(value) {
-        const result = UserModel.findById({
-            _id: value.userId
-        }, {
-            id: 1
-        });
+    exists(value)
+    {
+        const result = UserModel.exists({_id: value.userId},{id:1});
         if (result)
             return result;
         else
@@ -153,4 +150,5 @@ module.exports = {
                 error: "Error with accepting WaitingUser"
             };
     }
+    
 };

@@ -51,7 +51,7 @@ module.exports =  class User {
         const promiseResult = UserModel.findAllUsersIdOfARole({role:role});
         return promiseResult;
     }
-
+    
     acceptWaitingUser(userId)
     {
         const promiseResult = UserModel.acceptWaitingUser({_id:userId});

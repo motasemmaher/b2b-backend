@@ -97,11 +97,12 @@ module.exports =
                                                       //{"useFindAndModify":false}
                                                     );
         if(result)
-        return result;
+            return result;
         else
-        return {error:"Error with the removing product from warehouse"};
-    },
-
+            return {error:"Error with the removing product from warehouse"};
+    }
+    ,
+    
     // added by thaer
     getWarehouse(value) {
         const result = WarehouseModel.findById({_id: value._id});
@@ -149,7 +150,8 @@ module.exports =
         if(result)
             return result;
         else
-            return {error:"Error in increaseAmaountOfProduct Warehouse"};
+            return {error:"Error in increaseAmaountOfProduct Warehouse"};            
     }
+    
 
 }

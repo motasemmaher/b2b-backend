@@ -42,6 +42,18 @@ module.exports = class GarageOwner {
         });
         return promiseResult;
     }
+    /*
+    acceptWaitingUser(userId)
+    {
+        const promiseResult = GarageOwnerModel.acceptWaitingUser({_id:userId});
+        return promiseResult;
+    }
+    */
+    deleteGarageOwnerByUserId(userId)
+    {
+        const promiseResult = GarageOwnerModel.deleteGarageOwnerByUserId({_id:userId});
+        return promiseResult;
+    }
 
     removeStoreFromList(garageOwnerId, storeId) {
         const promiseResult = GarageOwnerModel.removeStoreFromList({

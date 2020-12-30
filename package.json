@@ -4,7 +4,8 @@
   "description": "This is the backend for the graduation project",
   "main": "server.js",
   "scripts": {
-    "test": "mocha --recursive --timeout 100000 --exit"
+    "test":"mocha --recursive --timeout 100000 --exit",
+    "test-coverage": "nyc --reporter=text --timeout 1000000 mocha --exit"
   },
   "author": "",
   "license": "ISC",
@@ -18,6 +19,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "fs": "0.0.1-security",
+    "googleapis": "^66.0.0",
     "image-to-base64": "^2.1.1",
     "mocha": "^8.2.0",
     "mockgoose": "^8.0.4",
@@ -33,5 +35,8 @@
     "socket.io": "^3.0.4",
     "supertest": "^6.0.0",
     "validator": "^13.1.17"
+  },
+  "devDependencies": {
+    "nyc": "^15.1.0"
   }
 }

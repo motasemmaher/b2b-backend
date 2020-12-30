@@ -1,18 +1,15 @@
 const OfferModel = require('../../models/model/Offer');
 const OfferValidation = require('./validate');
+const schedule = require('node-schedule');
+
+const Product = require('../Product/Product');
+const product = new Product();
 module.exports = class Offer{ 
     
-    constructor ()
-    {}
+    constructor () {}
 
     validateOfferInfo(offer)
     {
-        console.log("Inside offer");
-        console.log("discount: "+offer.discountRate);
-        console.log("duration: "+offer.duration);
-        console.log("new price: "+offer.newPrice);
-        //console.log("exiration: "+offer.expirationDate);
-
         const validationResult = OfferValidation.validateOfferInfo(offer);
         if(validationResult !== "pass")
             return {err:"Error: "+validationResult};
@@ -36,4 +33,33 @@ module.exports = class Offer{
         return promiseResult;
     }
 
+    removeExpiredOffers()
+    {
+        //----------Clear Offers----------
+        const checkOffers = schedule.scheduleJob('0 * * * *', () => {
+            console.log("CHECKING OFFERS");
+            product.expiredOffers()
+            .then(productsResult => {
+            productsResult.forEach(record => {
+                if(record.offer == null)
+                    return;
+                else
+                {
+                    this.deleteOffer(record.offer._id)
+                    .then(offerResult => {
+                    product.removeOffer(offerResult._id)
+                        .then(productResult => {
+                        console.log("Deleted an offer");
+                        return;
+                        })
+                        .catch(err => console.log("Error with removing offer from product. "+err));
+                    })
+                    .catch(err => console.log("Error with deleting offer. "+err));
+                }
+            });
+            console.log("Removed all expired offers");
+            })
+            .catch(err => console.log("Error with getting expired offers. "+err));
+        });
+    }
 }

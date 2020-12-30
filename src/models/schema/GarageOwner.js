@@ -8,11 +8,13 @@ const schema = mongoose.Schema;
 const GarageOwner = new schema({
     user: {
         type: schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required:true
     },
     stores: [{
         type: schema.Types.ObjectId,
-        ref: 'Store'
+        ref: 'Store',
+        required:true
     }],
     isVerified: {type: Boolean},
     reportId: {

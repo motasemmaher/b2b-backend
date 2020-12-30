@@ -30,7 +30,7 @@ module.exports = {
             };
         }
     },
-
+    //For testing
     deleteCarOwner(value) {
         const result = CarOwnerModel.findOneAndDelete({
             _id: value._id
