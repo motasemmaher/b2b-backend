@@ -61,7 +61,7 @@ const Store = new schema({
 
     location: {
         type:String,
-        required:true
+        //required:true
     },
     /*location: {
         long: {type:String,required: true,trim: true},

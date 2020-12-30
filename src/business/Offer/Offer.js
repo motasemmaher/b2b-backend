@@ -6,8 +6,7 @@ const Product = require('../Product/Product');
 const product = new Product();
 module.exports = class Offer{ 
     
-    constructor ()
-    {}
+    constructor () {}
 
     validateOfferInfo(offer)
     {

@@ -45,16 +45,17 @@ describe('User Class Tests', () => {
     it("Checking if the user exists without error (exists)", (done) => {
         user.exists(userId)
         .then(existsResult => {
-            expect(existsResult._id.toString()).to.equal(userId);
+            expect(existsResult).to.be.true;
             done();
         })
         .catch(err => done(err));
     });
+/*    
 
     it("Checking if the user exists invalid userId", (done) => {
         user.exists(nonExistingUserId)
         .then(existsResult => {
-            expect(existsResult).to.be.null;
+            expect(existsResult).to.be.false;
             done();
         })
         .catch(err => done(err));
@@ -150,7 +151,7 @@ describe('User Class Tests', () => {
         })
         .catch(err => done(err));
     });
-
+*/
    
 
 
@@ -297,5 +298,5 @@ describe('User Class Tests', () => {
         })
         .catch(err => done(err));
     });
-    */
+*/
 });

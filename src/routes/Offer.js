@@ -1,15 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const {userAuthenticated} = require('../middleware/authentication');
-const limitAndSkipValidation = require('./src/validations/limitAndSkipValidation');
-const bodyParser = require('body-parser');
+const limitAndSkipValidation = require('../shared/limitAndSkipValidation');
 
-//Setting-up req body parser
-router.use(bodyParser.json());
-router.use(bodyParser.urlencoded({ extended: true }))
-
-const Offer = require('../business/Offer/Offer');
-const offer = new Offer();
+const offer = require('../business/Objects').OFFER;
+const store = require('../business/Objects').STORE;
+const product = require('../business/Objects').PRODUCT;
 
 //----------View products with offers of a store----------
 router.get('/stores/:storeId/offers',(req,res) => {
@@ -24,7 +20,7 @@ router.get('/stores/:storeId/offers',(req,res) => {
     store.exists(storeId)
     .then(getStoreResult => {
     if(getStoreResult == null)
-        res.send({error:"Error! Didn't find a store with thats id."});
+        res.status(404).send({error:"Error! Didn't find a store with thats id."});
     else
     {
         product.getProductsWithOffers(storeId,limit,skip)
@@ -37,21 +33,21 @@ router.get('/stores/:storeId/offers',(req,res) => {
                 .then(base64Image => {
                 offerResult.image = base64Image;       
                 if(index  === offersArray.length - 1)
-                    res.send({count:countResult,offers:offersArray});
+                    res.status(200).send({count:countResult,offers:offersArray});
                 })
                 .catch(err => {
                     console.log({error:"Error converting image.    "+err})
                     if (!res.headersSent)
-                    res.send({count:countResult,offers:offersArray});
+                    res.status(200).send({count:countResult,offers:offersArray});
                 });  
                 }) //End of foreach
             })    
-            .catch(err => res.send({error:"Error with getting count of offers.  "+err}));
+            .catch(err => res.status(500).send({error:"Error with getting count of offers.  "+err}));
         })
-        .catch(err => res.send({error:"Error with getting offers of the store.  "+err}));
+        .catch(err => res.status(500).send({error:"Error with getting offers of the store.  "+err}));
     }
     })
-    .catch(err => res.send({error:"Error getting the store. "+err}));
+    .catch(err => res.status(500).send({error:"Error getting the store. "+err}));
 });
 //----------add Offer----------
 router.post('/stores/:storeId/offers/add-offer',userAuthenticated,(req,res) => {
@@ -59,44 +55,59 @@ router.post('/stores/:storeId/offers/add-offer',userAuthenticated,(req,res) => {
     storeId = req.params.storeId;
 
     if(loggedUser.role !== "garageOwner")
-        res.send({error:"Unauthorized user"});
+        res.status(401).send({error:"Unauthorized user"});
     else
     {
         store.exists(storeId)
         .then(getStoreResult => {
         if(getStoreResult == null)
-            res.send({error:"Error! Didn't find store with that id."});
+            res.status(404).send({error:"Error! Didn't find store with that id."});
         else if(getStoreResult.userId != loggedUser._id)
-            res.send({error:"Error! The requested store doesn't belong to this garage owner."});
+            res.status(401).send({error:"Error! The requested store doesn't belong to this garage owner."});
         else
         {
+            let errors;
             productOffers = req.body.productOffers;
-            productOffers.forEach(productOffer =>{
-                newPrice = productOffer['price'] - (productOffer['price']*(productOffer['discountRate']/100));
-                const offerValidationResult = offer.validateOfferInfo({discountRate:productOffer['discountRate'],
-                                                                       duration:productOffer['duration'],
-                                                                       newPrice:newPrice});
-                if(typeof offerValidationResult !== 'undefined')
-                    res.send(offerValidationResult.err);
-                else
-                {           
-                    offer.createOffer(productOffer['discountRate'],productOffer['duration'],newPrice)
-                    .then(offerResult => {
-                    product.addOffer(productOffer['productId'],offerResult)
-                        .then(productResult => {
-                        res.send("Added offer successfuly");
+            productOffers.forEach((productOffer,index,productOffer) => {
+                product.getProductById(productOffer['productId'])
+                .then(productResult => {
+                    newPrice = productResult.price - (productResult.price*(productOffer['discountRate']/100));
+                    const offerValidationResult = offer.validateOfferInfo({discountRate:productOffer['discountRate'],
+                                                                           duration:productOffer['duration'],
+                                                                           newPrice:newPrice});
+                    if(typeof offerValidationResult !== 'undefined'){
+                        errors[productResult._id] = offerValidationResult.err;
+                        return;
+                    }
+                    else
+                    {           
+                        offer.createOffer(productOffer['discountRate'],productOffer['duration'],newPrice)
+                        .then(offerResult => {
+                        product.addOffer(productOffer['productId'],offerResult)
+                            .then(updatedProductResult => {
+                                if(index  === storesArray.length - 1)            
+                                res.status(200).send({
+                                    message:"Processed offers successfuly with "+errors.length+"errors",
+                                    errors:errors
+                                });
+                            })
+                            .catch(err => {
+                                offer.deleteOffer(offerResult._id);
+                                errors[productResult._id] = "Errors with adding offer to product. "+err;
+                            });
                         })
                         .catch(err => {
-                        res.send({error:"Error with adding offer to product. "+err});
-                        offer.deleteOffer(offerResult._id);
+                            errors[productResult._id] = "Errors with creating offer. "+err;
                         });
-                    })
-                    .catch(err => res.send({error:"Error with creating offer. "+err}));
-                }
-            });    
+                    }
+                })
+                .catch(err => {
+                    errors[productResult._id] = "Errors with getting product. "+err;
+                });
+            });//End of foreach    
         }
         })
-        .catch(err => res.send({error:"Error getting store with that id.    "+err}));
+        .catch(err => res.status(500).send({error:"Error getting store with that id.    "+err}));
     }
 });
 //----------delete Offer----------
@@ -112,32 +123,32 @@ router.delete('/stores/:storeId/offers/delete-offer/:offerId',userAuthenticated,
         store.exists(storeId)
         .then(getStoreResult => {
         if(getStoreResult == null)
-            res.send({error:"Error! Didn't find store with that id."});
+            res.status(404).send({error:"Error! Didn't find store with that id."});
         else if(getStoreResult.userId != loggedUser._id)
-            res.send({error:"Error! The requested store doesn't belong to this garage owner."});
+            res.status(401).send({error:"Error! The requested store doesn't belong to this garage owner."});
         else
         {
             offer.exists(offerId)
             .then(getOfferResult => {
             if(getOfferResult == null)
-                res.send({error:"Error! Didn't find offer with that id."});
+                res.status(404).send({error:"Error! Didn't find offer with that id."});
             else
             {
                 product.removeOffer(offerId)
                 .then(productResult => {
                 offer.deleteOffer(offerId)
                     .then(offerResult => {
-                    res.send("Deleted offer");
+                        res.status(200).send({success:true});
                     })
-                    .catch(err => res.send({error:"Error with deleting offer. "+err}));
+                    .catch(err => res.status(500).send({error:"Error with deleting offer. "+err}));
                 })
-                .catch(err => res.send({error:"Error with removing offer from the product. "+err}));
+                .catch(err => res.status(500).send({error:"Error with removing offer from the product. "+err}));
             }
             })
-            .catch(err => res.send({error:"Error with getting offer id. "+err}));
+            .catch(err => res.status(500).send({error:"Error with getting offer id. "+err}));
         }
         })
-        .catch(err => res.send({error:"Error getting store with that id.    "+err}));
+        .catch(err => res.status(500).send({error:"Error getting store with that id.    "+err}));
     }
 });
 

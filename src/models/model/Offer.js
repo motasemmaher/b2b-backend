@@ -17,7 +17,7 @@ module.exports =
 {
     exists(value)
     {
-        const result = OfferModel.findById({_id: value.offerId},{id:1});
+        const result = OfferModel.exists({_id: value.offerId},{id:1});
         if (result)
             return result;
         else

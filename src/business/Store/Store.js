@@ -62,7 +62,7 @@ module.exports =  class Store {
 
     getAllStores(limit,skip)
     {
-        const promiseResult = StoreModel.findFullStores(limit,skip);
+        const promiseResult = StoreModel.findFullStores({limit:limit,skip:skip});
         return promiseResult;
     }
 

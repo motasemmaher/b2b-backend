@@ -7,7 +7,7 @@ const Product = new schema({
     name: {type: String,required: true,minlength: 4,maxlength: 64},
     storeId: {type:String,required:true},
     price: {type: Number,required: true},
-    image: {type: String,required: true},
+    image: {type: String},
     categoryId: {
         type: schema.Types.ObjectId,
         ref: 'Category'

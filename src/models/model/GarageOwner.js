@@ -13,8 +13,8 @@ module.exports = {
                 error: "Error with the creation GarageOwner"
             };
         }
-    },
-
+    }
+    ,
     updateGarageOwner(value) {
         const result = GarageOwnerModel.findByIdAndUpdate({
             _id: value._id
@@ -27,8 +27,8 @@ module.exports = {
                 error: "Error with the update GarageOwner"
             };
         }
-    },
-
+    }
+    ,
     deleteGarageOwner(value) {
         const result = GarageOwnerModel.findOneAndDelete({
             _id: value._id
@@ -41,7 +41,8 @@ module.exports = {
                 error: "Error with the delete GarageOwner"
             };
         }
-    },
+    }
+    ,
     deleteGarageOwnerByUserId(value) {
         const result = GarageOwnerModel.findOneAndDelete({user: value._id});
         if (result) {
@@ -90,7 +91,8 @@ module.exports = {
             return result;
         else
             return {error: "Error with getting all WaitingUsers"};
-    },
+    }
+    ,
     getGarageOwnerByUserId(value) {
         const result = GarageOwnerModel.findOne({
             user: value.userId
@@ -101,7 +103,8 @@ module.exports = {
             return {
                 error: "Error with the getting GarageOwner"
             };
-    },
+    }
+    ,
     addStoreToList(value)
     {
         const result = GarageOwnerModel.findByIdAndUpdate(
@@ -113,7 +116,8 @@ module.exports = {
             return result;
         else
             return { error: "Error with the adding store to stores list" };
-    },
+    }
+    ,
     removeStoreFromList(value)
     {
         const result = GarageOwnerModel.findByIdAndUpdate({ _id: value._id },
@@ -125,5 +129,15 @@ module.exports = {
         else
             return { error: "Error with the removing store from stores list" };
     }
-    
+    /*
+    ,
+    acceptWaitingUser(value)
+    {
+        const result = GarageOwnerModel.findOneAndUpdate({user:value._id},{role:'garageOwner'},{ "useFindAndModify": false });
+        if (result)
+            return result;
+        else
+            return {error: "Error with accepting WaitingUser"};
+    }
+    */
 };

@@ -20,13 +20,13 @@ module.exports =  class GarageOwner {
         const result = GarageOwnerModel.getGarageOwnerByUserId({userId: userId});
         return result;
     }
-
+    /*
     acceptWaitingUser(userId)
     {
         const promiseResult = GarageOwnerModel.acceptWaitingUser({_id:userId});
         return promiseResult;
     }
-
+    */
     deleteGarageOwnerByUserId(userId)
     {
         const promiseResult = GarageOwnerModel.deleteGarageOwnerByUserId({_id:userId});

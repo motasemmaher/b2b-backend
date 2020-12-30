@@ -81,6 +81,17 @@ module.exports =
         else
             return {error:"Error with the getting category of a Menu"};
     }
+    ,
+    //FOR TESTING
+    findMenu(value)
+    {
+        const result = MenuModel.findOne({_id:value._id});
+        if(result)
+            return result;
+        else
+            return {error:"Error with the getting menu by id."};
+    }
+
 
     
 }

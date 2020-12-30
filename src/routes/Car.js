@@ -2,13 +2,9 @@
 const express = require("express");
 const router = express.Router();
 const {userAuthenticated} = require('../middleware/authentication');
-const bodyParser = require('body-parser');
 
-//Setting-up path for the static files
-router.use('./public', express.static('uploads'));
-//Setting-up req body parser
-router.use(bodyParser.json());
-router.use(bodyParser.urlencoded({ extended: true }))
+const car = require('../business/Objects').CAR;
+const carOwner = require('../business/Objects').CAROWNER;
 
 //----------View Car Owner's cars----------
 router.get('/user/manage-car-owner/cars/:carId?',userAuthenticated,(req, res) => {
@@ -22,17 +18,20 @@ router.get('/user/manage-car-owner/cars/:carId?',userAuthenticated,(req, res) =>
         {
             carOwner.getCarOwnerByUserId(loggedUser._id).populate('cars').exec()
             .then(carOwnerResult => {
-            res.send(carOwnerResult.cars);
+                res.status(200).send(carOwnerResult.cars);
             })
-            .catch(err => res.send({error:"Error with getting car owners. "+err}));
+            .catch(err => res.status(500).send({error:"Error with getting car owners. "+err}));
         }
         else
         {
             car.getCar(req.params.carId)
             .then(carResult => {
-            res.send(carResult);
+                if(carResult == null)
+                    res.status(404).send({error:"Didn't find a car with that id."});
+                else
+                    res.status(200).send(carResult);
             })
-            .catch(err => res.send({error:"Error with getting car by id. "+err}));
+            .catch(err => res.status(500).send({error:"Error with getting car by id. "+err}));
         }
     }
 });
@@ -42,14 +41,14 @@ router.post('/user/manage-car-owner/add-car',userAuthenticated,(req, res) => {
     const loggedUser = req.user;
 
     if(loggedUser.role !== "carOwner")
-        res.send({error:"Unauthorized user !"});
+        res.status(401).send({error:"Unauthorized user !"});
     else
     {
         const carInfo = req.body;
         const carValidationResult = car.validateCarInfo(carInfo);
 
         if(typeof carValidationResult !== 'undefined')
-            res.send(carValidationResult.err);
+            res.status(400).send(carValidationResult.err);
         else
         {
             car.createCar(carInfo)
@@ -58,19 +57,19 @@ router.post('/user/manage-car-owner/add-car',userAuthenticated,(req, res) => {
                 .then(carOwnerResult => {
                 carOwner.addCarToList(carOwnerResult._id,carResult) 
                     .then(addResult => {
-                    res.redirect(`/user/manage-car-owner/cars`);
+                        res.status(201).send(addResult);
                     })
                     .catch(err =>{
                     car.deleteCar(carResult._id);
-                    res.send("Error with adding car to the CarOwner list: "+err);
+                    res.status(500).send("Error with adding car to the CarOwner list: "+err);
                     });
                 })
                 .catch(err => {
                 car.deleteCar(carResult._id);
-                res.send("Error with getting the CarOwner: "+err);
+                res.status(500).send("Error with getting the CarOwner: "+err);
                 });  
             })
-            .catch(err => res.send({error:"Error with creating car: "+err}));
+            .catch(err => res.status(500).send({error:"Error with creating car: "+err}));
         }    
     }
 });
@@ -80,39 +79,43 @@ router.put('/user/manage-car-owner/update-car/:carId',userAuthenticated,(req, re
     const carId = req.params.carId;
 
     if(loggedUser.role !== "carOwner")
-        res.send({error:"Unauthorized user !"});
+        res.status(401).send({error:"Unauthorized user !"});
     else
     {
         car.exists(carId)
         .then(getCarResult => {
         if(getCarResult == null)
-            res.send({error:"Error! Didn't find a car with that id."})
+            res.status(404).send({error:"Error! Didn't find a car with that id."})
         else
         {
             carOwner.getCarOwnerByUserId(loggedUser._id)
             .then(carOwnerResult => {
             if(!carOwnerResult.cars.includes(carId))
-                res.send({error:"The requested car doesn't belong to this carowner."});
+                res.status(400).send({error:"The requested car doesn't belong to this carowner."});
             else
             {
                 carInfo = {_id:carId,...req.body};    
                 const carValidationResult = car.validateCarInfo(carInfo);
                 if(typeof carValidationResult !== 'undefined')
-                    res.send(carValidationResult.err);
+                    res.status(400).send(carValidationResult.err);
                 else
                 {
                     car.updateCar(carInfo)
                     .then(carResult => {
-                    res.redirect(`/user/manage-car-owner/cars`);
+                    car.getCar(carResult._id)
+                        .then(updatedCar => {
+                            res.status(200).send(updatedCar);
+                        })
+                        .catch(err => res.status(500).send({error:"Error with getting Car. "+err}));
                     })
-                    .catch(err => res.send({error:"Error with updating Car. "+storeError}));
+                    .catch(err => res.status(500).send({error:"Error with updating Car. "+err}));
                 }
             }
             })
-            .catch(err => res.send({error:"Error with etting the car owner from the user id.    "+err}));
+            .catch(err => res.status(500).send({error:"Error with getting the car owner from the user id.    "+err}));
         }
         })
-        .catch(err => res.send({error:"Error with getting car with that id. "+err}));
+        .catch(err => res.status(500).send({error:"Error with getting car with that id. "+err}));
     }
 });
 //----------Delete Car----------
@@ -121,19 +124,19 @@ router.delete('/user/manage-car-owner/delete-car/:carId',userAuthenticated,(req,
     const carId = req.params.carId;
 
     if(loggedUser.role !== "carOwner")
-        res.send({error:"Unauthorized user !"});
+        res.status(401).send({error:"Unauthorized user !"});
     else
     {
         car.exists(carId)
         .then(getCarResult => {
         if(getCarResult == null)
-            res.send({error:"Error! Didn't find a car with that id."})
+            res.status(404).send({error:"Error! Didn't find a car with that id."})
         else
         {
             carOwner.getCarOwnerByUserId(loggedUser._id)
             .then(carOwnerResult => {
             if(!carOwnerResult.cars.includes(carId))
-                res.send({error:"The requested car doesn't belong to this carowner."});
+                res.status(400).send({error:"The requested car doesn't belong to this carowner."});
             else
             {
                 car.deleteCar(carId)
@@ -142,19 +145,19 @@ router.delete('/user/manage-car-owner/delete-car/:carId',userAuthenticated,(req,
                     .then(carOwnerResult => {
                     carOwner.removeCarFromList(carOwnerResult._id,carId)
                         .then(removeResult => {
-                        res.redirect(`/user/manage-car-owner/cars`);
+                            res.status(200).send({success:true});
                         })
-                        .catch(err => res.send({error:"Error removing car from the carOwner. "+err}));
+                        .catch(err => res.status(500).send({error:"Error removing car from the carOwner. "+err}));
                     })
-                    .catch(err => res.send({error:"Error getting carOwner. "+err}));
+                    .catch(err => res.status(500).send({error:"Error getting carOwner. "+err}));
                 })
-                .catch(err => res.send({error:"Error deleting the car. "+err}));    
+                .catch(err => res.status(500).send({error:"Error deleting the car. "+err}));    
             }
             })
-            .catch(err => res.send({error:"Error with getting the car owner from the user id.   "+err}));
+            .catch(err => res.status(500).send({error:"Error with getting the car owner from the user id.   "+err}));
         }
         })
-        .catch(err => res.send({error:"Error with getting car with that id. "+err}));
+        .catch(err => res.status(500).send({error:"Error with getting car with that id. "+err}));
     }
 });
 

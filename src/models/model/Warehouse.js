@@ -97,9 +97,9 @@ module.exports =
                                                       //{"useFindAndModify":false}
                                                     );
         if(result)
-        return result;
+            return result;
         else
-        return {error:"Error with the removing product from warehouse"};
+            return {error:"Error with the removing product from warehouse"};
     }
     ,
     //For Testing
@@ -109,7 +109,7 @@ module.exports =
         if(result)
             return result;
         else
-            return {error:"Error with the removing product from warehouse"};
+            return {error:"Error with the finding warehouse"};
     }
     
 

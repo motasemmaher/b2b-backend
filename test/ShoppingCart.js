@@ -11,7 +11,7 @@ function test(result)
     expect(result).to.contain.property('_id');
 }
 
-describe('Warehouse Class Tests', () => {    
+describe('ShoppingCart Class Tests', () => {    
 
     
     before((done) => {
@@ -32,7 +32,7 @@ describe('Warehouse Class Tests', () => {
         })
         .catch(err => done(err));
     });
-
+/*
     it('Deleting shoppingcart without errors.', (done) => {
         shoppingCart.createShoppingCart()
         .then(createResult => {
@@ -45,5 +45,5 @@ describe('Warehouse Class Tests', () => {
         })
         .catch(err => done(err));
     });
-    
+   */
 });

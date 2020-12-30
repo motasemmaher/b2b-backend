@@ -6,7 +6,7 @@ module.exports = {
 
     exists(value)
     {
-        const result = UserModel.findById({_id: value.userId},{id:1});
+        const result = UserModel.exists({_id: value.userId},{id:1});
         if (result)
             return result;
         else
@@ -112,4 +112,5 @@ module.exports = {
         else
             return {error: "Error with accepting WaitingUser"};
     }
+    
 };

@@ -6,7 +6,7 @@ module.exports = {
     
     exists(value)
     {
-        const result = StoreModel.findById({_id: value.storeId},{id:1,userId:1});
+        const result = StoreModel.findOne({_id: value.storeId},{id:1,userId:1});
         if (result)
             return result;
         else
@@ -41,19 +41,6 @@ module.exports = {
         } else {
             return {
                 error: "Error with the creation Store"
-            };
-        }
-    },
-
-    makeCopy(value)
-    {
-        const result = StoreModel.findByIdAndUpdate({_id: value._id},{storeIdCopy:value.storeIdCopy},{"useFindAndModify":false});
-
-        if (result) {
-            return result;
-        } else {
-            return {
-                error: "Error with the update Store copy"
             };
         }
     },
@@ -99,18 +86,18 @@ module.exports = {
             return {error: "Error with the delete Stores by userId"};
     },
 
-    findFullStores(limit,skip)
+    findFullStores(value)
     {
-        const result = StoreModel.find({}).select('name , address , image , openTime , closeTime').skip(skip).limit(limit)//.pretty();
+        const result = StoreModel.find({}).select('name , address , image , openTime , closeTime').skip(value.skip).limit(value.limit)//.pretty();
         if (result) 
             return result;
         else 
             return {error: "Error with the finding all Stores"};
     },
 
-    findSameAddressStores(value,limit,skip)
+    findSameAddressStores(value)
     {
-        const result = StoreModel.find({address:value.address}).select('name , address , image , openTime , closeTime').skip(skip).limit(limit)//.pretty();
+        const result = StoreModel.find({address:value.address}).select('name , address , image , openTime , closeTime').skip(value.skip).limit(value.limit)//.pretty();
         if (result) 
             return result;
         else 

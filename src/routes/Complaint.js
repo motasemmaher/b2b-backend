@@ -1,15 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const {userAuthenticated} = require('../middleware/authentication');
-const limitAndSkipValidation = require('./src/validations/limitAndSkipValidation');
-const bodyParser = require('body-parser');
+const limitAndSkipValidation = require('../shared/limitAndSkipValidation');
 
-//Setting-up req body parser
-router.use(bodyParser.json());
-router.use(bodyParser.urlencoded({ extended: true }))
-
-const Complaint = require('../business/Complaint/Complaint');
-const complaint = new Complaint();
+const complaint = require('../business/Objects').COMPLAINT;
+const store = require('../business/Objects').STORE;
+const user = require('../business/Objects').USER;
+const message = require('../business/Objects').MESSAGE;
 
 //----------View Complaints and View Complaint----------
 router.get('/view-complaints/:complaintId?',userAuthenticated,(req,res) => {
@@ -36,7 +33,7 @@ router.get('/view-complaints/:complaintId?',userAuthenticated,(req,res) => {
     {
         complaint.getAllComplaints(limit,skip)
         .then(complaintResult => {
-        complaint.countAllComplaints()
+            complaint.countAllComplaints()
             .then(countResult => {
             res.send({count:countResult,complaints:complaintResult});
             })
@@ -65,44 +62,44 @@ router.post('/stores/:storeId/create-complaint',userAuthenticated,(req,res) => {
     const storeId = req.params.storeId;
 
     if(loggedUser.role !== "carOwner")
-        res.send({error:"Unauthorized user !"});
+        res.status(401).send({error:"Unauthorized user !"});
     else
     {
         store.exists(storeId)
         .then(storeResult => {
         if(storeResult == null)
-            res.send({error:"Error! Didn't find a store with that id."});
+            res.status(404).send({error:"Error! Didn't find a store with that id."});
         else
         {
             user.exists(loggedUser._id)
             .then(getUserResult => {
                 if(getUserResult == null)
-                    res.send({error:"Error! Didn't find a user with that is."})
+                    res.status(404).send({error:"Error! Didn't find a user with that is."})
                 else
                 {
                     messageBody = req.body.message;
                     const messageValidationResult = message.validateMessageInfo({data:messageBody});
                     if(typeof messageValidationResult !== 'undefined')
-                        res.send(messageValidationResult.err);
+                        res.status(400).send(messageValidationResult.err);
                     else
                     {
                         message.createMessage(loggedUser._id,messageBody)
                         .then(messageResult => {
-                        complaint.createComplaint(loggedUser._id,messageResult,storeResult.userId,storeId)
+                            complaint.createComplaint(loggedUser._id,messageResult,storeResult.userId,storeId)
                             .then(complaintResult => {
-                            res.send(complaintResult);
+                                res.status(200).send(complaintResult);
                             //res.redirect('/store/'+req.params.id);
                             })
-                        .catch(err => res.send({error:"Error creating the complaint. "+err}));
+                        .catch(err => res.status(500).send({error:"Error creating the complaint. "+err}));
                         })
-                        .catch(err => res.send({error:"Error creating the message. "+err}));
+                        .catch(err => res.status(500).send({error:"Error creating the message. "+err}));
                     }
                 }
             })
-            .catch(err => res.send({error:"Error getting the user. "+err}));    
+            .catch(err => res.status(500).send({error:"Error getting the user. "+err}));    
         }
         })
-        .catch(err => res.send({error:"Error getting the store. "+err}));
+        .catch(err => res.status(500).send({error:"Error getting the store. "+err}));
     }
 });
 

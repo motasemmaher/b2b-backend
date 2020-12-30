@@ -6,17 +6,31 @@ const moment = require('moment');
 const ProductModel = mongoose.model('Product', ProductSchema);
 
 addDays = function(days)
-     {
-        let date = new Date();
-        date.setDate(date.getDate() + days);
-        return date;  
-    };
+{
+    let date = new Date();
+    date.setDate(date.getDate() + days);
+    return date;  
+};
+
+setProductType = function(productType)
+{
+    let type;
+    if(productType === "all")
+        type = ["Part","Accessory","Service"];
+    else if (productType === "Part")
+        type = "Part";
+    else if (productType === "Accessory")
+        type = "Accessory";
+    else if (productType === "Service")
+        type = "Service";
+    return type;
+};
 
 module.exports =
 {
     exists(value)
     {
-        const result = ProductModel.find({_id:value.productId},{id:1});
+        const result = ProductModel.exists({_id:value.productId},{id:1});
         if(result)
             return result;
         else
@@ -79,7 +93,7 @@ module.exports =
     ,
     findProductById(value)
     {
-        const result = ProductModel.find({_id:value.productId});
+        const result = ProductModel.findById({_id:value.productId});
         if(result)
             return result;
         else
@@ -87,28 +101,29 @@ module.exports =
     },
     findProductsOfCategory(value)
     {
-        nameSort = value.nameSort;
-        priceSort = value.priceSort;
-        limit = value.limit;
-        skip = value.skip;
+        const nameSort = value.nameSort;
+        const priceSort = value.priceSort;
+        const limit = value.limit;
+        const skip = value.skip;
+        const type = setProductType(value.type);
         let result;
 
         if(nameSort == 0 && priceSort == 0)
-            result = ProductModel.find({categoryId:value.categoryId})
+            result = ProductModel.find({categoryId:value.categoryId,productType:{$in:type}})
                                  .skip(skip).limit(limit)
                                  .select('name price image description');
         else if (nameSort == 0 && priceSort != 0)
-            result = ProductModel.find({categoryId:value.categoryId})
+            result = ProductModel.find({categoryId:value.categoryId,productType:{$in:type}})
                                  .skip(skip).limit(limit)
                                  .sort({price:priceSort})
                                  .select('name price image description');
         else if (nameSort != 0 && priceSort == 0)
-            result = ProductModel.find({categoryId:value.categoryId})
+            result = ProductModel.find({categoryId:value.categoryId,productType:{$in:type}})
                                  .skip(skip).limit(limit)                     
                                  .sort({name:nameSort})
                                  .select('name price image description');
         else if (nameSort != 0 && priceSort != 0)
-            result = ProductModel.find({categoryId:value.categoryId})
+            result = ProductModel.find({categoryId:value.categoryId,productType:{$in:type}})
                                  .skip(skip).limit(limit)
                                  .sort({name:nameSort,price:priceSort})
                                  .select('name price image description');  
@@ -170,35 +185,36 @@ module.exports =
     ,
     findAllProducts(value)
     {
-        nameSort = value.nameSort;
-        priceSort = value.priceSort;
-        limit = value.limit;
-        skip = value.skip;
+        const nameSort = value.nameSort;
+        const priceSort = value.priceSort;
+        const limit = value.limit;
+        const skip = value.skip;
+        const type = setProductType(value.type);
         let result;
 
         if(nameSort == 0 && priceSort == 0)
-            result = ProductModel.find({})
+            result = ProductModel.find({productType: {$in:type}})
                                  .skip(skip).limit(limit)
                                  .populate('offer')
-                                 .select('name , price , image , offer');
+                                 .select('name price image offer description');                                     
         else if (nameSort == 0 && priceSort != 0)
-            result = ProductModel.find({})
+            result = ProductModel.find({productType: {$in:type}})
                                  .skip(skip).limit(limit)
                                  .sort({price:priceSort})
                                  .populate('offer')
-                                 .select('name , price , image , offer');    
+                                 .select('name price image offer description');                                     
         else if (nameSort != 0 && priceSort == 0)
-            result = ProductModel.find({})
+            result = ProductModel.find({productType: {$in:type}})
                                  .skip(skip).limit(limit)
                                  .sort({name:nameSort})
                                  .populate('offer')
-                                 .select('name , price , image , offer');    
+                                 .select('name price image offer description');                                     
         else if (nameSort != 0 && priceSort != 0)
-            result = ProductModel.find({})
+            result = ProductModel.find({productType: {$in:type}})
                                  .skip(skip).limit(limit)
                                  .sort({name:nameSort,price:priceSort})
                                  .populate('offer')
-                                 .select('name , price , image , offer');                                     
+                                 .select('name price image offer description');                                     
         
         if(result)
             return result;
@@ -208,35 +224,38 @@ module.exports =
     ,
     findProductsOfStore(value)
     {
-        nameSort = value.nameSort;
-        priceSort = value.priceSort;
-        limit = value.limit;
-        skip = value.skip;
+        const nameSort = value.nameSort;
+        const priceSort = value.priceSort;
+        const limit = value.limit;
+        const skip = value.skip;
+        const from = value.type
+        const type = setProductType(value.type);
         let result;
 
         if(nameSort == 0 && priceSort == 0)
-            result = ProductModel.find({storeId:value.storeId})
+            result = ProductModel.find({storeId:value.storeId,productType: {$in:type}})
                                  .skip(skip).limit(limit)
                                  .populate('offer')
-                                 .select('name , price , image , offer');
+                                 .select('name price image offer description');                                     
         else if (nameSort == 0 && priceSort != 0)
-            result = ProductModel.find({storeId:value.storeId})
+            //result = ProductModel.find({storeId:value.storeId})
+            result = ProductModel.find({storeId:value.storeId,productType: {$in:type}})
                                  .skip(skip).limit(limit)
                                  .sort({price:priceSort})
                                  .populate('offer')
-                                 .select('name , price , image , offer');    
+                                 .select('name price image offer description');                                     
         else if (nameSort != 0 && priceSort == 0)
-            result = ProductModel.find({storeId:value.storeId})
+            result = ProductModel.find({storeId:value.storeId,productType: {$in:type}})
                                  .skip(skip).limit(limit)
                                  .sort({name:nameSort})
                                  .populate('offer')
-                                 .select('name , price , image , offer');    
+                                 .select('name price image offer description');    
         else if (nameSort != 0 && priceSort != 0)
-            result = ProductModel.find({storeId:value.storeId})
+            result = ProductModel.find({storeId:value.storeId,productType: {$in:type}})
                                  .skip(skip).limit(limit)
                                  .sort({name:nameSort,price:priceSort})
                                  .populate('offer')
-                                 .select('name , price , image , offer');                                     
+                                 .select('name price image offer description');                                     
         
         if(result)
             return result;
@@ -246,13 +265,15 @@ module.exports =
     ,
     countByStore(value)
     {
-        const count = ProductModel.countDocuments({ storeId: value.storeId });
+        type = setProductType(value.type);
+        const count = ProductModel.countDocuments({storeId: value.storeId,productType:{$in:type}});
         return count;
     }
     ,
     countByCategory(value)
     {
-        const count = ProductModel.countDocuments({ categoryId: value.categoryId });
+        type = setProductType(value.type);
+        const count = ProductModel.countDocuments({categoryId: value.categoryId,productType:{$in:type}});
         return count;
     }
     ,
@@ -262,9 +283,10 @@ module.exports =
         return count;
     }
     ,
-    countAllProducts()
+    countAllProducts(value)
     {
-        const count = ProductModel.countDocuments({});
+        type = setProductType(value.type);
+        const count = ProductModel.countDocuments({productType:{$in:type}});
         return count;
     }
 }

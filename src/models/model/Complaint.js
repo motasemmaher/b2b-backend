@@ -64,4 +64,14 @@ module.exports =
         else
         return {error:"Error with finding all complaints"};  
     }
+    ,
+    //FOR TESTING
+    deleteComplaint(value)
+    {
+        const result = ComplaintModel.findOneAndDelete({_id:value._id}).then().catch();
+        if(result)
+            return result;
+        else
+        return {error:"Error with the delete Complaint"}; 
+    }
 }

@@ -4,6 +4,7 @@
   "description": "This is the backend for the graduation project",
   "main": "server.js",
   "scripts": {
+    "test":"mocha --recursive --timeout 100000 --exit",
     "test-coverage": "nyc --reporter=text --timeout 1000000 mocha --exit"
   },
   "author": "",

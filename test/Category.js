@@ -65,7 +65,7 @@ describe('Category Class Tests', () => {
     expect(validationResult).to.be.undefined;
     done();
   });
-
+/*
   it('Validating category information invalid name (short).', (done) => {
     const validationResult = category.validateCategoryInfo({name:invalidNameShort,tags:tags});
     expect(validationResult.err).to.contain("name");
@@ -235,5 +235,5 @@ describe('Category Class Tests', () => {
     })
     .catch(err => done(err));
   });
-
+*/
 });

@@ -39,4 +39,11 @@ module.exports = class Complaint {
         const complaintPromise = ComplaintModel.findGarageOwnerComplaints({garageOwnerId:garageOwnerId,limit:limit,skip:skip});
         return complaintPromise;
     }
+
+    //FOR TESTING
+    deleteComplaint(complaintId)
+    {
+        const complaintPromise = ComplaintModel.deleteComplaint({_id:complaintId});
+        return complaintPromise;
+    }
 }

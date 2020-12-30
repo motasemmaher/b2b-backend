@@ -25,9 +25,9 @@ module.exports = class Category{
         return promiseResult;
     }
 
-    getProductsOfCategory(categoryId,limit,skip,nameSort,priceSort)
+    getProductsOfCategory(categoryId,type,limit,skip,nameSort,priceSort)
     {
-        const promiseResult = ProductModel.findProductsOfCategory({categoryId:categoryId,skip:skip,limit:limit,nameSort:nameSort,priceSort:priceSort});
+        const promiseResult = ProductModel.findProductsOfCategory({categoryId,type,skip,limit,nameSort,priceSort});
         return promiseResult;
     }
 
