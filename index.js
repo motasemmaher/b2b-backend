@@ -3108,7 +3108,7 @@ app.get('/store/:storeId/orders', userAuthenticated, (req, res) => {
             Error: 'you cannot access this page'
         });
     }
-});
+}); 
 
 //----------------------get Order from Store----------------------\\
 app.get('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
