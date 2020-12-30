@@ -70,9 +70,4 @@ module.exports = class Warehouse{
         const promiseResult = WarehouseModel.decreaseAmaountOfProduct({_id: warehouseId, productId: productId, quantity: quantity});
         return promiseResult;
     }
-
-    increaseAmaountOfProduct(warehouseId, productId, quantity) {        
-        const promiseResult = WarehouseModel.increaseAmaountOfProduct({_id: warehouseId, productId: productId, quantity: quantity});
-        return promiseResult;
-    }
 }

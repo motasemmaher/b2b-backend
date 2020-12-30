@@ -205,21 +205,5 @@ module.exports = {
             return {
                 error: "Error in getOrder"
             };
-    },
-
-    // getOrders(value) {        
-    //     result = CarOwnerModel.findOne({
-    //         user: value.user
-    //     }, {
-    //         orders: 1
-    //     }).populate('orders');        
-
-    //     if (result)
-    //         return result;
-    //     else
-    //         return {
-    //             error: "Error in getOrders"
-    //         };
-    // }
-
+    }
 };

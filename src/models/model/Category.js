@@ -33,13 +33,11 @@ module.exports = {
             };
     },
     updateCategory(value) {
-        if(!Array.isArray(value.tags)) {
-            tags = value.tags.split(',');
-            value = {
-                ...value,
-                tags: tags
-            };
-        }
+        tags = value.tags.split(',');
+        value = {
+            ...value,
+            tags: tags
+        };
         const result = CategoryModel.findOneAndUpdate({
                 _id: value._id
             },

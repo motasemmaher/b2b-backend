@@ -42,14 +42,11 @@ module.exports = {
             };
     },
     updateProduct(value) {
-        if(!Array.isArray(value.tags)) {
-            tags = value.tags.split(',');
-            value = {
-                ...value,
-                tags: tags
-            };
-        }
-        
+        tags = value.tags.split(',');
+        value = {
+            ...value,
+            tags: tags
+        };
         const result = ProductModel.findOneAndUpdate({
                 _id: value._id
             },
@@ -304,56 +301,49 @@ module.exports = {
         return count;
     },
 
-    countAllProducts() {
+    countAllProducts()
+    {
         const count = ProductModel.countDocuments({});
         return count;
     },
 
-    findAllProducts(value) {
+    findAllProducts(value)
+    {
         nameSort = value.nameSort;
         priceSort = value.priceSort;
         limit = value.limit;
         skip = value.skip;
         let result;
 
-        if (nameSort == 0 && priceSort == 0)
+        if(nameSort == 0 && priceSort == 0)
             result = ProductModel.find({})
-            .skip(skip).limit(limit)
-            .populate('offer')
-            .select('name , price , image , offer');
+                                 .skip(skip).limit(limit)
+                                 .populate('offer')
+                                 .select('name , price , image , offer');
         else if (nameSort == 0 && priceSort != 0)
             result = ProductModel.find({})
-            .skip(skip).limit(limit)
-            .sort({
-                price: priceSort
-            })
-            .populate('offer')
-            .select('name , price , image , offer');
+                                 .skip(skip).limit(limit)
+                                 .sort({price:priceSort})
+                                 .populate('offer')
+                                 .select('name , price , image , offer');    
         else if (nameSort != 0 && priceSort == 0)
             result = ProductModel.find({})
-            .skip(skip).limit(limit)
-            .sort({
-                name: nameSort
-            })
-            .populate('offer')
-            .select('name , price , image , offer');
+                                 .skip(skip).limit(limit)
+                                 .sort({name:nameSort})
+                                 .populate('offer')
+                                 .select('name , price , image , offer');    
         else if (nameSort != 0 && priceSort != 0)
             result = ProductModel.find({})
-            .skip(skip).limit(limit)
-            .sort({
-                name: nameSort,
-                price: priceSort
-            })
-            .populate('offer')
-            .select('name , price , image , offer');
-
-        if (result)
+                                 .skip(skip).limit(limit)
+                                 .sort({name:nameSort,price:priceSort})
+                                 .populate('offer')
+                                 .select('name , price , image , offer');                                     
+        
+        if(result)
             return result;
         else
-            return {
-                error: "Error with getting all products"
-            };
-    },
+            return {error:"Error with getting all products"};
+    },    
 
     // added by thaer
     searchProducts(value) {
@@ -381,18 +371,5 @@ module.exports = {
             return {
                 error: "Error in searchProducts function"
             };
-    },
-
-    findProductAndItsOffer(value) {
-        const result = ProductModel.findOne({
-            _id: value._id
-        })
-        .populate('offer');
-        if (result)
-            return result;
-        else
-            return {
-                error: "Error in findProductAndItsOffer function"
-            };
-    },
+    }
 }
