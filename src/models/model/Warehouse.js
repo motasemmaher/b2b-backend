@@ -116,14 +116,16 @@ module.exports =
         if(result)
             return result;
         else
-            return {error:"Error with the finding Warehouse"};
+            return {error:"Error with the finding product inside Warehouse"};
     },
 
     async decreaseAmaountOfProduct(value) {
         let result = null;
         await WarehouseModel.findOne({_id: value._id}, {storage: {$elemMatch: {productId: value.productId}}})
         .then(warehouse => {
+            
             if(warehouse.storage[0].amount >= value.quantity) {
+                
                 warehouse.storage[0].amount -= value.quantity;
                 result = warehouse.save();
             }
@@ -133,7 +135,21 @@ module.exports =
         if(result)
             return result;
         else
-            return {error:"Error with the finding Warehouse"};
+            return {error:"Error in decreaseAmaountOfProduct Warehouse"};
+    },
+    
+    async increaseAmaountOfProduct(value) {
+        let result = null;
+        await WarehouseModel.findOne({_id: value._id}, {storage: {$elemMatch: {productId: value.productId}}})
+        .then(warehouse => {                        
+                warehouse.storage[0].amount += value.quantity;
+                result = warehouse.save();
+        });
+        
+        if(result)
+            return result;
+        else
+            return {error:"Error in increaseAmaountOfProduct Warehouse"};
     }
 
 }

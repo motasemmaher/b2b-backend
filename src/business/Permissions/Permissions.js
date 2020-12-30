@@ -16,18 +16,18 @@ module.exports = class Permissions {
         return result;
     }
 
-    addPermission(role, perminssion) {
+    addPermission(role, permission) {
         const result = permissionsModel.addPermission({
             role: role,
-            perminssion: perminssion
+            permission: permission
         });
         return result;
     }
 
-    removePermission(role, perminssion) {
+    removePermission(role, permission) {
         const result = permissionsModel.removePermission({
             role: role,
-            perminssion: perminssion
+            permission: permission
         });
         return result;
     }

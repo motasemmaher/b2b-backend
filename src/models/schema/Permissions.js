@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const schema = mongoose.Schema;
 
-const Perminssions = new schema({
+const Permissions = new schema({
     
     role: {
         type: String,
@@ -10,9 +10,9 @@ const Perminssions = new schema({
         enum: ["admin", "garageOwner", "carOwner", "waitingUser"]
     },
 
-    perminssions: [{
+    permissions: [{
         type: String
     }]
 });
 
-module.exports = Perminssions;
+module.exports = Permissions;

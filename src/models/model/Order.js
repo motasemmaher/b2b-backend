@@ -109,5 +109,19 @@ module.exports = {
             return {
                 error: "Error in getOrdersByStoreIdAndStatus function"
             };
+    },
+
+    getOrderByCarOwnerId(value) {
+        console.log(value);
+        const result = OrderModel.find({
+            carOwnerId: value.carOwnerId
+        }).limit(value.limit).skip(value.skip);
+
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error in getOrderByCarOwnerId"
+            };
     }
 };

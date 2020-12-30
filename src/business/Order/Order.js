@@ -55,8 +55,17 @@ module.exports = class Order {
 
     getOrdersByStoreIdAndStatus(storeId, status, limit, skip) {
         const result = OrderModel.getOrdersByStoreIdAndStatus({
-            storeId: storeId, 
+            storeId: storeId,
             status: status,
+            limit: limit,
+            skip: skip
+        });
+        return result;
+    }
+
+    getOrderByCarOwnerId(carOwnerId, limit, skip) {
+        const result = OrderModel.getOrderByCarOwnerId({
+            carOwnerId: carOwnerId,
             limit: limit,
             skip: skip
         });

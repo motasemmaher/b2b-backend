@@ -105,20 +105,6 @@ app.use(cors())
 // app.use(passport.session());
 
 
-// app.post('/user/garage-owner/create', (req, res) => {
-//     const user = req.body.user;
-//     const store = req.body.store;
-
-//     SignUp.createGarageOwner(res, user, store);
-// });
-
-// app.post('/user/car-owner/create', (req, res) => {
-//     const user = req.body.user;
-//     const car = req.body.car;
-
-//     SignUp.createCarOwner(res, user, car);
-// });
-
 app.put('/update-menu/:id', (req, res) => {
     console.log("Inside put")
 
@@ -2340,8 +2326,8 @@ const reportTransporter = nodemailer.createTransport({
         pass: 'b2bgp2020'
     }
 });
-//----------Send garage owner report----------
 
+//----------Send garage owner report----------
 const garageOwnerReport = schedule.scheduleJob('0 0 1 * *', () => {
     user.getAllUsersIdOfARole('garageOwner')
         .then(garageOwners => {
@@ -2652,7 +2638,7 @@ var chatIO = io.of('/user/chat/start')
         });
 
     });
-
+/* // In Routes
 //---------get shoppingcart---------------\\
 app.get('/shopping-cart', userAuthenticated, (req, res) => {
     let skip = req.query.skip;
@@ -2744,44 +2730,57 @@ app.post('/shopping-cart/add-cart/:storeId/:productId', userAuthenticated, (req,
             Error: 'Quantity must be more than Zero'
         });
     }
-
+    let productPrice = 0;
     if (userInfo.role === 'carOwner') {
-        carOwner.getCarOwnerByUserId({
-            user: userInfo._id
-        }).then(carOwnerInfo => {
+        carOwner.getCarOwnerByUserId(userInfo._id).then(carOwnerInfo => {
             store.getStore(storeId)
                 .then(storeInfo => {
-                    warehouse.getProductFromWarehouse(
-                        storeInfo.warehouse, productId
-                    ).populate({
-                        path: 'storage.productId'
-                    }).then(warehouseInfo => {
-                        if (warehouseInfo.storage[0].amount >= quantity) {
-                            const totalPrice = warehouseInfo.storage[0].productId.price * quantity;
-                            if (totalPrice > 0) {
-                                cartItem.createCartItem({
-                                    product: productId,
-                                    quantity: quantity,
-                                    date: date,
-                                    storeId: storeId,
-                                    shoppingCart: carOwnerInfo.shoppingCart,
-                                    totalPrice: totalPrice
-                                }).then(item => {
-                                    shoppingCart.addCartItem(carOwnerInfo.shoppingCart, item).then((updatedShoppingCart) => {
-                                        res.status(200).send(updatedShoppingCart);
-                                    });
-                                }).catch(err => {
-                                    return res.status(401).send(err);
-                                });
-                            } else {
-                                return res.status(401).send('Error With The Price');
+                    product.findProductAndItsOffer(productId).then(productWithOffer => {
+                        console.log(productWithOffer);
+                        if (productWithOffer.offer != null) {
+                            if (offer.exists(productWithOffer.offer._id)) {
+                                productPrice = productWithOffer.offer.newPrice;
                             }
                         } else {
-                            return res.status(401).send('Error This Quantity Is not available');
+                            productPrice = productWithOffer.price;
                         }
+                        warehouse.getProductFromWarehouse(
+                            storeInfo.warehouse, productId
+                        ).populate({
+                            path: 'storage.productId'
+                        }).then(warehouseInfo => {
+                            if (warehouseInfo.storage[0].amount >= quantity) {
+                                const totalPrice = productPrice * quantity;
+                                if (totalPrice > 0) {
+                                    cartItem.createCartItem({
+                                        product: productId,
+                                        quantity: quantity,
+                                        date: date,
+                                        storeId: storeId,
+                                        shoppingCart: carOwnerInfo.shoppingCart,
+                                        totalPrice: totalPrice
+                                    }).then(item => {
+                                        shoppingCart.addCartItem(carOwnerInfo.shoppingCart, item).then((updatedShoppingCart) => {
+                                            res.status(200).send(updatedShoppingCart);
+                                        });
+                                    }).catch(err => {
+                                        return res.status(401).send(err);
+                                    });
+                                } else {
+                                    return res.status(401).send('Error With The Price');
+                                }
+                            } else {
+                                return res.status(401).send('Error This Quantity Is not available');
+                            }
+                        }).catch(err => {
+                            return res.status(404).send({
+                                err: 'warehouse is not found'
+                            });
+                        });
                     }).catch(err => {
-                        return res.status(404).send(err);
+                        return res.status(400).send('product id not found');
                     });
+
                 }).catch(err => {
                     return res.status(404).send(err);
                 });
@@ -2812,7 +2811,9 @@ app.delete('/shopping-cart/remove-cart-item/:cartItemId', userAuthenticated, (re
             res.status(501).send(err);
         });
     }).catch(err => {
-        res.status(404).send({ error: 'there is no cartItem in this id' });
+        res.status(404).send({
+            error: 'there is no cartItem in this id'
+        });
     });
 });
 
@@ -2873,7 +2874,9 @@ app.put('/shopping-cart/update-cart-item/:cartItemId', userAuthenticated, (req, 
                 res.status(501).send(err);
             });
         }).catch(err => {
-            res.status(404).send({ error: 'store is not exists' });
+            res.status(404).send({
+                error: 'store is not exists'
+            });
         });
     });
 
@@ -2898,63 +2901,143 @@ app.post('/shopping-cart/checkout', userAuthenticated, (req, res) => {
     }
 
     const status = 'pending';
+    let errors = [];
     if (userInfo.role === 'carOwner') {
         try {
-            carOwner.getCarOwnerByUserId({
-                user: userInfo._id
-            }).populate('shoppingCart').then(owner => {
+            carOwner.getCarOwnerByUserId(userInfo._id).populate('shoppingCart').then(owner => {
                 if (owner.shoppingCart.Items.length > 0) {
                     owner.shoppingCart.Items.forEach(async (item, index) => {
                         await cartItem.getCartItem(item).then(async cart => {
-                            await shoppingCart.createShoppingCart({}).then(async createdShoppingCartForStore => {
-                                cart.shoppingCart = createdShoppingCartForStore._id;
-                                await cart.save().then(async savedCart => {
-                                    await shoppingCart.addCartItem(createdShoppingCartForStore._id, savedCart).then(async OrderCart => {
-                                        order.createOrder({
-                                            shoppingCart: OrderCart,
-                                            deliveryAddress: deliveryAddress,
-                                            phoneNumber: phoneNumber,
-                                            carOwnerId: owner._id,
-                                            // date: date,
-                                            status: status,
-                                            storeId: cart.storeId
-                                        }).then(async createdOrderForStore => {
-                                            await carOwner.addOrder(
-                                                userInfo._id,
-                                                createdOrderForStore
-                                            ).then(async (savedOwner) => {
-                                                await store.addOrder(savedCart.storeId, createdOrderForStore._id)
-                                                    .then(async addedOrderToStore => {
-                                                        if (index === owner.shoppingCart.Items.length - 1) {
-                                                            await carOwner.clearShoppingcart(owner._id).then(clearedShoppingCart => {
-                                                                res.send(addedOrderToStore);
+                            await store.getStore(cart.storeId).then(async retrivedStore => {
+                                await warehouse.getProductFromWarehouse(retrivedStore.warehouse, cart.product).then(async retrivedStorage => {
+                                    if (retrivedStorage.storage[0].amount >= cart.quantity) {
+                                        if (retrivedStorage.storage[0].amount === cart.quantity) {
+                                            await product.getProductById(cart.product).then(async retrivedProduct => {
+                                                retrivedProduct[0].isInStock = false;
+                                                await product.updateProduct(retrivedProduct[0]).then(async updatedProduct => {
+                                                    await warehouse.decreaseAmaountOfProduct(retrivedStore.warehouse, cart.product, cart.quantity).then(async updatedWarehouse => {
+                                                        await shoppingCart.createShoppingCart({}).then(async createdShoppingCartForStore => {
+                                                            cart.shoppingCart = createdShoppingCartForStore._id;
+                                                            await cart.save().then(async savedCart => {
+                                                                await shoppingCart.addCartItem(createdShoppingCartForStore._id, savedCart).then(async OrderCart => {
+                                                                    await order.createOrder({
+                                                                        shoppingCart: OrderCart,
+                                                                        deliveryAddress: deliveryAddress,
+                                                                        phoneNumber: phoneNumber,
+                                                                        carOwnerId: owner._id,
+                                                                        // date: date,
+                                                                        status: status,
+                                                                        storeId: cart.storeId
+                                                                    }).then(async createdOrderForStore => {
+                                                                        await carOwner.addOrder(
+                                                                            userInfo._id,
+                                                                            createdOrderForStore
+                                                                        ).then(async (savedOwner) => {
+                                                                            await store.addOrder(savedCart.storeId, createdOrderForStore._id)
+                                                                                .then(async addedOrderToStore => {
+                                                                                    if (index === owner.shoppingCart.Items.length - 1) {
+                                                                                        await carOwner.clearShoppingcart(owner._id).then(clearedShoppingCart => {
+                                                                                            res.send(addedOrderToStore);
+                                                                                        });
+                                                                                    }
+                                                                                }).catch(err => {
+                                                                                    res.status(404).send(err);
+                                                                                });
+                                                                        }).catch(err => {
+                                                                            res.status(404).send(err);
+                                                                        });
+                                                                    }).catch(err => {
+                                                                        res.status(404).send(err);
+                                                                    });
+                                                                }).catch(err => {
+                                                                    res.status(404).send(err);
+                                                                });
+                                                            }).catch(err => {
+                                                                res.status(404).send(err);
                                                             });
-                                                        }
+                                                        }).catch(err => {
+                                                            res.status(404).send(err);
+                                                        });
+                                                    }).catch(err => {
+                                                        res.status(400).send('There is no available quantity in this store');
+                                                    });
+                                                }).catch(err => {
+                                                    res.status(400).send({
+                                                        Error: 'error in updating product'
+                                                    });
+                                                });
+                                            }).catch(err => {
+                                                res.status(400).send({
+                                                    Error: 'error getting product By Id in updating product'
+                                                });
+                                            });
+                                        } else {
+                                            await warehouse.decreaseAmaountOfProduct(retrivedStore.warehouse, cart.product, cart.quantity).then(async updatedWarehouse => {
+                                                await shoppingCart.createShoppingCart({}).then(async createdShoppingCartForStore => {
+                                                    cart.shoppingCart = createdShoppingCartForStore._id;
+                                                    await cart.save().then(async savedCart => {
+                                                        await shoppingCart.addCartItem(createdShoppingCartForStore._id, savedCart).then(async OrderCart => {
+                                                            await order.createOrder({
+                                                                shoppingCart: OrderCart,
+                                                                deliveryAddress: deliveryAddress,
+                                                                phoneNumber: phoneNumber,
+                                                                carOwnerId: owner._id,
+                                                                // date: date,
+                                                                status: status,
+                                                                storeId: cart.storeId
+                                                            }).then(async createdOrderForStore => {
+                                                                await carOwner.addOrder(
+                                                                    userInfo._id,
+                                                                    createdOrderForStore
+                                                                ).then(async (savedOwner) => {
+                                                                    await store.addOrder(savedCart.storeId, createdOrderForStore._id)
+                                                                        .then(async addedOrderToStore => {
+                                                                            if (index === owner.shoppingCart.Items.length - 1) {
+                                                                                await carOwner.clearShoppingcart(owner._id).then(clearedShoppingCart => {
+                                                                                    res.send(addedOrderToStore);
+                                                                                });
+                                                                            }
+                                                                        }).catch(err => {
+                                                                            res.status(404).send(err);
+                                                                        });
+                                                                }).catch(err => {
+                                                                    res.status(404).send(err);
+                                                                });
+                                                            }).catch(err => {
+                                                                res.status(404).send(err);
+                                                            });
+                                                        }).catch(err => {
+                                                            res.status(404).send(err);
+                                                        });
                                                     }).catch(err => {
                                                         res.status(404).send(err);
                                                     });
+                                                }).catch(err => {
+                                                    res.status(404).send(err);
+                                                });
                                             }).catch(err => {
-                                                res.status(404).send(err);
+                                                res.status(400).send('There is no available quantity in this store');
                                             });
-                                        }).catch(err => {
-                                            res.status(404).send(err);
-                                        });
-                                    }).catch(err => {
-                                        res.status(404).send(err);
-                                    });
+                                        }
+                                    } else {
+                                        errors[cart.product] = 'error in quantity of product ' + cart.product + 'there is no available quantity';
+                                        res.status(400).send('There is no available quantity in this store');
+                                    }
                                 }).catch(err => {
-                                    res.status(404).send(err);
+                                    return res.status(404).send('There no available quantity in this store');
                                 });
+
                             }).catch(err => {
-                                res.status(404).send(err);
+                                return res.status(404).send('There is no store');
                             });
+
                         }).catch(err => {
                             res.status(404).send(err);
                         });
                     });
                 } else {
                     res.status(400).send({
-                        Error: 'You must have at least one item in your shoppingcart'
+                        Error: 'You must have at least one cart in your shoppingcart'
                     });
                 }
             }).catch(err => {
@@ -2963,7 +3046,6 @@ app.post('/shopping-cart/checkout', userAuthenticated, (req, res) => {
         } catch (err) {
             res.status(404).send(err);
         }
-
     } else {
         res.status(403).send({
             Error: 'you cannot access this page'
@@ -3163,45 +3245,77 @@ app.put('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
             order.getOrder(orderId).then(retrivedOrder => {
                 if (retrivedOrder.status === "pending") {
                     if ((date.getTime() - retrivedOrder.date.getTime()) >= 3600000) {
-                        if (status === 'delivered') {
-                            store.updateOrderStatus(storeId, orderId, status)
-                                .then(storeOrder => {
-                                    shoppingCart.getShoppingCart(storeOrder.shoppingCart).populate('Items').then(retrivedSoppingCart => {
-                                        store.getStore(storeId).then(retrivedStore => {
-                                            retrivedSoppingCart.Items.forEach((item, index) => {
-                                                warehouse.decreaseAmaountOfProduct(retrivedStore.warehouse, item.product, item.quantity).then(updatedWarehouse => {
+                        if (status === 'delivered' || status === 'cancel') {
+                        store.updateOrderStatus(storeId, orderId, status)
+                            .then(updatedOrderStatus => {
+                                shoppingCart.getShoppingCart(updatedOrderStatus.shoppingCart).populate('Items').then(retrivedSoppingCart => {
+                                    store.getStore(storeId).then(retrivedStore => {
+                                        retrivedSoppingCart.Items.forEach((item, index) => {
+                                            if (status === 'delivered') {
+                                                // warehouse.decreaseAmaountOfProduct(retrivedStore.warehouse, item.product, item.quantity).then(updatedWarehouse => {
+                                                if (index === retrivedSoppingCart.Items.length - 1) {
                                                     report.addOrder(gaOwner.reportId, orderId).then(updatedReport => {
-                                                        if (index === retrivedSoppingCart.Items.length - 1) {
-                                                            res.status(200).send(storeOrder);
-                                                        }
+                                                        res.status(200).send(updatedOrderStatus);
                                                     }).catch(err => {
                                                         res.status(501).send('Error in the report');
                                                     });
-                                                }).catch(err => {
-                                                    res.status(501).send('There is no available quantity in this store');
-                                                });
-                                            })
-                                        }).catch(err => {
-                                            res.status(404).send('store does not exist');
-                                        });
+                                                }
+                                                // }).catch(err => {
+                                                //     res.status(400).send('There is no available quantity in this store');
+                                                // });
+                                            } else if (status === 'cancel') {
+                                                warehouse.increaseAmaountOfProduct(retrivedStore.warehouse, item.product, item.quantity).then(updatedWarehouse => {
+                                                    product.getProductById(item.product).then(retrivedProduct => {
+                                                        retrivedProduct[0].isInStock = true;
+                                                        product.updateProduct(retrivedProduct[0]).then(updatedProduct => {
+                                                            if (index === retrivedSoppingCart.Items.length - 1) {
+                                                                report.addCancelOrder(gaOwner.reportId, orderId).then(updatedReport => {
+                                                                    return res.status(200).send(updatedOrderStatus);
+                                                                }).catch(err => {
+                                                                    return res.status(500).send('Error in the add Cancel Order to report');
+                                                                });
+                                                            }
+                                                        })
+                                                        .catch(err => {
+                                                            return res.status(400).send({
+                                                                Error: 'error in increaseAmaountOfProduct'
+                                                            });
+                                                        });
+                                                        }).catch(err => {
+                                                        return res.status(400).send({
+                                                            Error: 'error in updateProduct in processing order'
+                                                        });
+                                                    });
+                                                    }).catch(err => {
+                                                        return res.status(400).send({
+                                                            Error: 'error in get Product By Id in processing order'
+                                                        });
+                                                    });                                                                                                    
+                                            }
+                                        })
                                     }).catch(err => {
-                                        res.status(404).send('shoppingCart does not exist');
+                                        res.status(404).send('store does not exist');
                                     });
                                 }).catch(err => {
-                                    res.status(404).send('Store Or order does not exist');
+                                    res.status(404).send('shoppingCart does not exist');
                                 });
-                        } else if (status === 'cancel') {
-                            store.updateOrderStatus(storeId, orderId, status)
-                                .then(storeOrder => {
-                                    report.addCancelOrder(gaOwner.reportId, orderId).then(updatedReport => {
-                                        res.status(200).send(storeOrder);
-                                    }).catch(err => {
-                                        res.status(501).send('Error in the report');
-                                    });
-                                }).catch(err => {
-                                    res.status(404).send('Store Or order does not exist');
-                                });
+                            }).catch(err => {
+                                res.status(404).send('Store Or order does not exist');
+                            });
                         }
+                        // } else if (status === 'cancel') {
+                        //     store.updateOrderStatus(storeId, orderId, status)
+                        //         .then(updatedOrderStatus => {
+                        //             warehouse.increaseAmaountOfProduct().then().catch();
+                        //             report.addCancelOrder(gaOwner.reportId, orderId).then(updatedReport => {
+                        //                 res.status(200).send(updatedOrderStatus);
+                        //             }).catch(err => {
+                        //                 res.status(501).send('Error in the report');
+                        //             });
+                        //         }).catch(err => {
+                        //             res.status(404).send('Store Or order does not exist');
+                        //         });
+                        // }
                     } else {
                         res.send({
                             Error: 'The user has 1 hour to update the order you need to wait one hour to have the ability to update the order status'
@@ -3238,22 +3352,33 @@ app.delete('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
 
     if (userInfo.role === 'garageOwner') {
         garageOwner.getGarageOwnerByUserId(userInfo._id).then(owner => {
-            garageOwner.removeOrder(owner._id, storeId, orderId).then(updateGarageOwner => {
-                order.getOrder(orderId).then(orderInfo => {
-                    carOwner.removeOrder(orderInfo.carOwnerId, orderId).then(updateCarOwner => {
-                        order.deleteOrder(orderId).then(deletedOrder => {
-                            shoppingCart.deleteShoppingCart(deletedOrder.shoppingCart).then(deletedShoppingCart => {
-                                cartItem.deleteAllCartItemsAssociatedWithShoppingCartId(deletedOrder.shoppingCart).then(deletedCartItem => {
-                                    res.status(200).send(deletedOrder);
-                                }).catch(err => {
-                                    res.status(501).send("Error in deleting");
-                                });
-                            }).catch(err => {
-                                res.status(501).send("Error in deleting");
-                            });
-                        })
+                garageOwner.removeOrder(owner._id, storeId, orderId).then(updateGarageOwner => {
+                        order.getOrder(orderId).then(orderInfo => {
+                                carOwner.removeOrder(orderInfo.carOwnerId, orderId).then(updateCarOwner => {
+                                        order.deleteOrder(orderId).then(deletedOrder => {
+                                                shoppingCart.deleteShoppingCart(deletedOrder.shoppingCart).then(deletedShoppingCart => {
+                                                    cartItem.deleteAllCartItemsAssociatedWithShoppingCartId(deletedOrder.shoppingCart).then(deletedCartItem => {
+                                                        res.status(200).send({
+                                                            msg: "successfully deleted order"
+                                                        });
+                                                    }).catch(err => {
+                                                        res.status(500).send("Error in deleting cartItem");
+                                                    });
+                                                }).catch(err => {
+                                                    res.status(500).send("Error in deleting shoppingCart");
+                                                });
+                                            })
+                                            .catch(err => {
+                                                res.status(500).send("Error in deleting order");
+                                            });
+                                    })
+                                    .catch(err => {
+                                        res.status(500).send("Error in deleting order from carOwner");
+                                    });
+
+                            })
                             .catch(err => {
-                                res.status(501).send("Error in deleting");
+                                res.status(500).send("Error in getting order");
                             });
                     })
                         .catch(err => {
@@ -3262,7 +3387,7 @@ app.delete('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
 
                 })
                     .catch(err => {
-                        res.status(501).send("Error in deleting");
+                        res.status(500).send("Error in deleting order from store");
                     });
             })
                 .catch(err => {
@@ -3270,8 +3395,71 @@ app.delete('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
                 });
         })
             .catch(err => {
-                res.status(501).send("Error in deleting");
+                res.status(500).send("Error in getting garageOwner");
             });
+    } else {
+        res.status(403).send({
+            Error: 'you cannot access this page'
+        });
+    }
+});
+
+app.get('/user/carowner/orders', userAuthenticated, (req, res) => {
+    const userInfo = req.user;
+
+    let skip = req.query.skip;
+    let limit = req.query.limit;
+    const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);
+
+    skip = limitAndSkipValues.skip;
+    limit = limitAndSkipValues.limit;
+
+    if (userInfo.role === 'carOwner') {
+        carOwner.getCarOwnerByUserId(userInfo._id).then(cOwner => {
+            order.getOrderByCarOwnerId(cOwner._id, limit, skip)
+                .then(orders => {
+                    res.send(orders);
+                })
+                .catch(err => {
+                    res.status(404).send({
+                        Error: 'this carOwner is not found'
+                    });
+                });
+        }).catch(err => {
+            res.status(404).send({
+                Error: 'this user is not found'
+            });
+        });
+    } else {
+        res.status(403).send({
+            Error: 'you cannot access this page'
+        });
+    }
+});
+//------------------this method for retrived order to car owner------------------\\
+app.get('/user/carowner/orders/order/:orderId', userAuthenticated, (req, res) => {
+    const userInfo = req.user;
+    const orderId = req.params.orderId;
+    if (userInfo.role === 'carOwner') {
+        carOwner.getCarOwnerByUserId(userInfo._id).then(cOwner => {
+            carOwner.getOrder(cOwner._id, orderId).then(orderId => {
+                order.getOrder(orderId).then(retrivedOrder => {
+                    res.send(retrivedOrder);
+                }).catch(err => {
+                    res.status(404).send({
+                        Error: 'thisorder is not found'
+                    });
+                });
+            }).catch(err => {
+                res.status(404).send({
+                    Error: 'this car owner is not found'
+                });
+            });
+        }).catch(err => {
+            res.status(404).send({
+                Error: 'this user is not found'
+            });
+        });
     } else {
         res.status(403).send({
             Error: 'you cannot access this page'
@@ -3335,7 +3523,7 @@ app.get('/search', (req, res) => {
     }
 });
 
-app.get('/perminssions', (req, res) => {
+app.get('/permissions', (req, res) => {
     const role = req.query.role;
     if (role === 'admin' || role === 'carOwner' || role === 'garageOwner' || role === 'waitingUser') {
         permissions.findPermissions(role).then(permission => {
@@ -3348,7 +3536,7 @@ app.get('/perminssions', (req, res) => {
     }
 });
 
-app.put('/perminssions/role/:role/add/:permission', (req, res) => {
+app.put('/permissions/role/:role/add/:permission', (req, res) => {
     const role = req.params.role;
     const permission = req.params.permission;
     if (!permission) {
@@ -3357,7 +3545,11 @@ app.put('/perminssions/role/:role/add/:permission', (req, res) => {
         });
     }
     if (role === 'admin' || role === 'carOwner' || role === 'garageOwner' || role === 'waitingUser') {
-        permissions.addPermission(role, permission)
+        permissions.addPermission(role, permission).then(addedPermission => {
+            res.send({
+                msg: 'added successfully'
+            });
+        });
     } else {
         res.status(400).send({
             Error: 'role must be one those (admin or carOwner or garageOwner or waitingUser)'
@@ -3365,7 +3557,7 @@ app.put('/perminssions/role/:role/add/:permission', (req, res) => {
     }
 });
 
-app.put('/perminssions/autoAdding', (req, res) => {
+app.put('/permissions/autoAdding', (req, res) => {
     const prom = [];
     const arrPermissionCarOwner = ['createCarOwner', 'login', 'manageAccount', 'viewProduct', 'placeOrder',
         'maintainOrder', 'submitComplaint', 'chat', 'sos', 'viewStores'
@@ -3386,7 +3578,9 @@ app.put('/perminssions/autoAdding', (req, res) => {
         prom.push(permissions.addPermission('admin', item));
     });
     Promise.all(prom).then(values => {
-        res.send(values);
+        res.send({
+            msg: 'successfully added all permissions'
+        });
     }).catch(err => {
         res.status(400).send({
             Error: 'Error in autoAdding'
@@ -3409,5 +3603,19 @@ app.put('/perminssions/autoAdding', (req, res) => {
 //         res.status(501).send(err);
 //     });
 // });
+*/
+//Load Routes
+const _shoppingCart = require('./src/routes/shopping-cart');
+const _store = require('./src/routes/store');
+const _carOwner = require('./src/routes/car-owner');
+const _search = require('./src/routes/search');
+const _permissions = require('./src/routes/permissions');
+
+// Use Routes
+app.use('/shopping-cart', _shoppingCart);
+app.use('/store', _store);
+app.use('/car-owner', _carOwner);
+app.use('/search', _search);
+app.use('/permissions', _permissions);
 
 module.exports = app;
