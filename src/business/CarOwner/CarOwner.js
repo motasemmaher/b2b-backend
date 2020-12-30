@@ -3,21 +3,27 @@ module.exports = class CarOwner {
 
     constructor() {}
 
-    getAllCarOwners(limit,skip)
-    {
-        const promiseResult = CarOwnerModel.findAllCarOwners({limit:limit,skip:skip});
+    getAllCarOwners(limit, skip) {
+        const promiseResult = CarOwnerModel.findAllCarOwners({
+            limit: limit,
+            skip: skip
+        });
         return promiseResult;
     }
 
-    addCarToList(carOwnerId,carInfo)
-    {
-        const promiseResult = CarOwnerModel.addCarToList({_id:carOwnerId,carInfo:carInfo});
+    addCarToList(carOwnerId, carInfo) {
+        const promiseResult = CarOwnerModel.addCarToList({
+            _id: carOwnerId,
+            carInfo: carInfo
+        });
         return promiseResult;
     }
 
-    removeCarFromList(carOwnerId,carId)
-    {
-        const promiseResult = CarOwnerModel.removeCarFromList({_id:carOwnerId,carId:carId});
+    removeCarFromList(carOwnerId, carId) {
+        const promiseResult = CarOwnerModel.removeCarFromList({
+            _id: carOwnerId,
+            carId: carId
+        });
         return promiseResult;
     }
 
@@ -32,17 +38,23 @@ module.exports = class CarOwner {
     }
 
     deleteCarOwner(CarOwnerId) {
-        const result = CarOwnerModel.deleteCarOwner(CarOwnerId);
+        const result = CarOwnerModel.deleteCarOwner({
+            _id: CarOwnerId
+        });
         return result;
     }
 
     getCarOwner(CarOwnerId) {
-        const result = CarOwnerModel.getCarOwner(CarOwnerId);
+        const result = CarOwnerModel.getCarOwner({
+            _id: CarOwnerId
+        });
         return result;
     }
 
     getCarOwnerByUserId(userId) {
-        const result = CarOwnerModel.getCarOwnerByUserId(userId);
+        const result = CarOwnerModel.getCarOwnerByUserId({
+            user: userId
+        });
         return result;
     }
 
@@ -85,8 +97,14 @@ module.exports = class CarOwner {
         const result = CarOwnerModel.getOrder({
             _id: carOwnerId,
             orderId: orderId
-        });        
+        });
+        return result;
+    }
 
+    getOrders(userId) {
+        const result = CarOwnerModel.getOrders({
+            user: userId
+        });
         return result;
     }
 
