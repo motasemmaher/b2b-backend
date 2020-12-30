@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const PermissionsSchema = require('../schema/Permissions');
 
-const permissionsModel = mongoose.model('Perminssions', PermissionsSchema);
+const permissionsModel = mongoose.model('Permissions', PermissionsSchema);
 
 module.exports = {    
     
@@ -31,7 +31,7 @@ module.exports = {
             role: value.role
         }, {
             $addToSet: {
-                'perminssions': value.perminssion,
+                'permissions': value.permission,
             }
         }, {
             "useFindAndModify": false
@@ -48,7 +48,7 @@ module.exports = {
             role: value.role
         }, {
             $pull: {
-                perminssions: value.perminssion,
+                permissions: value.permission,
             }
         }, {
             "useFindAndModify": false
