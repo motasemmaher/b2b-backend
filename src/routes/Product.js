@@ -52,20 +52,20 @@ router.get('/products/:productId?',(req,res) => {
             if(productsArray.length == 0)
                 res.status(200).send({message:"No documents were found."})
 
-            productsArray = productResults;
-            productsArray.forEach((productResult,index,productsArray) => {
-                imageToBase64(productResult.image)
-                .then(base64Image => {
-                productResult.image = base64Image;       
-                if(index  === productsArray.length - 1)
+            // productsArray = productResults;
+            // productsArray.forEach((productResult,index,productsArray) => {
+            //     imageToBase64(productResult.image)
+            //     .then(base64Image => {
+            //     productResult.image = base64Image;       
+            //     if(index  === productsArray.length - 1)
                     res.status(200).send({count:countResult,products:productsArray});
-                })
-                .catch(err => {
-                    console.log({error:"Error converting image.    "+err})
-                    if (!res.headersSent)
-                    res.status(200).send({count:countResult,products:productsArray});
-                });  
-                }) //End of foreach
+            //     })
+            //     .catch(err => {
+            //         console.log({error:"Error converting image.    "+err})
+            //         if (!res.headersSent)
+            //         res.status(200).send({count:countResult,products:productsArray});
+            //     });  
+            //     }) //End of foreach
             })
             .catch((err => res.status(500).send({error:"Error getting count of all products. "+err})));
         })
@@ -79,12 +79,12 @@ router.get('/products/:productId?',(req,res) => {
                 res.status(404).send({error:"Error! Didn't find a product with that id."});
             else
             {
-                imageToBase64(productResult.image)
-                .then((base64Image) => {
-                    product.image = base64Image;
+                // imageToBase64(productResult.image)
+                // .then((base64Image) => {
+                //     product.image = base64Image;
                 res.status(200).send(productResult);
-                })
-                .catch(err => res.status(500).send({error:"Error converting image.    "+err}));
+                // })
+                // .catch(err => res.status(500).send({error:"Error converting image.    "+err}));
             }
             })
             .catch(err => res.status(500).send({error:"Error getting productby id. "+err}));
@@ -132,19 +132,19 @@ router.get('/stores/:storeId/products/:productId?',(req,res) => {
                 if(productsArray.length == 0)
                     res.status(200).send({message:"No documents were found."})
 
-                productsArray.forEach((productResult,index,productsArray) => {
-                    imageToBase64(productResult.image)
-                    .then(base64Image => {
-                    productResult.image = base64Image;       
-                    if(index  === productsArray.length - 1)
+                // productsArray.forEach((productResult,index,productsArray) => {
+                //     imageToBase64(productResult.image)
+                //     .then(base64Image => {
+                //     productResult.image = base64Image;       
+                //     if(index  === productsArray.length - 1)
                         res.status(200).send({productsCountByStore:countResult,products:productsArray});
-                    })
-                    .catch(err => {
-                        console.log({error:"Error converting image.    "+err})
-                        if (!res.headersSent)
-                        res.status(200).send({productsCountByStore:countResult,products:productsArray});
-                    });  
-                    }) //End of foreach
+                //     })
+                //     .catch(err => {
+                //         console.log({error:"Error converting image.    "+err})
+                //         if (!res.headersSent)
+                //         res.status(200).send({productsCountByStore:countResult,products:productsArray});
+                //     });  
+                //     }) //End of foreach
                 })
                 .catch((err => res.status(500).send({error:"Error getting count of products of the store. "+err})));
             })
@@ -158,12 +158,12 @@ router.get('/stores/:storeId/products/:productId?',(req,res) => {
                     res.status(404).send({error:"Error! Didn't find a product with that id."});
                 else
                 {
-                    imageToBase64(productResult.image)
-                    .then((base64Image) => {
-                        product.image = base64Image;
+                    // imageToBase64(productResult.image)
+                    // .then((base64Image) => {
+                    //     product.image = base64Image;
                     res.send(productResult);
-                    })
-                    .catch(err => res.status(500).send({error:"Error converting image.    "+err}));
+                    // })
+                    // .catch(err => res.status(500).send({error:"Error converting image.    "+err}));
                 }
                 })
                 .catch(err => res.status(500).send({error:"Error getting products of the requested category. "+err}));
@@ -223,19 +223,19 @@ router.get('/stores/:storeId/category/:categoryId/products/:productId?',(req,res
                     if(productsArray.length == 0)
                         res.status(200).send({message:"No documents were found."});
                     productsArray = productsResult;
-                    productsArray.forEach((productResult,index,productsArray) => {
-                        imageToBase64(productResult.image)
-                        .then(base64Image => {
-                        productResult.image = base64Image;       
-                        if(index  === productsArray.length - 1)
+                    // productsArray.forEach((productResult,index,productsArray) => {
+                        // imageToBase64(productResult.image)
+                        // .then(base64Image => {
+                        // productResult.image = base64Image;       
+                        // if(index  === productsArray.length - 1)
                             res.status(200).send({productsCountByStore:countResult,products:productsArray});
-                        })
-                        .catch(err => {
-                            console.log({error:"Error converting image.    "+err})
-                            if (!res.headersSent)
-                                res.status(200).send({productsCountByStore:countResult,products:productsArray});
-                        });  
-                        }) //End of foreach
+                        // })
+                        // .catch(err => {
+                        //     console.log({error:"Error converting image.    "+err})
+                        //     if (!res.headersSent)
+                        //         res.status(200).send({productsCountByStore:countResult,products:productsArray});
+                        // });  
+                        // }) //End of foreach
                     })
                     .catch((err => res.status(500).send({error:"Error getting count of products of the category. "+err})));
                 })
@@ -249,12 +249,12 @@ router.get('/stores/:storeId/category/:categoryId/products/:productId?',(req,res
                     res.status(400).send({error:"Error! Didn't find a product with that id."});
                 else
                 {
-                    imageToBase64(productResult.image)
-                    .then((base64Image) => {
-                    product.image = base64Image;
+                    // imageToBase64(productResult.image)
+                    // .then((base64Image) => {
+                    // product.image = base64Image;
                     res.status(200).send(productResult);
-                    })
-                    .catch(err => res.status(500).send({error:"Error converting image.    "+err}));
+                    // })
+                    // .catch(err => res.status(500).send({error:"Error converting image.    "+err}));
                 }
                 })
                 .catch(err => res.status(500).send({error:"Error getting products of the requested category. "+err}));

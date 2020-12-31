@@ -12,6 +12,12 @@ const Message = require('./Message/Message');
 const Offer = require('./Offer/Offer');
 const Car = require('./Car/Car');
 const ShoppingCart = require('./ShoppingCart/ShoppingCart');
+const CartItem = require('./CartItem/CartItem');
+const Order = require('./Order/Order');
+const Contact = require('./Contact/Contact');
+// const Chat = require('./Chat/Chat');
+const Report = require('./Report/Report');
+const Permissions = require('./Permissions/Permissions');
 
 //Objects
 const USER = new User();
@@ -27,5 +33,11 @@ const MESSAGE = new Message();
 const OFFER = new Offer();
 const CAR = new Car();
 const SHOPPINGCART = new ShoppingCart();
+const CARTITEM = new CartItem();
+const ORDER = new Order();
+const CONTACT = new Contact();
+// const Chat = new 
+const REPORT = new Report();
+const PERMISSIONS = new Permissions();
 
-module.exports = {USER,GARAGEOWNER,CAROWNER,STORE,WAREHOUSE,MENU,CATEGORY,PRODUCT,COMPLAINT,MESSAGE,OFFER,CAR,SHOPPINGCART};
+module.exports = {USER,GARAGEOWNER,CAROWNER,STORE,WAREHOUSE,MENU,CATEGORY,PRODUCT,COMPLAINT,MESSAGE,OFFER,CAR,SHOPPINGCART, CARTITEM, ORDER, PERMISSIONS, REPORT, CONTACT};

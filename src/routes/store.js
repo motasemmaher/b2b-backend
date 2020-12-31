@@ -11,7 +11,7 @@ const product = require('../business/Objects').PRODUCT;
 const garageOwner = require('../business/Objects').GARAGEOWNER;
 const menu = require('../business/Objects').MENU;
 const warehouse = require('../business/Objects').WAREHOUSE;
-
+const order = require('../business/Objects').ORDER;
 
 //----------View Stores and View a store----------
 router.get('/stores/:storeId?',(req,res) => {
@@ -28,19 +28,19 @@ router.get('/stores/:storeId?',(req,res) => {
         store.countAll()
             .then(countResult => {
             storesArray = storesResult;
-            storesArray.forEach((storeResult,index,storesArray) => {
-                imageToBase64(storeResult.image)
-                .then(base64Image => {
-                storeResult.image = base64Image;       
-                if(index  === storesArray.length - 1)
+            // storesArray.forEach((storeResult,index,storesArray) => {
+            //     imageToBase64(storeResult.image)
+            //     .then(base64Image => {
+            //     storeResult.image = base64Image;       
+            //     if(index  === storesArray.length - 1)
                     res.status(200).send({count:countResult,stores:storesArray});
-                })
-                .catch(err => {
-                    console.log({error:"Error converting image.    "+err})
-                    if (!res.headersSent)
-                        res.status(200).send({count:countResult,stores:storesArray});
-                });  
-            }) //End of foreach
+            //     })
+            //     .catch(err => {
+            //         console.log({error:"Error converting image.    "+err})
+            //         if (!res.headersSent)
+            //             res.status(200).send({count:countResult,stores:storesArray});
+            //     });  
+            // }) //End of foreach
             })
             .catch(err => res.status(500).send({error:"Error with getting count of all stores.  "+err}));
         })
@@ -54,12 +54,12 @@ router.get('/stores/:storeId?',(req,res) => {
             res.status(404).send({error:"Error! Didn't find a store with thats id."});
         else
         {
-            imageToBase64(storeResult.image)
-            .then((base64Image) => {
-            storeResult.image = base64Image;
+            // imageToBase64(storeResult.image)
+            // .then((base64Image) => {
+            // storeResult.image = base64Image;
             res.status(200).send(storeResult);
-            })
-            .catch(err => res.status(500).send({error:"Error converting image.    "+err}));
+            // })
+            // .catch(err => res.status(500).send({error:"Error converting image.    "+err}));
         }
         })
         .catch(err => res.status(500).send({error:"Error getting the store. "+err}));    
@@ -78,19 +78,19 @@ router.get('/stores/nearby',(req,res) => {
     store.countBySameAddress()
         .then(countResult => {
         storesArray = storesResult;
-        storesArray.forEach((storeResult,index,storesArray) => {
-            imageToBase64(storeResult.image)
-            .then(base64Image => {
-            storeResult.image = base64Image;       
-            if(index  === storesArray.length - 1)
+        // storesArray.forEach((storeResult,index,storesArray) => {
+            // imageToBase64(storeResult.image)
+            // .then(base64Image => {
+            // storeResult.image = base64Image;       
+            // if(index  === storesArray.length - 1)
                 res.status(200).send({count:countResult,stores:storesArray});
-            })
-            .catch(err => {
-                console.log({error:"Error converting image.    "+err})
-                if (!res.headersSent)
-                    res.status(200).send({count:countResult,stores:storesArray});
-            });  
-        }) //End of foreach
+            // })
+            // .catch(err => {
+            //     console.log({error:"Error converting image.    "+err})
+            //     if (!res.headersSent)
+            //         res.status(200).send({count:countResult,stores:storesArray});
+            // });  
+        // }) //End of foreach
         })
         .catch(err => res.status(500).send({error:"Error with getting count of all stores.  "+err}));
     })
@@ -114,19 +114,19 @@ router.get('/user/manage-garage-owner/stores',userAuthenticated,(req, res) => {
         store.countByGarageOwner(loggedUser._id)
             .then(countResult => {
             storesArray = storesResult;
-            storesArray.forEach((storeResult,index,storesArray) => {
-                imageToBase64(storeResult.image)
-                .then(base64Image => {
-                storeResult.image = base64Image;       
-                if(index  === storesArray.length - 1)
+            // storesArray.forEach((storeResult,index,storesArray) => {
+            //     imageToBase64(storeResult.image)
+            //     .then(base64Image => {
+            //     storeResult.image = base64Image;       
+            //     if(index  === storesArray.length - 1)
                     res.status(200).send({count:countResult,stores:storesArray});
-                })
-                .catch(err =>  {
-                    console.log({error:"Error converting image.    "+err});
-                    if (!res.headersSent)
-                        res.status(200).send({count:countResult,stores:storesArray});
-                });
-            }) //End of foreach
+            //     })
+            //     .catch(err =>  {
+            //         console.log({error:"Error converting image.    "+err});
+            //         if (!res.headersSent)
+            //             res.status(200).send({count:countResult,stores:storesArray});
+            //     });
+            // }) //End of foreach
             })
             .catch(err => res.status(500).send({error:"Error with getting count of garage owner's stores.  "+err}));
         })

@@ -5,30 +5,20 @@ const {
 } = require('../middleware/authentication');
 
 //Requiring classes
-const Product = require('../business/Product/Product');
-const Warehouse = require('../business/Warehouse/Warehouse');
-const ShoppingCart = require('../business/ShoppingCart/ShoppingCart');
-const Store = require('../business/Store/Store');
-const CarOwner = require('../business/CarOwner/CarOwner');
-const CartItem = require('../business/CartItem/CartItem');
-const Order = require('../business/Order/Order');
-const Offer = require('../business/Offer/Offer');
+const product = require('../business/Objects').PRODUCT;
+const warehouse = require('../business/Objects').WAREHOUSE;
+const shoppingCart = require('../business/Objects').SHOPPINGCART;
+const store = require('../business/Objects').STORE;
+const carOwner = require('../business/Objects').CAROWNER;
+const cartItem = require('../business/Objects').CARTITEM;
+const order = require('../business/Objects').ORDER;
+const offer = require('../business/Objects').OFFER;
 
 
 // validation by thaer
-const orderInformationValidator = require('../validations/orderInformation');
-const cartItemInformationValidator = require('../validations/cartItemInformation');
-const limitAndSkipValidation = require('../validations/limitAndSkipValidation');
-
-//Objects
-const carOwner = new CarOwner();
-const store = new Store();
-const warehouse = new Warehouse();
-const product = new Product();
-const offer = new Offer();
-const shoppingCart = new ShoppingCart();
-const order = new Order();
-const cartItem = new CartItem();
+const orderInformationValidator = require('../business/Order/orderInformation');
+const cartItemInformationValidator = require('../business/CartItem/cartItemInformation');
+const limitAndSkipValidation = require('../shared/limitAndSkipValidation');
 
 //---------get shoppingcart---------------\\
 router.get('', userAuthenticated, (req, res) => {

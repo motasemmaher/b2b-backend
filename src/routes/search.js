@@ -2,15 +2,11 @@ const express = require('express');
 const router = express.Router();
 
 //Requiring classes
-const Product = require('../business/Product/Product');
-const Store = require('../business/Store/Store');
+const product = require('../business/Objects').PRODUCT;
+const store = require('../business/Objects').STORE;
 
 // validation by thaer
-const limitAndSkipValidation = require('../validations/limitAndSkipValidation');
-
-//Objects
-const store = new Store();
-const product = new Product();
+const limitAndSkipValidation = require('../shared/limitAndSkipValidation');
 
 function escapeRegex(text) {
     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");

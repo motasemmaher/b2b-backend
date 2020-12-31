@@ -36,7 +36,7 @@ function hashPassword(password)
     return hash;
 }
 //----------Creating garage owner----------
-router.post('/user/garage-owner/create',upload.single('image'),(req, res) => {
+router.post('/auth/garage-owner/create',upload.single('image'),(req, res) => {
     userInfo = req.body.user;
     const storeInfo = req.body.store;
 
@@ -98,7 +98,7 @@ router.post('/user/garage-owner/create',upload.single('image'),(req, res) => {
     }
 });
 //----------Creating car owner----------
-router.post('/user/car-owner/create', (req, res) => {
+router.post('/auth/car-owner/create', (req, res) => {
     
     userInfo = req.body.user;
     const carInfo = req.body.car;

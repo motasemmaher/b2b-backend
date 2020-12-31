@@ -6,14 +6,10 @@ const {
 } = require('../middleware/authentication');
 
 //Requiring classes
-const CarOwner = require('../business/CarOwner/CarOwner');
-const Order = require('../business/Order/Order');
+const carOwner = require('../business/Objects').CAROWNER;
+const order = require('../business/Objects').ORDER;
 
-const limitAndSkipValidation = require('../validations/limitAndSkipValidation');
-
-//Objects
-const carOwner = new CarOwner();
-const order = new Order();
+const limitAndSkipValidation = require('../shared/limitAndSkipValidation');
 
 router.get('/orders', userAuthenticated, (req, res) => {
     const userInfo = req.user;

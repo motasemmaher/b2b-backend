@@ -28,19 +28,19 @@ router.get('/stores/:storeId/offers',(req,res) => {
         product.countByOffers(storeId)
             .then(countResult => {
             offersArray = offersResult;
-            offersArray.forEach((offerResult,index,offersArray) => {
-                imageToBase64(productRofferResultesult.image)
-                .then(base64Image => {
-                offerResult.image = base64Image;       
-                if(index  === offersArray.length - 1)
+            // offersArray.forEach((offerResult,index,offersArray) => {
+            //     imageToBase64(productRofferResultesult.image)
+            //     .then(base64Image => {
+            //     offerResult.image = base64Image;       
+            //     if(index  === offersArray.length - 1)
                     res.status(200).send({count:countResult,offers:offersArray});
-                })
-                .catch(err => {
-                    console.log({error:"Error converting image.    "+err})
-                    if (!res.headersSent)
-                    res.status(200).send({count:countResult,offers:offersArray});
-                });  
-                }) //End of foreach
+                // })
+                // .catch(err => {
+                //     console.log({error:"Error converting image.    "+err})
+                //     if (!res.headersSent)
+                //     res.status(200).send({count:countResult,offers:offersArray});
+                // });  
+                // }) //End of foreach
             })    
             .catch(err => res.status(500).send({error:"Error with getting count of offers.  "+err}));
         })
@@ -68,7 +68,7 @@ router.post('/stores/:storeId/offers/add-offer',userAuthenticated,(req,res) => {
         {
             let errors;
             productOffers = req.body.productOffers;
-            productOffers.forEach((productOffer,index,productOffer) => {
+            productOffers.forEach((productOffer,index,productOffers) => {
                 product.getProductById(productOffer['productId'])
                 .then(productResult => {
                     newPrice = productResult.price - (productResult.price*(productOffer['discountRate']/100));

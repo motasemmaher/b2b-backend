@@ -1,11 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-//Requiring classes
-const Permissions = require('../business/Permissions/Permissions');
 
-//Objects
-const permissions = new Permissions();
+const permissions = require('../business/Objects').PERMISSIONS;
+
 
 router.get('/', (req, res) => {
     const role = req.query.role;
