@@ -11,7 +11,7 @@ const order = require('../business/Objects').ORDER;
 
 const limitAndSkipValidation = require('../shared/limitAndSkipValidation');
 
-router.get('/orders', userAuthenticated, (req, res) => {
+router.get('/car-owner/orders', userAuthenticated, (req, res) => {
     const userInfo = req.user;
 
     let skip = req.query.skip;
@@ -44,7 +44,7 @@ router.get('/orders', userAuthenticated, (req, res) => {
     }
 });
 //------------------this method for retrived order to car owner------------------\\
-router.get('/orders/:orderId', userAuthenticated, (req, res) => {
+router.get('/car-owner/orders/:orderId', userAuthenticated, (req, res) => {
     const userInfo = req.user;
     const orderId = req.params.orderId;
     if (userInfo.role === 'carOwner') {
@@ -75,7 +75,7 @@ router.get('/orders/:orderId', userAuthenticated, (req, res) => {
 });
 
 //------------------------maintain order------------------------\\
-router.put('/maintain/:orderId', userAuthenticated, (req, res) => {
+router.put('/car-owner/maintain/:orderId', userAuthenticated, (req, res) => {
     const userInfo = req.user;
     const orderId = req.params.orderId;
     const deliveryAddress = req.body.deliveryAddress;
@@ -105,7 +105,7 @@ router.put('/maintain/:orderId', userAuthenticated, (req, res) => {
                             order.updateOrder(retrivedOrder).then(updatedOrder => {
                                 res.send(updatedOrder);
                             }).catch(err => {
-                                res.status(501).send(err);
+                                res.status(500).send({Error: 'error in updating Order'});
                             });
                         } else {
                             res.send({
@@ -123,10 +123,10 @@ router.put('/maintain/:orderId', userAuthenticated, (req, res) => {
                     });
                 }
             }).catch(err => {
-                res.status(501).send(err);
+                res.status(404).send({Error: 'order ID is not found'});
             });
         }).catch(err => {
-            res.status(501).send(err);
+            res.status(404).send({Error: 'car owner is not found'});
         });
     } else {
         res.status(403).send({

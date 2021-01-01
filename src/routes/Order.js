@@ -134,7 +134,7 @@ router.put('/:storeId/order/:orderId', userAuthenticated, (req, res) => {
                                                     report.addOrder(gaOwner.reportId, orderId).then(updatedReport => {
                                                         res.status(200).send(updatedOrderStatus);
                                                     }).catch(err => {
-                                                        res.status(501).send('Error in the report');
+                                                        res.status(500).send({Error: 'Error in adding order to the report the report'});
                                                     });
                                                 }
                                                 // }).catch(err => {

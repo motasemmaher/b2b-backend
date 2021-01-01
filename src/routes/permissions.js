@@ -5,7 +5,7 @@ const router = express.Router();
 const permissions = require('../business/Objects').PERMISSIONS;
 
 
-router.get('/', (req, res) => {
+router.get('/permissions', (req, res) => {
     const role = req.query.role;
     if (role === 'admin' || role === 'carOwner' || role === 'garageOwner' || role === 'waitingUser') {
         permissions.findPermissions(role).then(permission => {
@@ -18,7 +18,7 @@ router.get('/', (req, res) => {
     }
 });
 
-router.put('/role/:role/add/:permission', (req, res) => {
+router.put('/permissions/role/:role/add/:permission', (req, res) => {
     const role = req.params.role;
     const permission = req.params.permission;
     if (!permission) {
@@ -39,7 +39,7 @@ router.put('/role/:role/add/:permission', (req, res) => {
     }
 });
 
-router.put('/autoAdding', (req, res) => {
+router.put('/permissions/autoAdding', (req, res) => {
     const prom = [];
     const arrPermissionCarOwner = ['createCarOwner', 'login', 'manageAccount', 'viewProduct', 'placeOrder',
         'maintainOrder', 'submitComplaint', 'chat', 'sos', 'viewStores'

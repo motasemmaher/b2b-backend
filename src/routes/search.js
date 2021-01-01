@@ -13,7 +13,7 @@ function escapeRegex(text) {
 };
 
 //---------------------search in (stores or products)---------------------\\
-router.get('/', (req, res) => {
+router.get('/search', (req, res) => {
     let skip = req.query.skip;
     let limit = req.query.limit;
     const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);

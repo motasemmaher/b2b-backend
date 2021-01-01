@@ -21,7 +21,7 @@ const cartItemInformationValidator = require('../business/CartItem/cartItemInfor
 const limitAndSkipValidation = require('../shared/limitAndSkipValidation');
 
 //---------get shoppingcart---------------\\
-router.get('', userAuthenticated, (req, res) => {
+router.get('/shopping-cart', userAuthenticated, (req, res) => {
     let skip = req.query.skip;
     let limit = req.query.limit;
     const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);
@@ -57,7 +57,7 @@ router.get('', userAuthenticated, (req, res) => {
 });
 
 //---------get cartItem from shoppingcart (back here)---------------\\
-router.get('/cart-item/:cartItemId', userAuthenticated, (req, res) => {
+router.get('/shopping-cart/cart-item/:cartItemId', userAuthenticated, (req, res) => {
     const userInfo = req.user;
     const cartItemId = req.params.cartItemId;
 
@@ -86,7 +86,7 @@ router.get('/cart-item/:cartItemId', userAuthenticated, (req, res) => {
 });
 
 //------------------add cartItem to shoppingcart by car owner-----------------\\
-router.post('/add-cart/:storeId/:productId', userAuthenticated, (req, res) => {
+router.post('/shopping-cart/add-cart/:storeId/:productId', userAuthenticated, (req, res) => {
     const productId = req.params.productId;
     const storeId = req.params.storeId;
     const date = req.body.date;
@@ -174,7 +174,7 @@ router.post('/add-cart/:storeId/:productId', userAuthenticated, (req, res) => {
 });
 
 //------------remove cartitem by car owner-----------\\
-router.delete('/remove-cart-item/:cartItemId', userAuthenticated, (req, res) => {
+router.delete('/shopping-cart/remove-cart-item/:cartItemId', userAuthenticated, (req, res) => {
     const cartItemId = req.params.cartItemId;
 
     cartItem.getCartItem(cartItemId).then(retrivedCartItem => {
@@ -184,10 +184,10 @@ router.delete('/remove-cart-item/:cartItemId', userAuthenticated, (req, res) => 
             }).then(deletedCartItem => {
                 res.status(200).send(updatedShoppingCart);
             }).catch(err => {
-                res.status(501).send(err);
+                res.status(400).send({error: 'error in delete CartItem there is no cartItem with this id'});            
             });
         }).catch(err => {
-            res.status(501).send(err);
+            res.status(400).send({error: 'error in remove CartItem from shopping cart'});
         });
     }).catch(err => {
         res.status(404).send({
@@ -197,7 +197,7 @@ router.delete('/remove-cart-item/:cartItemId', userAuthenticated, (req, res) => 
 });
 
 //------------update cartitem by car owner-----------\\
-router.put('/update-cart-item/:cartItemId', userAuthenticated, (req, res) => {
+router.put('/shopping-cart/update-cart-item/:cartItemId', userAuthenticated, (req, res) => {
     const cartItemId = req.params.cartItemId;
 
     const isValidQuantity = cartItemInformationValidator.validateCartItemInfo({
@@ -243,27 +243,31 @@ router.put('/update-cart-item/:cartItemId', userAuthenticated, (req, res) => {
                             }).then(updatedShoppingCart => {
                                 res.status(200).send(updatedShoppingCart);
                             }).catch(err => {
-                                res.status(501).send(err);
+                                res.status(400).send({Error: 'error in update shopping cart'});
                             });
                         }).catch(err => {
-                            res.status(501).send(err);
+                            res.status(400).send({Error: 'error in update cartItem'});
                         });
                     }
                 }
             }).catch(err => {
-                res.status(501).send(err);
+                res.status(400).send({Error: 'error in getting Product From Warehouse'});
             });
         }).catch(err => {
             res.status(404).send({
                 error: 'store is not exists'
             });
         });
+    }).catch(err => {
+        res.status(404).send({
+            error: 'cartItem is not exists'
+        });
     });
 
 });
 
 //--------------------checkout Order (place Order)--------------------\\
-router.post('/checkout', userAuthenticated, (req, res) => {
+router.post('/shopping-cart/checkout', userAuthenticated, (req, res) => {
 
     const userInfo = req.user;
     const deliveryAddress = req.body.deliveryAddress;

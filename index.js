@@ -31,51 +31,16 @@ app.use(session({
 
 require('./src/models/model');
 
-//Requiring classes
-const Category = require('./src/business/Category/Category');
-const Product = require('./src/business/Product/Product');
-const Warehouse = require('./src/business/Warehouse/Warehouse');
-const Menu = require('./src/business/Menu/Menu');
-// added By thaer
-const ShoppingCart = require('./src/business/ShoppingCart/ShoppingCart');
-const Store = require('./src/business/Store/Store');
-const CarOwner = require('./src/business/CarOwner/CarOwner');
-const User = require('./src/business/User/User');
-const CartItem = require('./src/business/CartItem/CartItem');
-const Order = require('./src/business/Order/Order');
-const GarageOwner = require('./src/business/GarageOwner/GarageOwner');
-const Contact = require('./src/business/Contact/Contact');
-// const Chat = require('./src/business/Chat/Chat');
-const Report = require('./src/business/Report/Report');
-const Complaint = require('./src/business/Complaint/Complaint');
-const Message = require('./src/business/Message/Message');
-const Offer = require('./src/business/Offer/Offer');
-const Car = require('./src/business/Car/Car');
-const Permissions = require('./src/business/Permissions/Permissions');
+//Objects
+const product = require('./src/business/Objects').PRODUCT;
+const user = require('./src/business/Objects').USER;
+const garageOwner = require('./src/business/Objects').GARAGEOWNER;
+const contact = require('./src/business/Objects').CONTACT;
+// const Chat = require('./src/business/Objects');
+const report = require('./src/business/Objects').REPORT;
 
 // validation by thaer
 const limitAndSkipValidation = require('./src/shared/limitAndSkipValidation');
-
-//Objects
-const user = new User();
-const garageOwner = new GarageOwner();
-const carOwner = new CarOwner();
-const store = new Store();
-const warehouse = new Warehouse();
-const menu = new Menu();
-const category = new Category();
-const product = new Product();
-const complaint = new Complaint();
-const message = new Message();
-const offer = new Offer();
-const car = new Car();
-const shoppingCart = new ShoppingCart();
-const contact = new Contact();
-// const chat = new Chat();
-const report = new Report();
-const order = new Order();
-const cartItem = new CartItem();
-const permissions = new Permissions();
 
 //Setting-up express app
 //Setting-up path for the static files
@@ -568,17 +533,15 @@ var chatIO = io.of('/user/chat/start')
     
 
 //Load Routes
-const _shoppingCart = require('./src/routes/ShoppingCart');
-const _store = require('./src/routes/Store');
-const _carOwner = require('./src/routes/CarOwner');
-const _search = require('./src/routes/Search');
-const _permissions = require('./src/routes/Permissions');
+const shoppingCartRoute = require('./src/routes/ShoppingCart');
+const orderRoute = require('./src/routes/Order');
+const searchRoute = require('./src/routes/Search');
+const permissionsRoute = require('./src/routes/Permissions');
 
 // Use Routes
-app.use('/shopping-cart', _shoppingCart);
-app.use('/store', _store);
-app.use('/car-owner', _carOwner);
-app.use('/search', _search);
-app.use('/permissions', _permissions);
+app.use(shoppingCartRoute);
+app.use(orderRoute);
+app.use(searchRoute);
+app.use(permissionsRoute);
 
 module.exports = app;
