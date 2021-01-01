@@ -399,13 +399,11 @@ app.post('/user/contact/create', userAuthenticated, (req, res) => {
         name: req.body.storeName,
         otherUserId: garageOwnerId
     }).then(retrivedUserContact => {
-        console.log(retrivedUserContact);
         contact.updateContact({
             ownerId: garageOwnerId,
             name: req.body.userName,
             otherUserId: userInfo._id
         }).then(retrivedGarageOwnerContact => {
-            console.log(retrivedGarageOwnerContact);
             if (userInfo._id > garageOwnerId) {
                 userForChat.add(userInfo._id + "-" + garageOwnerId)
             } else {

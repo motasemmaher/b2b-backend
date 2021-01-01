@@ -1,15 +1,15 @@
 const mongoose = require('mongoose');
 // const uri = "mongodb+srv://admin:admin@cluster0.n4bjd.mongodb.net/GP?retryWrites=true&w=majority";
 // const testuri = "mongodb+srv://admin:admin@cluster0.n4bjd.mongodb.net/GPTest?retryWrites=true&w=majority";
-const uri = 'mongodb://localhost:27017/GPro2Test';
-const testuri = 'mongodb://localhost:27017/GPro2Test';
+const uri = 'mongodb://localhost:27017/GPTest';
+const testuri = 'mongodb://localhost:27017/GPTest';
 //"test":"mocha --recursive --timeout 100000 --exit"
 //"test": "nyc --reporter=text --timeout 100000 mocha --exit"
 function connect() {
   return new Promise((resolve, reject) => {
     if (process.env.NODE_ENV === 'test') 
     {
-        mongoose.connect(testuri,{ useNewUrlParser: true, useCreateIndex: true,useUnifiedTopology: true})
+        mongoose.connect(testuri,{ useNewUrlParser: true, useCreateIndex: true,useUnifiedTopology: true, useFindAndModify: false})
         .then((res, err) => {
             console.log("connected to testdb")
             require ('./src/models/model/Admin');
@@ -37,7 +37,7 @@ function connect() {
     }
     else 
     {
-        mongoose.connect(uri,{ useNewUrlParser: true, useCreateIndex: true,useUnifiedTopology: true})
+        mongoose.connect(uri,{ useNewUrlParser: true, useCreateIndex: true,useUnifiedTopology: true, useFindAndModify: false})
         .then((res, err) => {
           console.log("connected to DB")
           if (err) return reject(err);

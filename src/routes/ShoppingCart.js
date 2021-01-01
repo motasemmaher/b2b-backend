@@ -32,7 +32,7 @@ router.get('/shopping-cart', userAuthenticated, (req, res) => {
     const userInfo = req.user;
     if (userInfo.role === 'carOwner') {
         carOwner.getCarOwnerByUserId(userInfo._id).populate('shoppingCart').then(carOwnerInfo => {
-            cartItem.getCartItemsAssociatedWithShoppingCartId(carOwnerInfo.shoppingCart._id, limit, skip)
+            cartItem.getCartItemsAssociatedWithShoppingCartId(carOwnerInfo.shoppingCart._id, limit, skip).populate('product')
                 .then(retrivedCartItems => {
                     res.send({
                         shoppingCart: {
@@ -115,7 +115,6 @@ router.post('/shopping-cart/add-cart/:storeId/:productId', userAuthenticated, (r
             store.getStore(storeId)
                 .then(storeInfo => {
                     product.findProductAndItsOffer(productId).then(productWithOffer => {
-                        console.log(productWithOffer);
                         if (productWithOffer.offer != null) {
                             if (offer.exists(productWithOffer.offer._id)) {
                                 productPrice = productWithOffer.offer.newPrice;
@@ -220,13 +219,11 @@ router.put('/shopping-cart/update-cart-item/:cartItemId', userAuthenticated, (re
 
     cartItem.getCartItem(cartItemId).then(retrivedCartItem => {
         store.getStore(retrivedCartItem.storeId).then(storeInfo => {
-            console.log(storeInfo);
             warehouse.getProductFromWarehouse(
                 storeInfo.warehouse, retrivedCartItem.product
             ).populate({
                 path: 'storage.productId'
             }).then(warehouseInfo => {
-                // console.log(warehouseInfo);
                 if (warehouseInfo.storage[0].amount >= quantity) {
                     const totalPrice = warehouseInfo.storage[0].productId.price * quantity;
                     if (totalPrice > 0) {
