@@ -107,7 +107,8 @@ app.post('/user/login', (req, res, next) => {
 
 app.delete('/user/logout', (req, res) => {
     req.session.token = null;
-    res.redirect('/user/login');
+    res.send({sucess: true})
+    // res.redirect('/user/login');
 });
 
 
