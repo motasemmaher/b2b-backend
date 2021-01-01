@@ -536,10 +536,12 @@ const shoppingCartRoute = require('./src/routes/ShoppingCart');
 const orderRoute = require('./src/routes/Order');
 const searchRoute = require('./src/routes/Search');
 const permissionsRoute = require('./src/routes/Permissions');
+const carOwnerRoute = require('./src/routes/CarOwner');
 
 // Use Routes
 app.use(shoppingCartRoute);
 app.use(orderRoute);
+app.use(carOwnerRoute);
 app.use(searchRoute);
 app.use(permissionsRoute);
 
