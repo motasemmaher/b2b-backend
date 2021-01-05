@@ -349,7 +349,7 @@ router.put('/car-owner/maintain/:orderId', userAuthenticated, (req, res) => {
                                 res.status(500).send({error: 'Internal server error'});
                             });
                         } else {
-                            res.send({
+                            res.status(500).send({
                                 error: 'You cannot update your order now accepted time has elapsed'
                             });
                         }
