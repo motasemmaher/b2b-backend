@@ -5,7 +5,7 @@ const connection = require('../connect');
 // var mongoose = require('mongoose');
 // var addedCartItemId = mongoose.Types.ObjectId('5ff2711458e25b1b84611b68');
 
-const shoppingCart = require('../src/business/Objects').SHOPPINGCART;
+const cartItem = require('../src/business/Objects').CARTITEM;
 
 const shoppingCartId = "5fee1adfcef37314e007dd03";
 const addedCartItemId = "5ff2711458e25b1b84611b68";
@@ -16,8 +16,7 @@ function test(result) {
     expect(result).to.contain.property('_id');
 }
 
-describe('ShoppingCart Class Tests', () => {
-
+describe('CartItem Class Tests', () => {
 
     before((done) => {
         connection.connect()
@@ -25,11 +24,11 @@ describe('ShoppingCart Class Tests', () => {
             .catch((err) => done(err));
     });
 
-    it('Creating shoppingcart without errors.', (done) => {
-        shoppingCart.createShoppingCart()
+    it('Creating CartItem without errors.', (done) => {
+        shoppingCart.createCartItem()
             .then(createResult => {
                 test(createResult);
-                shoppingCart.deleteShoppingCart(createResult._id)
+                shoppingCart.deleteCartItem(createResult._id)
                     .then(deleteResult => {
                         done();
                     })
@@ -37,20 +36,7 @@ describe('ShoppingCart Class Tests', () => {
             })
             .catch(err => done(err));
     });
-    /*
-        it('Deleting shoppingcart without errors.', (done) => {
-            shoppingCart.createShoppingCart()
-            .then(createResult => {
-                shoppingCart.deleteShoppingCart(createResult._id)
-                .then(deleteResult => {
-                    test(deleteResult);
-                    done();
-                })
-                .catch(err => done(err));
-            })
-            .catch(err => done(err));
-        });
-       */
+
     it('should get ShoppingCart', (done) => {
         shoppingCart.getShoppingCart(shoppingCartId)
             .then(retrievedShoppingCart => {
@@ -86,14 +72,15 @@ describe('ShoppingCart Class Tests', () => {
             })
             .catch(err => done(err));
     });
-
+    
     it('should remove all Cart Items from ShoppingCart', (done) => {
         shoppingCart.removeAllCartItem(shoppingCartId).then(removedAllCartItems => {
+            console.log(removedAllCartItems);
                 expect(removedAllCartItems.totalBill).to.equal(0);
                 shoppingCart.addCartItem(shoppingCartId, cartItemId).then(updatedShoppingCart => {
-                        done();
-                    })
-                    .catch(err => done(err));
+                    done();
+                })
+                .catch(err => done(err));                
             })
             .catch(err => done(err));
     });

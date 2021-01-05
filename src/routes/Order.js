@@ -37,13 +37,13 @@ router.get('/:storeId/orders', userAuthenticated, (req, res) => {
                                     return res.send(orders);
                                 } else {
                                     return res.status(404).send({
-                                        Error: `there is no ${status} orders in your stores`
+                                        error: `there is no ${status} orders in your stores`
                                     });
                                 }
                             });
                     } else {
                         return res.status(400).send({
-                            Error: 'status is wrong it must be pending or cancel or delivered'
+                            error: 'status is wrong it must be pending or cancel or delivered'
                         });
                     }
                 } else {
@@ -54,17 +54,17 @@ router.get('/:storeId/orders', userAuthenticated, (req, res) => {
                 }
             } else {
                 res.status(404).send({
-                    Error: 'store does not belong to this garage owner'
+                    error: 'store does not belong to this garage owner'
                 });
             }
         }).catch(err => {
             res.status(404).send({
-                Error: 'garageOwner is not exits'
+                error: 'garageOwner is not exits'
             });
         });
     } else {
         res.status(403).send({
-            Error: 'you cannot access this page'
+            error: 'you cannot access this page'
         });
     }
 });
@@ -86,23 +86,23 @@ router.get('/:storeId/order/:orderId', userAuthenticated, (req, res) => {
                             res.send(storeInfo.orders);
                         } else {
                             res.status(404).send({
-                                Error: 'order does not exists'
+                                error: 'order does not exists'
                             });
                         }
                     }).catch(err => {
                         res.status(404).send({
-                            Error: 'order does not exists'
+                            error: 'order does not exists'
                         });
                     });
             } else {
                 res.status(404).send({
-                    Error: 'store does not belong to this garage owner'
+                    error: 'store does not belong to this garage owner'
                 });
             }
         });
     } else {
         res.status(403).send({
-            Error: 'you cannot access this page'
+            error: 'you cannot access this page'
         });
     }
 });
@@ -134,7 +134,7 @@ router.put('/:storeId/order/:orderId', userAuthenticated, (req, res) => {
                                                     report.addOrder(gaOwner.reportId, orderId).then(updatedReport => {
                                                         res.status(200).send(updatedOrderStatus);
                                                     }).catch(err => {
-                                                        res.status(500).send({Error: 'Error in adding order to the report the report'});
+                                                        res.status(500).send({error: 'Internal server error'});
                                                     });
                                                 }
                                                 // }).catch(err => {
@@ -149,54 +149,54 @@ router.put('/:storeId/order/:orderId', userAuthenticated, (req, res) => {
                                                                 report.addCancelOrder(gaOwner.reportId, orderId).then(updatedReport => {
                                                                     return res.status(200).send(updatedOrderStatus);
                                                                 }).catch(err => {
-                                                                    return res.status(500).send('Error in the add Cancel Order to report');
+                                                                    return res.status(500).send({error: 'Internal server error'});
                                                                 });
                                                             }
                                                         })
                                                         .catch(err => {
                                                             return res.status(400).send({
-                                                                Error: 'error in increaseAmaountOfProduct'
+                                                                error: 'error in increaseAmaountOfProduct'
                                                             });
                                                         });
                                                         }).catch(err => {
                                                         return res.status(400).send({
-                                                            Error: 'error in updateProduct in processing order'
+                                                            error: 'error in updateProduct in processing order'
                                                         });
                                                     });
                                                     }).catch(err => {
                                                         return res.status(400).send({
-                                                            Error: 'error in get Product By Id in processing order'
+                                                            error: 'error in get Product By Id in processing order'
                                                         });
                                                     });                                                                                                    
                                             }
                                         })
                                     }).catch(err => {
-                                        res.status(404).send('store does not exist');
+                                        res.status(404).send({ error:'store does not exist'});
                                     });
                                 }).catch(err => {
-                                    res.status(404).send('shoppingCart does not exist');
+                                    res.status(404).send({ error:'shoppingCart does not exist'});
                                 });
                             }).catch(err => {
-                                res.status(404).send('Store Or order does not exist');
+                                res.status(404).send({ error: 'Store Or order does not exist'});
                             });
                         }
                     } else {
                         res.send({
-                            Error: 'The user has 1 hour to update the order you need to wait one hour to have the ability to update the order status'
+                            error: 'The user has 1 hour to update the order you need to wait one hour to have the ability to update the order status'
                         });
                     }
                 } else {
                     res.send({
-                        Error: 'The Order is Already processed'
+                        error: 'The Order is Already processed'
                     });
                 }
             }).catch(err => {
-                res.status(404).send('There is no order in this id');
+                res.status(404).send({error: 'There is no order in this id'});
             });
         });
     } else {
         res.status(403).send({
-            Error: 'you cannot access this page'
+            error: 'you cannot access this page'
         });
     }
 });
@@ -219,35 +219,159 @@ router.delete('/:storeId/order/:orderId', userAuthenticated, (req, res) => {
                                                             msg: "successfully deleted order"
                                                         });
                                                     }).catch(err => {
-                                                        res.status(500).send("Error in deleting cartItem");
+                                                        res.status(500).send({error: 'Internal server error'});
                                                     });
                                                 }).catch(err => {
-                                                    res.status(500).send("Error in deleting shoppingCart");
+                                                    res.status(500).send({error: 'Internal server error'});
                                                 });
                                             })
                                             .catch(err => {
-                                                res.status(500).send("Error in deleting order");
+                                                res.status(500).send({error: 'Internal server error'});
                                             });
                                     })
                                     .catch(err => {
-                                        res.status(500).send("Error in deleting order from carOwner");
+                                        res.status(500).send({error: 'Internal server error'});
                                     });
 
                             })
                             .catch(err => {
-                                res.status(500).send("Error in getting order");
+                                res.status(500).send({error: 'Internal server error'});
                             });
                     })
                     .catch(err => {
-                        res.status(500).send("Error in deleting order from store");
+                        res.status(500).send({error: 'Internal server error'});
                     });
             })
             .catch(err => {
-                res.status(500).send("Error in getting garageOwner");
+                res.status(500).send({error: 'Internal server error'});
             });
     } else {
         res.status(403).send({
-            Error: 'you cannot access this page'
+            error: 'you cannot access this page'
+        });
+    }
+});
+
+router.get('/car-owner/orders', userAuthenticated, (req, res) => {
+    const userInfo = req.user;
+
+    let skip = req.query.skip;
+    let limit = req.query.limit;
+    const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);
+
+    skip = limitAndSkipValues.skip;
+    limit = limitAndSkipValues.limit;
+
+    if (userInfo.role === 'carOwner') {
+        carOwner.getCarOwnerByUserId(userInfo._id).then(cOwner => {
+            order.getOrderByCarOwnerId(cOwner._id, limit, skip)
+                .then(orders => {
+                    res.send(orders);
+                })
+                .catch(err => {
+                    res.status(404).send({
+                        error: 'this carOwner is not found'
+                    });
+                });
+        }).catch(err => {
+            res.status(404).send({
+                error: 'this user is not found'
+            });
+        });
+    } else {
+        res.status(403).send({
+            error: 'you cannot access this page'
+        });
+    }
+});
+//------------------this method for retrived order to car owner------------------\\
+router.get('/car-owner/orders/:orderId', userAuthenticated, (req, res) => {
+    const userInfo = req.user;
+    const orderId = req.params.orderId;
+    if (userInfo.role === 'carOwner') {
+        carOwner.getCarOwnerByUserId(userInfo._id).then(cOwner => {
+            carOwner.getOrder(cOwner._id, orderId).then(orderId => {
+                order.getOrder(orderId).then(retrivedOrder => {
+                    res.send(retrivedOrder);
+                }).catch(err => {
+                    res.status(404).send({
+                        error: 'thisorder is not found'
+                    });
+                });
+            }).catch(err => {
+                res.status(404).send({
+                    error: 'this car owner is not found'
+                });
+            });
+        }).catch(err => {
+            res.status(404).send({
+                error: 'this user is not found'
+            });
+        });
+    } else {
+        res.status(403).send({
+            error: 'you cannot access this page'
+        });
+    }
+});
+
+//------------------------maintain order------------------------\\
+router.put('/car-owner/maintain/:orderId', userAuthenticated, (req, res) => {
+    const userInfo = req.user;
+    const orderId = req.params.orderId;
+    const deliveryAddress = req.body.deliveryAddress;
+
+    const phoneNumber = req.body.phoneNumber.toString();
+    const isValidOrderInfo = orderInformationValidator.validateOrderInfo({
+        phoneNumber: phoneNumber
+    });
+
+    if (isValidOrderInfo !== 'pass') {
+        return res.status(400).send({
+            error: isValidOrderInfo
+        });
+    }
+
+    date = new Date();
+    if (userInfo.role === 'carOwner') {
+        carOwner.getCarOwnerByUserId({
+            user: userInfo._id
+        }).then(cOwner => {
+            order.getOrder(orderId).then(retrivedOrder => {
+                if (retrivedOrder.status === 'pending') {
+                    if (cOwner._id.equals(retrivedOrder.carOwnerId)) {
+                        if ((date.getTime() - retrivedOrder.date.getTime()) >= 3600000) {
+                            retrivedOrder.deliveryAddress = deliveryAddress;
+                            retrivedOrder.phoneNumber = phoneNumber;
+                            order.updateOrder(retrivedOrder).then(updatedOrder => {
+                                res.send(updatedOrder);
+                            }).catch(err => {
+                                res.status(500).send({error: 'Internal server error'});
+                            });
+                        } else {
+                            res.send({
+                                error: 'You cannot update your order now accepted time has elapsed'
+                            });
+                        }
+                    } else {
+                        res.status(403).send({
+                            error: "You don't have access to this order"
+                        });
+                    }
+                } else {
+                    res.status(403).send({
+                        error: "This order is delivered or cancel"
+                    });
+                }
+            }).catch(err => {
+                res.status(404).send({error: 'order ID is not found'});
+            });
+        }).catch(err => {
+            res.status(404).send({error: 'car owner is not found'});
+        });
+    } else {
+        res.status(403).send({
+            error: 'you cannot access this page'
         });
     }
 });

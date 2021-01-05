@@ -44,7 +44,7 @@ module.exports =  class ShoppingCart {
     }
 
     removeAllCartItem(shoppingCartId) {
-        const promiseResult = ShoppingCartModel.removeCartItem({_id: shoppingCartId});
+        const promiseResult = ShoppingCartModel.removeAllCartItem({_id: shoppingCartId});
         return promiseResult;
     }
 }

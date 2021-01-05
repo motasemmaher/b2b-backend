@@ -29,37 +29,37 @@ router.get('/search', (req, res) => {
             store.searchStores(regex, limit, skip).then(storesSearchResult => {
                 if (storesSearchResult.length <= 0) {
                     return res.status(404).send({
-                        Error: 'There is no result'
+                        error: 'There is no result'
                     });
                 }
                 return res.send({
                     storesSearchResult
                 });
             }).catch(err => {
-                res.status(404).send("Error in search");
+                res.status(404).send({error: "Error in search"});
             });
         } else if (fliter === 'products') {
             product.searchProducts(regex, limit, skip).then(productsSearchResult => {
                 if (productsSearchResult.length <= 0) {
                     return res.status(404).send({
-                        Error: 'There is no result'
+                        error: 'There is no result'
                     });
                 }
                 return res.send({
                     productsSearchResult
                 });
             }).catch(err => {
-                res.status(404).send("Error in search");
+                res.status(404).send({error: "error in search"});
             });
         } else {
             return res.status(400).send({
-                Error: 'you must specify where you want to search in (stores or products)'
+                error: 'you must specify where you want to search in (stores or products)'
             });
         }
 
     } else {
         res.status(404).send({
-            Error: 'There is no result'
+            error: 'There is no result'
         });
     }
 });
