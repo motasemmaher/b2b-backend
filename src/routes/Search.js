@@ -27,39 +27,39 @@ router.get('/search', (req, res) => {
         const regex = new RegExp(escapeRegex(search), 'gi');
         if (fliter === 'stores') {
             store.searchStores(regex, limit, skip).then(storesSearchResult => {
-                if (storesSearchResult.length <= 0) {
-                    return res.status(404).send({
-                        error: 'There is no result'
-                    });
-                }
+                // if (storesSearchResult.length <= 0) {
+                //     return res.status(404).send({
+                //         error: 'There is no result'
+                //     });
+                // }
                 return res.send({
                     storesSearchResult
                 });
             }).catch(err => {
-                res.status(404).send({error: "Error in search"});
+                res.status(404).send({error: "ERROR_IN_SEARCH"});
             });
         } else if (fliter === 'products') {
             product.searchProducts(regex, limit, skip).then(productsSearchResult => {
-                if (productsSearchResult.length <= 0) {
-                    return res.status(404).send({
-                        error: 'There is no result'
-                    });
-                }
+                // if (productsSearchResult.length <= 0) {
+                //     return res.status(404).send({
+                //         error: 'There is no result'
+                //     });
+                // }
                 return res.send({
                     productsSearchResult
                 });
             }).catch(err => {
-                res.status(404).send({error: "error in search"});
+                res.status(404).send({error: "ERROR_IN_SEARCH"});
             });
         } else {
             return res.status(400).send({
-                error: 'you must specify where you want to search in (stores or products)'
+                error: 'ERROR_YOU_MUST_SPECIFY_WHERE_YOU_WANT_TO_SEARCH_IN_STORES_OR_PRODUCTS'
             });
         }
 
     } else {
         res.status(404).send({
-            error: 'There is no result'
+            error: 'ERROR_THERE_IS_NO_RESULT'
         });
     }
 });
