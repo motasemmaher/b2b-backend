@@ -107,7 +107,8 @@ app.post('/user/login', (req, res, next) => {
 
 app.delete('/user/logout', (req, res) => {
     req.session.token = null;
-    res.redirect('/user/login');
+    res.send({sucess: true})
+    // res.redirect('/user/login');
 });
 
 
@@ -399,13 +400,11 @@ app.post('/user/contact/create', userAuthenticated, (req, res) => {
         name: req.body.storeName,
         otherUserId: garageOwnerId
     }).then(retrivedUserContact => {
-        console.log(retrivedUserContact);
         contact.updateContact({
             ownerId: garageOwnerId,
             name: req.body.userName,
             otherUserId: userInfo._id
         }).then(retrivedGarageOwnerContact => {
-            console.log(retrivedGarageOwnerContact);
             if (userInfo._id > garageOwnerId) {
                 userForChat.add(userInfo._id + "-" + garageOwnerId)
             } else {
@@ -537,10 +536,12 @@ const shoppingCartRoute = require('./src/routes/ShoppingCart');
 const orderRoute = require('./src/routes/Order');
 const searchRoute = require('./src/routes/Search');
 const permissionsRoute = require('./src/routes/Permissions');
+const carOwnerRoute = require('./src/routes/CarOwner');
 
 // Use Routes
 app.use(shoppingCartRoute);
 app.use(orderRoute);
+app.use(carOwnerRoute);
 app.use(searchRoute);
 app.use(permissionsRoute);
 

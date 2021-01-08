@@ -104,8 +104,6 @@ const nodemailer = require('nodemailer');
 
 
 app.put('/update-menu/:id', (req, res) => {
-    console.log("Inside put")
-
     Menu.updateMenu({
         _id: req.params.id,
         temp: req.body.temp,
@@ -426,7 +424,6 @@ app.delete('/store/:id/delete-category/:categoryId',(req,res) => {
     menu.getAllCategories(req.params.id)
             .then(menuResult => {
             //2- Updating the categories list inside the store's list 
-            console.log("Menu result: \n"+menuResult.categories)   
             const index = menuResult.categories.indexOf(req.params.categoryId);
             menuResult.categories.splice(index,1);
             menu.updateMenu({storeId:menuResult.storeId,categories:menuResult.categories})
@@ -504,7 +501,6 @@ app.put('/store/:id/category/:categoryId/update-product/:productId',upload.singl
         res.send(warehouseValidationResult.err);
     else{
         //Updating product
-        console.log("categoryName: "+req.body.categoryName)
 
         category.findCategoryByName(req.body.categoryName)
         .then(categoryFindByNameResult =>{
@@ -514,7 +510,7 @@ app.put('/store/:id/category/:categoryId/update-product/:productId',upload.singl
                 
             if(categoryFindByNameResult._id != req.params.categoryId) 
             {
-            console.log("Inside update product if")
+            console.log(" update product if")
             category.removeProductFromCategory(req.params.categoryId,req.params.productId)
                 .then(removeProductFromCategoryResult => {
                 category.addProduct(updatedProductInfo.categoryId,productResult._id)
@@ -991,7 +987,6 @@ app.delete('/store/:id/offers/delete-offer/:offerId',(req,res) => {
 
 //----------View Garage Owner's stores----------
 app.get('/user/:userId/manage-garage-owner/stores',(req, res) => {
-    console.log(req.params.userId);
     store.getFullStoresByUserId(req.params.userId)
     .then(storesResult => {
         res.send(storesResult);
@@ -1007,7 +1002,6 @@ app.post('/user/:userId/garage-owner/add-store',upload.single('image'),(req, res
     const storeInfo = {name:req.body.name,address:req.body.address,description:req.body.description,
                        openTime:req.body.openTime,closeTime:req.body.closeTime,location:req.body.location,
                        image:req.file.path,userId:userInfo};
-    console.log(storeInfo)
     const storeValidationResult = store.validateStoreInfo(storeInfo);
     
     if(typeof storeValidationResult !== 'undefined')

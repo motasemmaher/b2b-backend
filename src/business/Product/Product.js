@@ -20,8 +20,6 @@ module.exports = class Product {
 
     countByStore(storeId,type)
     {
-        console.log("Inside buisness")
-        console.log(type)
         const promiseResult = ProductModel.countByStore({storeId,type});
         return promiseResult;
     }

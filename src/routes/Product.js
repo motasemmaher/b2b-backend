@@ -49,8 +49,8 @@ router.get('/products/:productId?',(req,res) => {
         .then(productResults => {
         product.countAll(type)
             .then(countResult => {
-            if(productsArray.length == 0)
-                res.status(200).send({message:"No documents were found."})
+            // if(productsArray.length == 0)
+            //     res.status(200).send({message:"No documents were found."})
 
             // productsArray = productResults;
             // productsArray.forEach((productResult,index,productsArray) => {
@@ -58,7 +58,7 @@ router.get('/products/:productId?',(req,res) => {
             //     .then(base64Image => {
             //     productResult.image = base64Image;       
             //     if(index  === productsArray.length - 1)
-                    res.status(200).send({count:countResult,products:productsArray});
+                    res.status(200).send({count:countResult || 0 ,products:productResults || []});
             //     })
             //     .catch(err => {
             //         console.log({error:"Error converting image.    "+err})
@@ -129,15 +129,15 @@ router.get('/stores/:storeId/products/:productId?',(req,res) => {
             product.countByStore(storeId,type)
                 .then(countResult => {
                 productsArray = productResults;
-                if(productsArray.length == 0)
-                    res.status(200).send({message:"No documents were found."})
+                // if(productsArray.length == 0)
+                //     return res.status(200).send({message:"No documents were found."})
 
                 // productsArray.forEach((productResult,index,productsArray) => {
                 //     imageToBase64(productResult.image)
                 //     .then(base64Image => {
                 //     productResult.image = base64Image;       
                 //     if(index  === productsArray.length - 1)
-                        res.status(200).send({productsCountByStore:countResult,products:productsArray});
+                       return res.status(200).send({productsCountByStore:countResult,products:productsArray});
                 //     })
                 //     .catch(err => {
                 //         console.log({error:"Error converting image.    "+err})
@@ -220,8 +220,8 @@ router.get('/stores/:storeId/category/:categoryId/products/:productId?',(req,res
                 .then(productsResult => {
                 product.countByCategory(categoryId,type)
                     .then(countResult => {
-                    if(productsArray.length == 0)
-                        res.status(200).send({message:"No documents were found."});
+                    // if(productsArray.length == 0)
+                    //     return res.status(200).send({message:"No documents were found."});
                     productsArray = productsResult;
                     // productsArray.forEach((productResult,index,productsArray) => {
                         // imageToBase64(productResult.image)
