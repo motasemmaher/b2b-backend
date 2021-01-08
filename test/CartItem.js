@@ -10,6 +10,21 @@ const cartItem = require('../src/business/Objects').CARTITEM;
 const shoppingCartId = "5fee1adfcef37314e007dd03";
 const addedCartItemId = "5ff2711458e25b1b84611b68";
 const cartItemId = "5ff26094fb96cf1ac0b0482f";
+const productId = "5fc2dca11796751e3c73829f";
+const productPrice = 500;
+const quantity = 3;
+const date = Date.now();
+const storeId = "5ff2484f18a88e286c5f0a8a";
+
+const createdCartItem = {
+    product: productId,
+    quantity: quantity,
+    date: date,
+    storeId: storeId,
+    shoppingCart: shoppingCartId,
+    totalPrice: productPrice * quantity
+}; 
+let createdCartItemId = null;
 
 //Testing functions
 function test(result) {
@@ -25,64 +40,38 @@ describe('CartItem Class Tests', () => {
     });
 
     it('Creating CartItem without errors.', (done) => {
-        shoppingCart.createCartItem()
+        cartItem.createCartItem(createdCartItem)
             .then(createResult => {
+                console.log(createResult);
                 test(createResult);
-                shoppingCart.deleteCartItem(createResult._id)
-                    .then(deleteResult => {
-                        done();
-                    })
-                    .catch(err => done(err));
-            })
-            .catch(err => done(err));
-    });
-
-    it('should get ShoppingCart', (done) => {
-        shoppingCart.getShoppingCart(shoppingCartId)
-            .then(retrievedShoppingCart => {
-                expect(retrievedShoppingCart.Items).to.be.an('array').that.includes(cartItemId);
-                expect(retrievedShoppingCart.totalBill).to.equal(1500);
+                createdCartItem = createResult._id;
                 done();
             })
             .catch(err => done(err));
     });
 
-    it('should update ShoppingCart', (done) => {
-        shoppingCart.updateShoppingCart({
-                _id: shoppingCartId
-            }).then(updatedShoppingCart => {
-                expect(updatedShoppingCart.Items).to.be.an('array')
-                done();
-            })
-            .catch(err => done(err));
-    });
+    // it('should get CartItem', (done) => {
+    //     console.log(createdCartItem);
+    //     cartItem.getCartItem(createdCartItem)
+    //         .then(retrievedCartItem => {
+    //             expect(retrievedCartItem.quantity).to.equal(3);
+    //             expect(retrievedCartItem.totalPrice).to.equal(1500);
+    //             done();
+    //         })
+    //         .catch(err => done(err));
+    // });
 
-    it('should add Cart Item to ShoppingCart', (done) => {
-        shoppingCart.addCartItem(shoppingCartId, addedCartItemId).then(updatedShoppingCart => {
-                expect(updatedShoppingCart.totalBill).to.equal(3000);
-                done();
-            })
-            .catch(err => done(err));
-    });
-
-    it('should remove Cart Item from ShoppingCart', (done) => {
-        shoppingCart.removeCartItem(shoppingCartId, addedCartItemId).then(removedCartItem => {
-                expect(removedCartItem.totalBill).to.equal(1500);
-                done();
-            })
-            .catch(err => done(err));
-    });
-    
-    it('should remove all Cart Items from ShoppingCart', (done) => {
-        shoppingCart.removeAllCartItem(shoppingCartId).then(removedAllCartItems => {
-            console.log(removedAllCartItems);
-                expect(removedAllCartItems.totalBill).to.equal(0);
-                shoppingCart.addCartItem(shoppingCartId, cartItemId).then(updatedShoppingCart => {
-                    done();
-                })
-                .catch(err => done(err));                
-            })
-            .catch(err => done(err));
-    });
+    // it('should delete CartItem', (done) => {
+    //     cartItem.deleteCartItem(createdCartItem)
+    //         .then(deleteResult => {
+    //             cartItem.getCartItem(createdCartItem)
+    //                 .then(retrievedCartItem => {
+    //                     expect(retrievedCartItem).toBe(undefined);
+    //                     done();
+    //                 })
+    //                 .catch(err => done(err));
+    //         })
+    //         .catch(err => done(err));
+    // });
 
 });
