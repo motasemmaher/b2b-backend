@@ -48,7 +48,7 @@ router.post('/user/manage-car-owner/add-car',userAuthenticated,(req, res) => {
         const carValidationResult = car.validateCarInfo(carInfo);
 
         if(typeof carValidationResult !== 'undefined')
-            res.status(400).send(carValidationResult.err);
+            res.status(400).send({error:carValidationResult.err});
         else
         {
             car.createCar(carInfo)
@@ -91,13 +91,13 @@ router.put('/user/manage-car-owner/update-car/:carId',userAuthenticated,(req, re
             carOwner.getCarOwnerByUserId(loggedUser._id)
             .then(carOwnerResult => {
             if(!carOwnerResult.cars.includes(carId))
-                res.status(400).send({error:"The requested car doesn't belong to this carowner."});
+                res.status(401).send({error:"The requested car doesn't belong to this carowner."});
             else
             {
                 carInfo = {_id:carId,...req.body};    
                 const carValidationResult = car.validateCarInfo(carInfo);
                 if(typeof carValidationResult !== 'undefined')
-                    res.status(400).send(carValidationResult.err);
+                    res.status(400).send({error:carValidationResult.err});
                 else
                 {
                     car.updateCar(carInfo)
@@ -136,7 +136,7 @@ router.delete('/user/manage-car-owner/delete-car/:carId',userAuthenticated,(req,
             carOwner.getCarOwnerByUserId(loggedUser._id)
             .then(carOwnerResult => {
             if(!carOwnerResult.cars.includes(carId))
-                res.status(400).send({error:"The requested car doesn't belong to this carowner."});
+                res.status(401).send({error:"The requested car doesn't belong to this carowner."});
             else
             {
                 car.deleteCar(carId)

@@ -53,7 +53,7 @@ function testDeleted(categoryId)
 }
 
 describe('Category Class Tests', () => {    
-
+  
   before((done) => {
     connection.connect()
               .then(() => done())
@@ -144,7 +144,10 @@ describe('Category Class Tests', () => {
         })
     .catch(err => done(err));
   });
-  
+  */
+
+  //--------------------------------------------------------------------------------------
+  /*
   it('Getting products of a category without errors.', (done) => {
     category.getProductsOfCategory(existingCategoryId)
     .then(productsResult => {
@@ -162,7 +165,9 @@ describe('Category Class Tests', () => {
     })
     .catch(err => done(err));
   });
-
+  */
+ //--------------------------------------------------------------------------------------
+ /*
   it('Adding product to category without errors.', (done) => {
     category.addProduct(existingCategoryId,testingProductId)
     .then(addResult => {

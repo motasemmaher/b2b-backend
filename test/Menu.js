@@ -29,7 +29,7 @@ function testDeleted(menuId)
 }
 
 describe('Menu Class Tests', () => {    
-
+     
     before((done) => {
       connection.connect()
                 .then(() => done())

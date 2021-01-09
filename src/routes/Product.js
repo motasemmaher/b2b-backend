@@ -40,7 +40,7 @@ router.get('/products/:productId?',(req,res) => {
     else 
     {
         if(validateProductType(type) === "Doesn't exist")
-            return res.status(400).send({message:"The requested product type is invalid !"});
+            return res.status(400).send({error:"The requested product type is invalid !"});
     }
     
     if(req.params.productId == null)
@@ -50,7 +50,7 @@ router.get('/products/:productId?',(req,res) => {
         product.countAll(type)
             .then(countResult => {
             // if(productsArray.length == 0)
-            //     res.status(200).send({message:"No documents were found."})
+            //     res.status(200).send({error:"No documents were found."})
 
             // productsArray = productResults;
             // productsArray.forEach((productResult,index,productsArray) => {
@@ -112,7 +112,7 @@ router.get('/stores/:storeId/products/:productId?',(req,res) => {
     else 
     {
         if(validateProductType(type) === "Doesn't exist")
-            return res.status(400).send({message:"The requested product type is invalid !"});
+            return res.status(400).send({error:"The requested product type is invalid !"});
     } 
     
     storeId = req.params.storeId;
@@ -130,7 +130,7 @@ router.get('/stores/:storeId/products/:productId?',(req,res) => {
                 .then(countResult => {
                 productsArray = productResults;
                 // if(productsArray.length == 0)
-                //     return res.status(200).send({message:"No documents were found."})
+                //     return res.status(200).send({error:"No documents were found."})
 
                 // productsArray.forEach((productResult,index,productsArray) => {
                 //     imageToBase64(productResult.image)
@@ -170,7 +170,7 @@ router.get('/stores/:storeId/products/:productId?',(req,res) => {
         }
     }
     })
-    .catch(err => res.send({error:"Error getting the store. "+err}));
+    .catch(err => res.status(500).send({error:"Error getting the store. "+err}));
 });
 //----------View products of a category and View Product----------
 router.get('/stores/:storeId/category/:categoryId/products/:productId?',(req,res) => {
@@ -194,7 +194,7 @@ router.get('/stores/:storeId/category/:categoryId/products/:productId?',(req,res
     else 
     {        
         if(validateProductType(type) === "Doesn't exist")
-            return res.status(400).send({message:"The requested product type is invalid !"});
+            return res.status(400).send({error:"The requested product type is invalid !"});
     }
 
     storeId = req.params.storeId;
@@ -216,7 +216,7 @@ router.get('/stores/:storeId/category/:categoryId/products/:productId?',(req,res
             if(productId == null)
             {
                 //Getting the products of that category
-                category.getProductsOfCategory(categoryId,type,limit,skip,nameSort,priceSort)
+                product.getProductsOfCategory(categoryId,type,limit,skip,nameSort,priceSort)
                 .then(productsResult => {
                 product.countByCategory(categoryId,type)
                     .then(countResult => {
@@ -273,7 +273,7 @@ router.post('/stores/:storeId/category/:categoryId/create-product',userAuthentic
     categoryId = req.params.categoryId;
     
     if(loggedUser.role !== "garageOwner")
-        res.status(401).send("Unauthorized user")
+        res.status(401).send({error:"Unauthorized user !"});
     else
     {
         store.exists(storeId)
@@ -281,7 +281,7 @@ router.post('/stores/:storeId/category/:categoryId/create-product',userAuthentic
         if(getStoreResult == null)
             res.status(404).send({error:"Error! Didn't find a store with that id."});
         else if(getStoreResult.userId != loggedUser._id)
-            res.status(404).send({error:"Error! The requested store doesn't belong to this garage owner."});
+            res.status(401).send({error:"Error! The requested store doesn't belong to this garage owner."});
         else
         {
             //Checking if the category exists by it's ID
@@ -298,9 +298,9 @@ router.post('/stores/:storeId/category/:categoryId/create-product',userAuthentic
                 const warehouseValidationResult = warehouse.validateWarehouseInfo({amount:req.body.amount});
                 
                 if(typeof productValidationResult !== 'undefined')
-                    res.status(400).send(productValidationResult.err);
+                    res.status(400).send({error:productValidationResult.err});
                 else if(typeof warehouseValidationResult !== 'undefined')
-                    res.status(400).send(warehouseValidationResult.err);
+                    res.status(400).send({error:warehouseValidationResult.err});
                 else
                 {
                     product.createProduct(productInfo)
@@ -334,7 +334,7 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId',use
     productId = req.params.productId;
     
     if(loggedUser.role !== "garageOwner")
-        res.status(401).send("Unauthorized user")
+        res.status(401).send({error:"Unauthorized user !"});
     else
     {
         store.exists(storeId)
@@ -342,7 +342,7 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId',use
         if(getStoreResult == null)
             res.status(404).send({error:"Error! Didn't find a store with that id."});
         else if(getStoreResult.userId != loggedUser._id)
-            res.status(404).send({error:"Error! The requested store doesn't belong to this garage owner."});
+            res.status(401).send({error:"Error! The requested store doesn't belong to this garage owner."});
         else
         {
             //Checking if the category exists by it's ID
@@ -366,9 +366,9 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId',use
                     const warehouseValidationResult = warehouse.validateWarehouseInfo({amount:req.body.amount});
                     
                     if(typeof productValidationResult !== 'undefined')
-                        res.status(400).send(productValidationResult.err);
+                        res.status(400).send({error:productValidationResult.err});
                     else if(typeof warehouseValidationResult !== 'undefined')
-                        res.status(400).send(warehouseValidationResult.err);
+                        res.status(400).send({error:warehouseValidationResult.err});
                     else
                     {
                         //Updating product
@@ -442,7 +442,7 @@ router.delete('/stores/:storeId/category/:categoryId/delete-product/:productId',
     productId = req.params.productId;
     
     if(loggedUser.role !== "garageOwner")
-        res.status(401).send("Unauthorized user")
+        res.status(401).send({error:"Unauthorized user !"});
     else
     {
         store.exists(storeId)
@@ -450,7 +450,7 @@ router.delete('/stores/:storeId/category/:categoryId/delete-product/:productId',
         if(getStoreResult == null)
             res.status(404).send({error:"Error! Didn't find a store with that id."});
         else if(getStoreResult.userId != loggedUser._id)
-            res.status(404).send({error:"Error! The requested store doesn't belong to this garage owner."});
+            res.status(401).send({error:"Error! The requested store doesn't belong to this garage owner."});
         else
         {
             //Checking if the category exists by it's ID

@@ -47,7 +47,7 @@ const invalidNameFormat = "Testing Store @1";
 
 //Invalid store address
 const invalidAddressLong = new Array(10).join('A'); //Produces AAAAAAAAA
-const invalidAddressShort = "Addr";
+const invalidAddressShort = "Add";
 const invalidAddressFormat = "Amm@n";
 
 //Invalid store description
@@ -108,7 +108,7 @@ function testDeleted(storeId)
 }
 
 describe('Store Class Tests', () => {    
-
+  
   before((done) => {
     connection.connect()
               .then(() => done())

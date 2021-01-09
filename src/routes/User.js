@@ -26,7 +26,7 @@ const hrTransporter = nodemailer.createTransport({
 router.get('/admin/waiting-users',userAuthenticated,(req,res) => {
     loggedUser = req.user;
     if(loggedUser.role !== "admin")
-        res.status(401).send("Unauthorized user !");
+        res.status(401).send({error:"Unauthorized user !"});
     else
     {
         let skip = req.query.skip;
@@ -54,7 +54,7 @@ router.get('/admin/waiting-users',userAuthenticated,(req,res) => {
 router.get('/admin/view-users',userAuthenticated,(req,res) => {
     loggedUser = req.user;
     if(loggedUser.role !== "admin")
-        res.status(401).send("Unauthorized user !");
+        res.status(401).send({error:"Unauthorized user !"});
     else
     {
         let skip = req.query.skip;
@@ -86,7 +86,7 @@ router.get('/admin/view-users',userAuthenticated,(req,res) => {
 router.put('/admin/waiting-users/accept/:userId',userAuthenticated,(req,res) => {
     loggedUser = req.user;
     if(loggedUser.role !== "admin")
-        res.status(401).send("Unauthorized user !");
+        res.status(401).send({error:"Unauthorized user !"});
     else
     {
         userId = req.params.userId;
@@ -129,7 +129,7 @@ router.put('/admin/waiting-users/accept/:userId',userAuthenticated,(req,res) => 
 router.delete('/admin/waiting-users/reject/:userId',userAuthenticated,(req,res) => {
     loggedUser = req.user;
     if(loggedUser.role !== "admin")
-        res.status(401).send("Unauthorized user !");
+        res.status(401).send({error:"Unauthorized user !"});
     else
     {
         userId = req.params.userId;
@@ -187,7 +187,7 @@ router.delete('/admin/waiting-users/reject/:userId',userAuthenticated,(req,res) 
 router.delete('/admin/view-users/delete/:userId',userAuthenticated,(req,res) => {
     loggedUser = req.user;
     if(loggedUser.role !== "admin")
-        res.status(401).send("Unauthorized user !");
+        res.status(401).send({error:"Unauthorized user !"});
     else
     {   
         userId = req.params.userId;
@@ -262,13 +262,13 @@ router.put('/user/manage-user-info',userAuthenticated,(req, res) => {
     user.exists(userId)
     .then(getUserResult => {
     if(getUserResult == null)
-        res.status(404).send({error:"Error! Didn't find a user with that is."})
+        res.status(404).send({error:"Error! Didn't find a user with that id."})
     else
     {
         const userValidationResult = user.validateUserInfo(userInfo);
     
         if(typeof userValidationResult !== 'undefined')
-            res.status(400).send(userValidationResult.err);
+            res.status(400).send({error:userValidationResult.err});
         else
         {
             hashedPassword = hashPassword(userInfo.password);

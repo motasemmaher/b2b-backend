@@ -7,6 +7,39 @@ const offer = require('../business/Objects').OFFER;
 const store = require('../business/Objects').STORE;
 const product = require('../business/Objects').PRODUCT;
 
+//----------View all products with offers ----------
+router.get('/offers',(req,res) => {
+    let skip = req.query.skip;
+    let limit = req.query.limit;
+    const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);
+    skip = limitAndSkipValues.skip;
+    limit = limitAndSkipValues.limit;
+
+    product.getProductsWithOffers(limit,skip)
+    .then(offersResult => {
+    product.countByOffers()
+        .then(countResult => {
+        offersArray = offersResult;
+        if(offersArray.length == 0)
+            return res.status(200).send({error:"No Offers were found."});
+        // offersArray.forEach((offerResult,index,offersArray) => {
+        //     imageToBase64(productRofferResultesult.image)
+        //     .then(base64Image => {
+        //     offerResult.image = base64Image;       
+        //     if(index  === offersArray.length - 1)
+                res.status(200).send({count:countResult,offers:offersArray});
+            // })
+            // .catch(err => {
+            //     console.log({error:"Error converting image.    "+err})
+            //     if (!res.headersSent)
+            //     res.status(200).send({count:countResult,offers:offersArray});
+            // });  
+            // }) //End of foreach
+        })    
+        .catch(err => res.status(500).send({error:"Error with getting count of offers.  "+err}));
+    })
+    .catch(err => res.status(500).send({error:"Error with getting offers.  "+err}));
+});
 //----------View products with offers of a store----------
 router.get('/stores/:storeId/offers',(req,res) => {
     let skip = req.query.skip;
@@ -23,11 +56,13 @@ router.get('/stores/:storeId/offers',(req,res) => {
         res.status(404).send({error:"Error! Didn't find a store with thats id."});
     else
     {
-        product.getProductsWithOffers(storeId,limit,skip)
+        product.getProductsWithOffersOfStore(storeId,limit,skip)
         .then(offersResult => {
-        product.countByOffers(storeId)
+        product.countByOffersByStore(storeId)
             .then(countResult => {
             offersArray = offersResult;
+            if(offersArray.length == 0)
+                return res.status(200).send({error:"No Offers were found."});
             // offersArray.forEach((offerResult,index,offersArray) => {
             //     imageToBase64(productRofferResultesult.image)
             //     .then(base64Image => {
@@ -55,7 +90,7 @@ router.post('/stores/:storeId/offers/add-offer',userAuthenticated,(req,res) => {
     storeId = req.params.storeId;
 
     if(loggedUser.role !== "garageOwner")
-        res.status(401).send({error:"Unauthorized user"});
+        res.status(401).send({error:"Unauthorized user !"});
     else
     {
         store.exists(storeId)
@@ -117,7 +152,7 @@ router.delete('/stores/:storeId/offers/delete-offer/:offerId',userAuthenticated,
     offerId = req.params.offerId;
 
     if(loggedUser.role !== "garageOwner")
-        res.send("Unauthorized user")
+        res.status(401).send({error:"Unauthorized user !"})
     else
     {
         store.exists(storeId)

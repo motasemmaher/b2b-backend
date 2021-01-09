@@ -4,19 +4,19 @@ module.exports = {
 
     validateUserInfo(user)
     {
-        if(!validator.matches(user.fullName,/(^[A-Z a-z \s]{3,64}$)/))
+        if(user.fullName === undefined || !validator.matches(user.fullName,/(^[\p{L}\s]{3,64}$)/ugi))
             return "Invalid user fullname !";
-        if(!validator.matches(user.username,/(^[A-Z a-z \d_]{8,64}$)/))
-            return "Invalid username !";
-        if(!validator.isEmail(user.email))
-            return "Invalid email!";
-        if(!validator.matches(user.phoneNumber,/(^[0][7][789]\d{7}$)/))
-            return "Invalid pone number !";
-        if(!validator.matches(user.password,/(.{8,64})/))
-            return "Invalid password !";
-        if(!validator.matches(user.address,/(^[A-Z a-z ' -]{5,8}$)/))
+        if(user.username === undefined || !validator.matches(user.username,/(^[\p{L}\d_]{8,64}$)/ugi))
+            return "Invalid user username !";
+        if(user.email === undefined || !validator.isEmail(user.email))
+            return "Invalid user email !";
+        if(user.phoneNumber === undefined || !validator.matches(user.phoneNumber,/(^[0][7][789]\d{7}$)/))
+            return "Invalid user phone number !";
+        if(user.password === undefined || !validator.matches(user.password,/(^.{8,64}$)/))
+            return "Invalid user password !";
+        if(user.address === undefined || !validator.matches(user.address,/(^[\p{L}'-]{4,8}$)/ugi))
             return "Invalid user address !";
-        if(!["admin", "garageOwner", "carOwner", "waitingUser"].includes(user.role))  
+        if(user.role === undefined || !["admin", "garageOwner", "carOwner", "waitingUser"].includes(user.role))  
             return "Invalid user role !";
 
         return "pass";

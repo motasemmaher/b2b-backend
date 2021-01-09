@@ -23,13 +23,13 @@ function test(result,submitterId,garageOwnerId,garageId,message,messageId)
 }
 
 describe('Complaint Class Tests', () => {    
-
+    
     before((done) => {
       connection.connect()
                 .then(() => done())
                 .catch((err) => done(err));
     });
-/*  
+
     it('Creating a complaint without errors.', (done) => {
         COMPLAINT.createComplaint(submitterId,messageId,garageOwnerId,garageId)
         .then(createResult => {
@@ -42,7 +42,7 @@ describe('Complaint Class Tests', () => {
         })
         .catch(err => done(err))
     });
-
+/*
     it('Count all complaints without errors.', (done) => {
       COMPLAINT.countAllComplaints()
       .then(countResult => {
@@ -135,5 +135,5 @@ describe('Complaint Class Tests', () => {
         })
         .catch(err => done(err))
     });
-   */ 
+   */
 });

@@ -21,7 +21,7 @@ function test(result,owner,data)
 }
 
 describe('Message Class Tests', () => {    
-
+     
     before((done) => {
       connection.connect()
                 .then(() => done())

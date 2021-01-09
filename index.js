@@ -545,4 +545,13 @@ app.use(carOwnerRoute);
 app.use(searchRoute);
 app.use(permissionsRoute);
 
+carvaldation = require('./src/business/Car/validate')
+app.get("/test",(req,res)=> {
+    let model = req.body.model;
+    let make = req.body.make;
+    let year = req.body.year;
+    let result = carvaldation.validateCarInfo({model,make,year});
+    res.send(result);
+})
+
 module.exports = app;

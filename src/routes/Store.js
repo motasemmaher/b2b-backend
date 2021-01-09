@@ -27,6 +27,8 @@ router.get('/stores/:storeId?',(req,res) => {
         store.countAll()
             .then(countResult => {
             storesArray = storesResult;
+            if(storesArray.length == 0)
+                return res.status(200).send({error:"No Stores were found."});
             // storesArray.forEach((storeResult,index,storesArray) => {
             //     imageToBase64(storeResult.image)
             //     .then(base64Image => {
@@ -64,6 +66,7 @@ router.get('/stores/:storeId?',(req,res) => {
         .catch(err => res.status(500).send({error:"Error getting the store. "+err}));    
     }
 });
+//----------View nearby stores----------
 router.get('/stores/nearby',(req,res) => {
     const loggedUser = req.user;
     let skip = req.query.skip;
@@ -77,6 +80,8 @@ router.get('/stores/nearby',(req,res) => {
     store.countBySameAddress()
         .then(countResult => {
         storesArray = storesResult;
+        if(storesArray.length == 0)
+            return res.status(200).send({error:"No Stores were found."});
         // storesArray.forEach((storeResult,index,storesArray) => {
             // imageToBase64(storeResult.image)
             // .then(base64Image => {
@@ -91,9 +96,9 @@ router.get('/stores/nearby',(req,res) => {
             // });  
         // }) //End of foreach
         })
-        .catch(err => res.status(500).send({error:"Error with getting count of all stores.  "+err}));
+        .catch(err => res.status(500).send({error:"Error with getting count of all nearby stores.  "+err}));
     })
-    .catch(err => res.status(500).send({error:"Error getting all stores. "+err}));
+    .catch(err => res.status(500).send({error:"Error getting all nearby stores. "+err}));
 });
 //----------View Garage Owner's stores----------
 router.get('/user/manage-garage-owner/stores',userAuthenticated,(req, res) => {
@@ -113,6 +118,8 @@ router.get('/user/manage-garage-owner/stores',userAuthenticated,(req, res) => {
         store.countByGarageOwner(loggedUser._id)
             .then(countResult => {
             storesArray = storesResult;
+            if(storesArray.length == 0)
+                return res.status(200).send({error:"No Stores were found."});
             // storesArray.forEach((storeResult,index,storesArray) => {
             //     imageToBase64(storeResult.image)
             //     .then(base64Image => {
@@ -143,7 +150,7 @@ router.post('/user/manage-garage-owner/add-store',userAuthenticated,upload.singl
         const storeInfo = {...req.body,image:req.file.path,userId:loggedUser._id};
         const storeValidationResult = store.validateStoreInfo(storeInfo);
         if(typeof storeValidationResult !== 'undefined')
-            res.status(400).send(storeValidationResult.err);
+            res.status(400).send({error:storeValidationResult.err});
         else
         {
             menu.createMenu()
@@ -205,7 +212,7 @@ router.put('/user/manage-garage-owner/update-store/:storeId',userAuthenticated,u
         if(getStoreResult == null)
             res.status(404).send({error:"Error! Didn't find store with that id."});
         else if(getStoreResult.userId != loggedUser._id)
-            res.status(404).send({error:"Error! The requested store doesn't belong to this garage owner."});
+            res.status(401).send({error:"Error! The requested store doesn't belong to this garage owner."});
         else
         {        
             const body = req.body;    
@@ -214,7 +221,7 @@ router.put('/user/manage-garage-owner/update-store/:storeId',userAuthenticated,u
             const storeValidationResult = store.validateStoreInfo(storeInfo);
             
             if(typeof storeValidationResult !== 'undefined')
-                res.status(400).send(storeValidationResult.err);
+                res.status(400).send({error:storeValidationResult.err});
             else
             {
                 store.updateStore(storeInfo)
@@ -223,7 +230,7 @@ router.put('/user/manage-garage-owner/update-store/:storeId',userAuthenticated,u
                     .then(updatedStore => {
                         res.status(200).send(updatedStore);
                     })
-                    .catch(error => res.status(500).send({error:"Error with updating Store: "+error}));
+                    .catch(error => res.status(500).send({error:"Error with getting Store: "+error}));
                 })
                 .catch(error => res.status(500).send({error:"Error with updating Store: "+error}));
             }
@@ -246,7 +253,7 @@ router.delete('/user/manage-garage-owner/delete-store/:storeId',userAuthenticate
         if(getStoreResult == null)
             res.status(404).send({error:"Error! Didn't find store with that id."});
         else if(getStoreResult.userId != loggedUser._id)
-            res.status(404).send({error:"Error! The requested store doesn't belong to this garage owner."});
+            res.status(401).send({error:"Error! The requested store doesn't belong to this garage owner."});
         else
         {
             menu.deleteMenuByStoreId(storeId)

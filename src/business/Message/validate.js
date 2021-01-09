@@ -4,7 +4,7 @@ module.exports = {
     
    validateMessageInfo(message)
     {
-        if(!validator.matches(message.data,/(^[A-Z a-z\s\d-,\.']{2,512}$)/))
+        if(message.data === undefined || !validator.matches(message.data,/(^[\p{L}\s\d,\.'-]{2,512}$)/ugi))
             return "Invalid message data !";
  
         return "pass";

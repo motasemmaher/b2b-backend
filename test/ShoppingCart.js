@@ -12,14 +12,13 @@ function test(result)
 }
 
 describe('ShoppingCart Class Tests', () => {    
-
     
     before((done) => {
       connection.connect()
                 .then(() => done())
                 .catch((err) => done(err));
     });
-
+/*
     it('Creating shoppingcart without errors.', (done) => {
         shoppingCart.createShoppingCart()
         .then(createResult => {
@@ -32,7 +31,7 @@ describe('ShoppingCart Class Tests', () => {
         })
         .catch(err => done(err));
     });
-/*
+
     it('Deleting shoppingcart without errors.', (done) => {
         shoppingCart.createShoppingCart()
         .then(createResult => {

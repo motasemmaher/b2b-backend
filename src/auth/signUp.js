@@ -4,30 +4,15 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const upload = require('../shared/imageUpload');
 
-//Setting-up path for the static files
-router.use('./public', express.static('uploads'));
-//Setting-up req body parser
-router.use(bodyParser.json());
-router.use(bodyParser.urlencoded({ extended: true }))
-
-//Requiring classes
-const Warehouse = require('../business/Warehouse/Warehouse');
-const Menu = require('../business/Menu/Menu');
-const User = require('../business/User/User');
-const GarageOwner = require('../business/GarageOwner/GarageOwner');
-const CarOwner = require('../business/CarOwner/CarOwner');
-const Store = require('../business/Store/Store');
-const Car = require('../business/Car/Car');
-const ShoppingCart = require('../business/ShoppingCart/ShoppingCart');
 //Objects
-const user = new User();
-const garageOwner = new GarageOwner();
-const carOwner = new CarOwner();
-const store = new Store();
-const warehouse = new Warehouse();
-const menu = new Menu();
-const car = new Car();
-const shoppingCart = new ShoppingCart();
+const user = require('../business/Objects').USER;
+const garageOwner = require('../business/Objects').GARAGEOWNER;
+const carOwner = require('../business/Objects').CAROWNER;
+const store = require('../business/Objects').STORE;
+const warehouse = require('../business/Objects').WAREHOUSE;
+const menu = require('../business/Objects').MENU;
+const car = require('../business/Objects').CAR;
+const shoppingCart = require('../business/Objects').SHOPPINGCART;
 
 //----------Hashing password----------
 function hashPassword(password)
@@ -44,9 +29,9 @@ router.post('/auth/garage-owner/create',upload.single('image'),(req, res) => {
     const storeValidationResult = store.validateStoreInfo(storeInfo);
     
     if(typeof userValidationResult !== 'undefined')
-        res.send(userValidationResult.err);
+        res.status(400).send({error:userValidationResult.err});
     else if(typeof storeValidationResult !== 'undefined')
-        res.send(storeValidationResult.err);
+        res.status(400).send({error:storeValidationResult.err});
     else
     {
         hashedPassword = hashPassword(userInfo.password);
@@ -64,36 +49,36 @@ router.post('/auth/garage-owner/create',upload.single('image'),(req, res) => {
                         .then(garageOwnerResult => {
                         warehouse.linkWarehouse({_id:warehouseResult._id,storeId:storeResult._id});
                         menu.linkMenu({_id:menuResult._id,storeId:storeResult._id});
-                        res.send("Successfully created GarageOwner (waiting user)");
+                        res.status(200).send("Successfully created GarageOwner (waiting user)");
                         })
                     .catch(err => {
                     user.deleteUser(userResult._id);
                     menu.deleteMenu(menuResult._id);
                     warehouse.deleteWarehouse(warehouseResult._id);
                     store.deleteStore(storeResult._id);
-                    res.send("Error with creating GarageOwner: "+err);
+                    res.status(500).send("Error with creating GarageOwner: "+err);
                     });
                 })    
                 .catch(err =>{
                 user.deleteUser(userResult._id);
                 menu.deleteMenu(menuResult._id);
                 warehouse.deleteWarehouse(warehouseResult._id);
-                res.send("Error with creating Store: "+err);
+                res.status(500).send("Error with creating Store: "+err);
                 });
             })
             .catch( err =>{
             user.deleteUser(userResult._id);
             menu.deleteMenu(menuResult._id);
-            res.send("Error with creating Warehouse: "+err);
+            res.status(500).send("Error with creating Warehouse: "+err);
             });
         })
         .catch(err =>{
         user.deleteUser(userResult._id);
-        res.send("Error with creating Menu: "+err);
+        res.status(500).send("Error with creating Menu: "+err);
         });
     })
     .catch(err =>{
-    res.send("Error with creating User: "+err);
+    res.status(500).send("Error with creating User: "+err);
     });
     }
 });
@@ -107,9 +92,9 @@ router.post('/auth/car-owner/create', (req, res) => {
     const carValidationResult = car.validateCarInfo(carInfo);
     
     if(typeof userValidationResult !== 'undefined')
-        res.send(userValidationResult.err);
+        res.status(400).send({error:userValidationResult.err});
     else if(typeof carValidationResult !== 'undefined')
-        res.send(carValidationResult.err);
+        res.status(400).send({error:carValidationResult.err});
     else
     {
         hashedPassword = hashPassword(userInfo.password);
@@ -123,28 +108,28 @@ router.post('/auth/car-owner/create', (req, res) => {
                .then(shoppingCartResult => {
                carOwner.createCarOwner({user:userResult,cars:[carResult],shoppingCart:shoppingCartResult._id}) 
                    .then(carOwnerResult => {
-                   res.send("Successfully created CarOwner");
+                    res.status(200).send("Successfully created CarOwner");
                    })
                    .catch(err =>{
                    user.deleteUser(userResult._id);
                    car.deleteCar(carResult._id);
                    shoppingCart.deleteShoppingCart(shoppingCartResult._id);
-                   res.send("Error with creating CarOwner: "+err);
+                   res.status(500).send("Error with creating CarOwner: "+err);
                    });
                })
                .catch(err =>{
                user.deleteUser(userResult._id);
                car.deleteCar(carResult._id);
-               res.send("Error with creating ShoppingCart: "+err);
+               res.status(500).send("Error with creating ShoppingCart: "+err);
                });
            })
            .catch(err => {
            user.deleteUser(userResult._id);    
-           res.send("Error with creating Car: "+err);
+           res.status(500).send("Error with creating Car: "+err);
            });
         })
         .catch(err => {
-        res.send("Error with creating User: "+err);
+        res.status(500).send("Error with creating User: "+err);
         });
     }    
 });

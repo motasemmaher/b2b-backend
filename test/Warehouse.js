@@ -20,7 +20,7 @@ let deleteStoreId = "5fd9af52fdac372044c3aa01";
 
 
 describe('Warehouse Class Tests', () => {    
-
+    
     before((done) => {
       connection.connect()
                 .then(() => done())

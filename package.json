@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "mocha --recursive --timeout 100000 --exit",
-    "test-coverage": "nyc --reporter=text --timeout 1000000 mocha --exit"
+    "test-coverage": "nyc --reporter=text --reporter=lcov mocha --exit"
   },
   "author": "",
   "license": "ISC",

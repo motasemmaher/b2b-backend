@@ -87,7 +87,7 @@ router.put('/car-owner/maintain/:orderId', userAuthenticated, (req, res) => {
 
     if (isValidOrderInfo !== 'pass') {
         return res.status(400).send({
-            Error: isValidOrderInfo
+            error: isValidOrderInfo
         });
     }
 

@@ -27,7 +27,7 @@ router.get('/view-complaints/:complaintId?',userAuthenticated,(req,res) => {
         else
             res.status(200).send(complaintResult);
         })
-        .catch(err => res.status(404).send({error:"Error getting the complaint. "+err}));
+        .catch(err => res.status(500).send({error:"Error getting the complaint. "+err}));
     }
     else if(loggedUser.role === 'admin')
     {
@@ -35,11 +35,11 @@ router.get('/view-complaints/:complaintId?',userAuthenticated,(req,res) => {
         .then(complaintResult => {
             complaint.countAllComplaints()
             .then(countResult => {
-            res.send({count:countResult,complaints:complaintResult});
+            res.status(200).send({count:countResult,complaints:complaintResult});
             })
-            .catch(err => res.send({error:"Error getting the count of all complaints. "+err}));
+            .catch(err => res.status(500).send({error:"Error getting the count of all complaints. "+err}));
         })
-        .catch(err => res.send({error:"Error getting all complaints. "+err}));
+        .catch(err => res.status(500).send({error:"Error getting all complaints. "+err}));
     }
     else if(loggedUser.role === 'garageOwner')
     {
@@ -47,14 +47,14 @@ router.get('/view-complaints/:complaintId?',userAuthenticated,(req,res) => {
         .then(complaintResult => {
         complaint.countByGarageOwner(loggedUser._id)
         .then(countResult => {
-        res.send({count:countResult,complaints:complaintResult});
+        res.status(200).send({count:countResult,complaints:complaintResult});
         })
-        .catch(err => res.send({error:"Error getting the count of garageOwner's complaints. "+err}));
+        .catch(err => res.status(500).send({error:"Error getting the count of garageOwner's complaints. "+err}));
         })
-        .catch(err => res.send({error:"Error getting the garageOwner's complaints. "+err}));
+        .catch(err => res.status(500).send({error:"Error getting the garageOwner's complaints. "+err}));
     }
     else
-        res.send({error:"Error, the user isn't allowed to view the complaints."});
+        res.status(401).send({error:"Error, the user isn't allowed to view the complaints."});
 });
 //----------Create Complaint----------
 router.post('/stores/:storeId/create-complaint',userAuthenticated,(req,res) => {
@@ -80,7 +80,7 @@ router.post('/stores/:storeId/create-complaint',userAuthenticated,(req,res) => {
                     messageBody = req.body.message;
                     const messageValidationResult = message.validateMessageInfo({data:messageBody});
                     if(typeof messageValidationResult !== 'undefined')
-                        res.status(400).send(messageValidationResult.err);
+                        res.status(400).send({error:messageValidationResult.err});
                     else
                     {
                         message.createMessage(loggedUser._id,messageBody)

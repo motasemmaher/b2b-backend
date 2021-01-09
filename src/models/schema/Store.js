@@ -29,7 +29,7 @@ const Store = new schema({
         type: String,
         required: true,
         trim: true,
-        minLength: 5,
+        minLength: 4,
         maxlength: 8
     },
 
