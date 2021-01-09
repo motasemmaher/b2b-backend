@@ -62,6 +62,7 @@ module.exports = {
             };
     },
 
+    //delete this
     deleteAllShoppingCart() {
         const result = ShoppingCartModel.deleteMany({});
 
@@ -75,11 +76,23 @@ module.exports = {
 
     async addCartItem(value) {
         let result = null;
-        console.log
-        await ShoppingCartModel.findOne({
+        let id = null;
+        if(value.cartItem._id){
+            id = value.cartItem._id;
+        } else {
+            id = value.cartItem;
+        }
+        await ShoppingCartModel.findOneAndUpdate({
             _id: value._id
+        }, {
+            $push: {
+                Items: id
+            }
+        }, {
+            "useFindAndModify": false,
+            new: true
         }).populate('Items').then(updatedShoppingCart => {
-            updatedShoppingCart.Items.push(value.cartItem);
+            // updatedShoppingCart.Items.push(value.cartItem);
             updatedShoppingCart.totalBill = 0;
             updatedShoppingCart.Items.forEach(element => {
                 updatedShoppingCart.totalBill += element.totalPrice;
@@ -109,11 +122,9 @@ module.exports = {
             new: true
         }).populate('Items').then(updatedShoppingCart => {
             updatedShoppingCart.totalBill = 0;
-            updatedShoppingCart.Items.forEach(element => {
-                // console.log(updatedShoppingCart.totalBill); 
+            updatedShoppingCart.Items.forEach(element => {              
                 updatedShoppingCart.totalBill += element.totalPrice;
-            });
-            // console.log(updatedShoppingCart.totalBill);         
+            });                  
             result = updatedShoppingCart.save();
         });
 
@@ -126,8 +137,8 @@ module.exports = {
     },
 
     removeAllCartItem(value) {
-        ShoppingCartModel.findOneAndUpdate({
-            _id: value.shoppingCartId
+        const result = ShoppingCartModel.findOneAndUpdate({
+            _id: value._id
         }, {
             $set: {
                 'Items': [],
@@ -135,7 +146,8 @@ module.exports = {
             }
         }, {
             multi: true,
-            "useFindAndModify": false
+            "useFindAndModify": false,
+            new: true
         });
 
         if (result)

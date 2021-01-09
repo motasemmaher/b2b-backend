@@ -3,7 +3,7 @@ const CartItemModel = require('../../models/model/CartItem');
 module.exports = class CartItem {
     constructor(cartItem) {}
 
-    createCartItem(cartItemInfo) {
+    createCartItem(cartItemInfo = {}) {
         const result = CartItemModel.createCartItem(cartItemInfo);
         return result;
     }

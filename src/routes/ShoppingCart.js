@@ -42,16 +42,14 @@ router.get('/shopping-cart', userAuthenticated, (req, res) => {
                         cartItems: retrivedCartItems
                     });
                 }).catch(err => {
-                    res.status(404).send(err);
+                    res.status(404).send({error: 'ERROR_IN_SHOPPINGCART'});
                 });
         }).catch(err => {
-            res.status(404).send(err);
+            res.status(401).send({error: 'UNAUTHORIZED_USER'});
         });
     } else {
-        res.status(403).send({
-            Error: {
-                Error: 'you cannot access this page'
-            }
+        res.status(401).send({
+                error: 'UNAUTHORIZED_USER'
         });
     }
 });
@@ -71,16 +69,14 @@ router.get('/shopping-cart/cart-item/:cartItemId', userAuthenticated, (req, res)
                         cartItem: retrivedCartItem
                     });
                 }).catch(err => {
-                    res.status(404).send(err);
+                    res.status(404).send({error: 'ERROR_IN_SHOPPINGCART'});
                 });
         }).catch(err => {
-            res.status(404).send(err);
+            res.status(401).send({error: 'UNAUTHORIZED_USER'});
         });
     } else {
-        res.status(403).send({
-            Error: {
-                Error: 'you cannot access this page'
-            }
+        res.status(401).send({
+                error: 'UNAUTHORIZED_USER'
         });
     }
 });
@@ -98,7 +94,7 @@ router.post('/shopping-cart/add-cart/:storeId/:productId', userAuthenticated, (r
 
     if (isValidQuantity !== 'pass') {
         return res.status(400).send({
-            Error: isValidQuantity
+            error: isValidQuantity
         });
     }
 
@@ -106,7 +102,7 @@ router.post('/shopping-cart/add-cart/:storeId/:productId', userAuthenticated, (r
 
     if (quantity <= 0) {
         return res.status(400).send({
-            Error: 'Quantity must be more than Zero'
+            error: 'ERROR_QUANTITY_MUST_BE_MORE_THAN_ZERO'
         });
     }
     let productPrice = 0;
@@ -142,32 +138,32 @@ router.post('/shopping-cart/add-cart/:storeId/:productId', userAuthenticated, (r
                                             res.status(200).send(updatedShoppingCart);
                                         });
                                     }).catch(err => {
-                                        return res.status(401).send(err);
+                                        return res.status(400).send({error: 'INVALID_CARTITEM_DATA'});
                                     });
                                 } else {
-                                    return res.status(401).send('Error With The Price');
+                                    return res.status(400).send({error:'ERROR_WITH_THE_PRICE'});
                                 }
                             } else {
-                                return res.status(401).send('Error This Quantity Is not available');
+                                return res.status(400).send({error:'ERROR_THIS_QUANTITY_IS_NOT_AVAILABLE'});
                             }
                         }).catch(err => {
                             return res.status(404).send({
-                                err: 'warehouse is not found'
+                                err: 'WAREHOUSE_IS_NOT_FOUND'
                             });
                         });
                     }).catch(err => {
-                        return res.status(400).send('product id not found');
+                        return res.status(400).send({error:'PRODUCT_ID_IS_NOT_FOUND'});
                     });
 
                 }).catch(err => {
-                    return res.status(404).send(err);
+                    return res.status(404).send({error:'STORE_ID_IS_NOT_FOUND'});
                 });
         }).catch(err => {
-            return res.status(404).send(err);
+            return res.status(401).send({error:'UNAUTHORIZED_USER'});
         });
     } else {
-        return res.status(403).send({
-            Error: 'you cannot access this page'
+        return res.status(401).send({
+            error: 'UNAUTHORIZED_USER'
         });
     }
 });
@@ -183,14 +179,14 @@ router.delete('/shopping-cart/remove-cart-item/:cartItemId', userAuthenticated, 
             }).then(deletedCartItem => {
                 res.status(200).send(updatedShoppingCart);
             }).catch(err => {
-                res.status(400).send({error: 'error in delete CartItem there is no cartItem with this id'});            
+                res.status(400).send({error: 'ERROR_IN_DELETE_CARTITEM_THERE_IS_NO_CARTITEM_WITH_THIS_ID'});            
             });
         }).catch(err => {
-            res.status(400).send({error: 'error in remove CartItem from shopping cart'});
+            res.status(400).send({error: 'ERROR_IN_REMOVE_CARTITEM_FROM_SHOPPING_CART'});
         });
     }).catch(err => {
         res.status(404).send({
-            error: 'there is no cartItem in this id'
+            error: 'THERE_IS_NO_CARTITEM_IN_THIS_ID'
         });
     });
 });
@@ -205,7 +201,7 @@ router.put('/shopping-cart/update-cart-item/:cartItemId', userAuthenticated, (re
 
     if (isValidQuantity !== 'pass') {
         return res.status(400).send({
-            Error: isValidQuantity
+            error: isValidQuantity
         });
     }
 
@@ -213,7 +209,7 @@ router.put('/shopping-cart/update-cart-item/:cartItemId', userAuthenticated, (re
 
     if (quantity <= 0) {
         return res.status(400).send({
-            Error: 'Quantity must be more than Zero'
+            error: 'ERROR_QUANTITY_MUST_BE_MORE_THAN_ZERO'
         });
     }
 
@@ -240,24 +236,24 @@ router.put('/shopping-cart/update-cart-item/:cartItemId', userAuthenticated, (re
                             }).then(updatedShoppingCart => {
                                 res.status(200).send(updatedShoppingCart);
                             }).catch(err => {
-                                res.status(400).send({Error: 'error in update shopping cart'});
+                                res.status(400).send({error: 'ERROR_IN_UPDATE_SHOPPING_CART'});
                             });
                         }).catch(err => {
-                            res.status(400).send({Error: 'error in update cartItem'});
+                            res.status(400).send({error: 'ERROR_IN_UPDATE_CARTITEM'});
                         });
                     }
                 }
             }).catch(err => {
-                res.status(400).send({Error: 'error in getting Product From Warehouse'});
+                res.status(400).send({error: 'ERROR_IN_GETTING_PRODUCT_FROM_WAREHOUSE'});
             });
         }).catch(err => {
             res.status(404).send({
-                error: 'store is not exists'
+                error: 'ERROR_STORE_IS_NOT_EXISTS'
             });
         });
     }).catch(err => {
         res.status(404).send({
-            error: 'cartItem is not exists'
+            error: 'ERROR_CARTITEM_IS_NOT_EXISTS'
         });
     });
 
@@ -277,7 +273,7 @@ router.post('/shopping-cart/checkout', userAuthenticated, (req, res) => {
 
     if (isValidOrderInfo !== 'pass') {
         return res.status(400).send({
-            Error: isValidOrderInfo
+            error: isValidOrderInfo
         });
     }
 
@@ -322,34 +318,34 @@ router.post('/shopping-cart/checkout', userAuthenticated, (req, res) => {
                                                                                         });
                                                                                     }
                                                                                 }).catch(err => {
-                                                                                    res.status(404).send(err);
+                                                                                    res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
                                                                                 });
                                                                         }).catch(err => {
-                                                                            res.status(404).send(err);
+                                                                            res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
                                                                         });
                                                                     }).catch(err => {
-                                                                        res.status(404).send(err);
+                                                                        res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
                                                                     });
                                                                 }).catch(err => {
-                                                                    res.status(404).send(err);
+                                                                    res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
                                                                 });
                                                             }).catch(err => {
-                                                                res.status(404).send(err);
+                                                                res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
                                                             });
                                                         }).catch(err => {
-                                                            res.status(404).send(err);
+                                                            res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
                                                         });
                                                     }).catch(err => {
-                                                        res.status(400).send('There is no available quantity in this store');
+                                                        res.status(400).send({error:'ERROR THERE_IS_NO_AVAILABLE_QUANTITY_IN_THIS_STORE'});
                                                     });
                                                 }).catch(err => {
                                                     res.status(400).send({
-                                                        Error: 'error in updating product'
+                                                        error: 'ERROR_IN_UPDATING_PRODUCT'
                                                     });
                                                 });
                                             }).catch(err => {
                                                 res.status(400).send({
-                                                    Error: 'error getting product By Id in updating product'
+                                                    error: 'ERROR_GETTING_PRODUCT_BY_ID_IN_UPDATING_PRODUCT'
                                                 });
                                             });
                                         } else {
@@ -379,57 +375,57 @@ router.post('/shopping-cart/checkout', userAuthenticated, (req, res) => {
                                                                                 });
                                                                             }
                                                                         }).catch(err => {
-                                                                            res.status(404).send(err);
+                                                                            res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
                                                                         });
                                                                 }).catch(err => {
-                                                                    res.status(404).send(err);
+                                                                    res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
                                                                 });
                                                             }).catch(err => {
-                                                                res.status(404).send(err);
+                                                                res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
                                                             });
                                                         }).catch(err => {
-                                                            res.status(404).send(err);
+                                                            res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
                                                         });
                                                     }).catch(err => {
-                                                        res.status(404).send(err);
+                                                        res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
                                                     });
                                                 }).catch(err => {
-                                                    res.status(404).send(err);
+                                                    res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
                                                 });
                                             }).catch(err => {
-                                                res.status(400).send('There is no available quantity in this store');
+                                                res.status(400).send({error: 'ERROR THERE_IS_NO_AVAILABLE_QUANTITY_IN_THIS_STORE'});
                                             });
                                         }
                                     } else {
-                                        errors[cart.product] = 'error in quantity of product ' + cart.product + 'there is no available quantity';
-                                        res.status(400).send('There is no available quantity in this store');
+                                        // errors[cart.product] = 'error in quantity of product ' + cart.product + 'there is no available quantity';
+                                        res.status(400).send({error: 'ERROR THERE_IS_NO_AVAILABLE_QUANTITY_IN_THIS_STORE'});
                                     }
                                 }).catch(err => {
-                                    return res.status(404).send('There no available quantity in this store');
+                                    return res.status(404).send({error: 'ERROR THERE_IS_NO_AVAILABLE_QUANTITY_IN_THIS_STORE'});
                                 });
 
                             }).catch(err => {
-                                return res.status(404).send('There is no store');
+                                return res.status(404).send({error:'ERROR_THERE_IS_NO_STORE'});
                             });
 
                         }).catch(err => {
-                            res.status(404).send(err);
+                            res.status(404).send({error: 'ERROR_CARTITEM_IS_NOT_FOUND'});
                         });
                     });
                 } else {
                     res.status(400).send({
-                        Error: 'You must have at least one cart in your shoppingcart'
+                        error: 'ERROR_YOU_MUST_HAVE_AT_LEAST_ONE_CART_IN_YOUR_SHOPPINGCART'
                     });
                 }
             }).catch(err => {
-                res.status(404).send(err);
+                res.status(401).send({error: 'UNAUTHORIZED_USER'});
             });
         } catch (err) {
-            res.status(404).send(err);
+            res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
         }
     } else {
         res.status(403).send({
-            Error: 'you cannot access this page'
+            error: 'UNAUTHORIZED_USER'
         });
     }
 });

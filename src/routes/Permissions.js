@@ -13,7 +13,7 @@ router.get('/permissions', (req, res) => {
         });
     } else {
         res.status(400).send({
-            Error: 'role must be one those (admin or carOwner or garageOwner or waitingUser)'
+            error: 'ERROR_ROLE_MUST_BE_ONE_THOSE_ADMIN_OR_CAROWNER_OR_GARAGEOWNER_OR_WAITINGUSER'
         });
     }
 });
@@ -23,7 +23,7 @@ router.put('/permissions/role/:role/add/:permission', (req, res) => {
     const permission = req.params.permission;
     if (!permission) {
         return res.status(400).send({
-            Error: 'error in permission param'
+            error: 'error in permission param'
         });
     }
     if (role === 'admin' || role === 'carOwner' || role === 'garageOwner' || role === 'waitingUser') {
@@ -34,7 +34,7 @@ router.put('/permissions/role/:role/add/:permission', (req, res) => {
         });
     } else {
         res.status(400).send({
-            Error: 'role must be one those (admin or carOwner or garageOwner or waitingUser)'
+            error: 'ERROR_ROLE_MUST_BE_ONE_THOSE_ADMIN_OR_CAROWNER_OR_GARAGEOWNER_OR_WAITINGUSER'
         });
     }
 });
@@ -64,8 +64,8 @@ router.put('/permissions/autoAdding', (req, res) => {
             msg: 'successfully added all permissions'
         });
     }).catch(err => {
-        res.status(400).send({
-            Error: 'Error in autoAdding'
+        res.status(500).send({
+            error: 'INTERNAL_SERVER_ERROR'
         });
     });
 });
