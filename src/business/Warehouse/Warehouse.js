@@ -9,7 +9,7 @@ module.exports = class Warehouse{
     {
         const validationResult = WarehouseValidation.validateWarehouseInfo(warehouseInfo);
         if(validationResult !== "pass")
-            return {err:"Error: "+validationResult};
+            return {error:"Error: "+validationResult};
     }
 
     createWarehouse()

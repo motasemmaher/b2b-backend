@@ -12,7 +12,7 @@ module.exports = class Offer{
     {
         const validationResult = OfferValidation.validateOfferInfo(offer);
         if(validationResult !== "pass")
-            return {err:"Error: "+validationResult};
+            return {error:"Error: "+validationResult};
     }
 
     exists(offerId)

@@ -416,17 +416,17 @@ app.post('/user/contact/create', userAuthenticated, (req, res) => {
                 res.status(200).send(retrivedGarageOwnerContact);
             }).catch(err => {
                 res.status(400).send({
-                    err: err
+                    error: err
                 });
             });
         }).catch(err => {
             res.status(400).send({
-                err: err
+                error: err
             });
         });
     }).catch(err => {
         res.status(400).send({
-            err: err
+            error: err
         });
     });
 });
@@ -446,7 +446,7 @@ app.get('/user/contact/get', userAuthenticated, (req, res) => {
         res.status(200).send(results);
     }).catch(err => {
         res.status(400).send({
-            err: err
+            error: err
         });
     });
 });
@@ -460,7 +460,7 @@ app.delete('/user/contact', userAuthenticated, (req, res) => {
     }).catch(err => {
         console.log(err);
         res.status(400).send({
-            err: err
+            error: err
         });
     });
 });
@@ -480,7 +480,7 @@ app.get('/user/chat/:contactID', userAuthenticated, (req, res) => {
         if (err) {
             console.log(err);
             res.status(400).send({
-                err: err
+                error: err
             })
         }
     });
@@ -503,7 +503,7 @@ app.get('/user/chat/hasContactId/:subcontactId', userAuthenticated, (req, res) =
         if (err) {
             console.log(err)
             res.status(400).send({
-                err: err
+                error: err
             })
         }
     });
@@ -519,7 +519,7 @@ var chatIO = io.of('/user/chat/start')
                     if (err) {
                         console.log(err)
                         res.status(400).send({
-                            err: err
+                            error: err
                         })
                     }
                 });

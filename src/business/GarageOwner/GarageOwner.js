@@ -103,4 +103,12 @@ module.exports = class GarageOwner {
         });
         return result;
     }
+
+    trustGarageOwner(garageOwnerId)
+    {
+        const result = GarageOwnerModel.trustGarageOwner({
+            _id: garageOwnerId,
+        });
+        return result;
+    }
 };

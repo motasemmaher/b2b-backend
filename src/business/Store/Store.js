@@ -7,7 +7,7 @@ module.exports = class Store {
         const validationResult = StoreValidation.validateStoreInfo(storeInfo);
         if (validationResult !== "pass")
             return {
-                err: "Error: " + validationResult
+                error: "Error: " + validationResult
             };
     }
 

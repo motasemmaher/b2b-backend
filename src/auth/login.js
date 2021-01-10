@@ -76,7 +76,7 @@ module.exports = {
 
         } catch (err) {
             return {
-                err: err
+                error: err
             }
         }
         await User.findUserByUsername(username).then(async (user) => {
