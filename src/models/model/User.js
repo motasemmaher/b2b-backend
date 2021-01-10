@@ -14,6 +14,39 @@ module.exports = {
                 error: "Error with the getting User"
             };
     },
+    checkUsername(value)
+    {
+        const result = UserModel.findOne({username: value.username},{id:1});
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error with the getting User"
+            };
+    }
+    ,
+    checkPhone(value)
+    {
+        const result = UserModel.findOne({phoneNumber: value.phone},{id:1});
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error with the getting User"
+            };
+    }
+    ,
+    checkEmail(value)
+    {
+        const result = UserModel.findOne({email: value.email},{id:1});
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error with the getting User"
+            };
+    }
+    ,
 
     countByRole(value) {
         const count = UserModel.countDocuments({

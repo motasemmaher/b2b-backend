@@ -37,49 +37,76 @@ router.post('/auth/garage-owner/create',upload.single('image'),(req, res) => {
         hashedPassword = hashPassword(userInfo.password);
         userInfo = {...userInfo,password:hashedPassword,role:"waitingUser"};
         
-        user.createUser(userInfo)
-        .then(userResult => {
-        menu.createMenu()
-            .then(menuResult =>{
-            warehouse.createWarehouse()
-                .then(warehouseResult =>{
-                store.createStore({...storeInfo,userId:userResult._id,menu:menuResult,warehouse:warehouseResult})//,image:req.file.path
-                    .then(storeResult => {
-                    garageOwner.createGarageOwner({user:userResult,stores:[storeResult]})
-                        .then(garageOwnerResult => {
-                        warehouse.linkWarehouse({_id:warehouseResult._id,storeId:storeResult._id});
-                        menu.linkMenu({_id:menuResult._id,storeId:storeResult._id});
-                        res.status(200).send("Successfully created GarageOwner (waiting user)");
+        user.checkUsername(userInfo.username)
+        .then(usernameCheckResult => {
+        if(usernameCheckResult != null)
+            res.status(400).send({error:"Error! The username you entered is already in use by another user."});
+        else
+        {
+            user.checkEmail(userInfo.email)
+            .then(emailCheckResult => {
+            if(emailCheckResult != null)
+                res.status(400).send({error:"Error! The email you entered is already in use by another user."});
+            else
+            {
+                user.checkPhone(userInfo.phoneNumber)
+                .then(phoneNumberCheckResult => {
+                if(phoneNumberCheckResult != null)
+                    res.status(400).send({error:"Error! The phone number you entered is already in use by another user."});
+                else
+                {
+                    user.createUser(userInfo)
+                    .then(userResult => {
+                    menu.createMenu()
+                        .then(menuResult =>{
+                        warehouse.createWarehouse()
+                            .then(warehouseResult =>{
+                            store.createStore({...storeInfo,userId:userResult._id,menu:menuResult,warehouse:warehouseResult})//,image:req.file.path
+                                .then(storeResult => {
+                                garageOwner.createGarageOwner({user:userResult,stores:[storeResult]})
+                                    .then(garageOwnerResult => {
+                                    warehouse.linkWarehouse({_id:warehouseResult._id,storeId:storeResult._id});
+                                    menu.linkMenu({_id:menuResult._id,storeId:storeResult._id});
+                                    res.status(200).send({created:true,message:"SUCCESSFULLY_CREATED_GARAGEOWNER_(WAITING_USER)"});
+                                    })
+                                    .catch(err => {
+                                    user.deleteUser(userResult._id);
+                                    menu.deleteMenu(menuResult._id);
+                                    warehouse.deleteWarehouse(warehouseResult._id);
+                                    store.deleteStore(storeResult._id);
+                                    res.status(500).send({error:"Error with creating GarageOwner: "+err});
+                                    });
+                                })    
+                                .catch(err =>{
+                                user.deleteUser(userResult._id);
+                                menu.deleteMenu(menuResult._id);
+                                warehouse.deleteWarehouse(warehouseResult._id);
+                                res.status(500).send({error:"Error with creating Store: "+err});
+                                });
+                            })
+                            .catch( err =>{
+                            user.deleteUser(userResult._id);
+                            menu.deleteMenu(menuResult._id);
+                            res.status(500).send({error:"Error with creating Warehouse: "+err});
+                            });
                         })
-                    .catch(err => {
-                    user.deleteUser(userResult._id);
-                    menu.deleteMenu(menuResult._id);
-                    warehouse.deleteWarehouse(warehouseResult._id);
-                    store.deleteStore(storeResult._id);
-                    res.status(500).send("Error with creating GarageOwner: "+err);
+                        .catch(err =>{
+                        user.deleteUser(userResult._id);
+                        res.status(500).send({error:"Error with creating Menu: "+err});
+                        });
+                    })
+                    .catch(err =>{
+                    res.status(500).send({error:"Error with creating User: "+err});
                     });
-                })    
-                .catch(err =>{
-                user.deleteUser(userResult._id);
-                menu.deleteMenu(menuResult._id);
-                warehouse.deleteWarehouse(warehouseResult._id);
-                res.status(500).send("Error with creating Store: "+err);
-                });
+                }
+                })
+                .catch(res.status(500).send({error:"Error with checking phoneNumber. "+err}));
+            }
             })
-            .catch( err =>{
-            user.deleteUser(userResult._id);
-            menu.deleteMenu(menuResult._id);
-            res.status(500).send("Error with creating Warehouse: "+err);
-            });
+            .catch(res.status(500).send({error:"Error with checking email. "+err}));
+        }
         })
-        .catch(err =>{
-        user.deleteUser(userResult._id);
-        res.status(500).send("Error with creating Menu: "+err);
-        });
-    })
-    .catch(err =>{
-    res.status(500).send("Error with creating User: "+err);
-    });
+        .catch(res.status(500).send({error:"Error with checking username. "+err}));
     }
 });
 //----------Creating car owner----------
@@ -100,37 +127,64 @@ router.post('/auth/car-owner/create', (req, res) => {
         hashedPassword = hashPassword(userInfo.password);
         userInfo = {...userInfo,password:hashedPassword,role:"carOwner"};
 
-        user.createUser(userInfo) 
-        .then(userResult =>{
-        car.createCar(carInfo)
-           .then(carResult => {
-           shoppingCart.createShoppingCart()
-               .then(shoppingCartResult => {
-               carOwner.createCarOwner({user:userResult,cars:[carResult],shoppingCart:shoppingCartResult._id}) 
-                   .then(carOwnerResult => {
-                    res.status(200).send("Successfully created CarOwner");
-                   })
-                   .catch(err =>{
-                   user.deleteUser(userResult._id);
-                   car.deleteCar(carResult._id);
-                   shoppingCart.deleteShoppingCart(shoppingCartResult._id);
-                   res.status(500).send("Error with creating CarOwner: "+err);
-                   });
-               })
-               .catch(err =>{
-               user.deleteUser(userResult._id);
-               car.deleteCar(carResult._id);
-               res.status(500).send("Error with creating ShoppingCart: "+err);
-               });
-           })
-           .catch(err => {
-           user.deleteUser(userResult._id);    
-           res.status(500).send("Error with creating Car: "+err);
-           });
+        user.checkUsername(userInfo.username)
+        .then(usernameCheckResult => {
+        if(usernameCheckResult != null)
+            res.status(400).send({error:"Error! The username you entered is already in use by another user."});
+        else
+        {
+            user.checkEmail(userInfo.email)
+            .then(emailCheckResult => {
+            if(emailCheckResult != null)
+                res.status(400).send({error:"Error! The email you entered is already in use by another user."});
+            else
+            {
+                user.checkPhone(userInfo.phoneNumber)
+                .then(phoneNumberCheckResult => {
+                if(phoneNumberCheckResult != null)
+                    res.status(400).send({error:"Error! The phone number you entered is already in use by another user."});
+                else
+                {
+                    user.createUser(userInfo) 
+                    .then(userResult =>{
+                    car.createCar(carInfo)
+                        .then(carResult => {
+                        shoppingCart.createShoppingCart()
+                            .then(shoppingCartResult => {
+                            carOwner.createCarOwner({user:userResult,cars:[carResult],shoppingCart:shoppingCartResult._id}) 
+                                .then(carOwnerResult => {
+                                res.status(200).send({created:true,message:"SUCCESSFULLY_CREATED_CAROWNER"});
+                                })
+                                .catch(err =>{
+                                user.deleteUser(userResult._id);
+                                car.deleteCar(carResult._id);
+                                shoppingCart.deleteShoppingCart(shoppingCartResult._id);
+                                res.status(500).send({error:"Error with creating CarOwner: "+err});
+                                });
+                            })
+                            .catch(err =>{
+                            user.deleteUser(userResult._id);
+                            car.deleteCar(carResult._id);
+                            res.status(500).send({error:"Error with creating ShoppingCart: "+err});
+                            });
+                        })
+                        .catch(err => {
+                        user.deleteUser(userResult._id);    
+                        res.status(500).send({error:"Error with creating Car: "+err});
+                        });
+                    })
+                    .catch(err => {
+                    res.status(500).send({error:"Error with creating User: "+err});
+                    });
+                }
+                })
+                .catch(res.status(500).send({error:"Error with checking phoneNumber. "+err}));
+            }
+            })
+            .catch(res.status(500).send({error:"Error with checking email. "+err}));
+        }
         })
-        .catch(err => {
-        res.status(500).send("Error with creating User: "+err);
-        });
+        .catch(res.status(500).send({error:"Error with checking username. "+err}));
     }    
 });
 

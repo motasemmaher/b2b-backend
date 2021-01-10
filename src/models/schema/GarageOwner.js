@@ -20,6 +20,11 @@ const GarageOwner = new schema({
     reportId: {
         type: schema.Types.ObjectId,
         ref: 'Report'
+    },
+    isTrusted: {
+        type:Boolean,
+        requied:true,
+        default:false
     }
 });
 

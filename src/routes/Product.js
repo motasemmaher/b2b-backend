@@ -9,6 +9,7 @@ const product = require('../business/Objects').PRODUCT;
 const store = require('../business/Objects').STORE;
 const warehouse = require('../business/Objects').WAREHOUSE;
 const category = require('../business/Objects').CATEGORY;
+const garageOwner = require('../business/Objects').GARAGEOWNER;
 
 validateProductType =  function (productType)
 {
@@ -303,21 +304,27 @@ router.post('/stores/:storeId/category/:categoryId/create-product',userAuthentic
                     res.status(400).send({error:warehouseValidationResult.err});
                 else
                 {
-                    product.createProduct(productInfo)
-                    .then(productResult => {
-                    //Adding a ref of the product to the category
-                    category.addProduct(categoryId,productResult)
-                        .then(categoryResult =>{
-                        //Adding the product and its quantity to the warehouse
-                        warehouse.addProduct(storeId,productResult._id,categoryId,req.body.amount)
-                            .then(warehouseResult => {
-                            res.status(200).send(productResult);
+                    garageOwner.getGarageOwnerByUserId(loggedUser._id)
+                    .then(garageOwnerResult => {
+                        if(garageOwnerResult != null && garageOwnerResult.isTrusted)
+                            productInfo = {...productInfo,tags:req.body.generalType+tags};
+                        product.createProduct(productInfo)
+                        .then(productResult => {
+                        //Adding a ref of the product to the category
+                        category.addProduct(categoryId,productResult)
+                            .then(categoryResult =>{
+                            //Adding the product and its quantity to the warehouse
+                            warehouse.addProduct(storeId,productResult._id,categoryId,req.body.amount)
+                                .then(warehouseResult => {
+                                    res.status(200).send(productResult);
+                                })
+                                .catch(err => res.status(500).send({error:"Error updating warehouse. "+err})); 
                             })
-                            .catch(err => res.status(500).send({error:"Error updating warehouse. "+err})); 
+                            .catch(err => res.status(500).send({error:"Error updating category. "+err}));
                         })
-                        .catch(err => res.status(500).send({error:"Error updating category. "+err}));
+                        .catch(err => res.status(500).send({error:"Error creating product. "+err}));
                     })
-                    .catch(err => res.status(500).send({error:"Error creating product. "+err}));
+                    .catch(err => res.status(500).send({error:"Error getting garageOwner by user id. "+err}));
                 }            
             }
             }).catch(err => res.status(500).send({error:"Error getting category id. "+err}));

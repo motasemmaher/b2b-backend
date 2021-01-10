@@ -253,6 +253,38 @@ router.delete('/admin/view-users/delete/:userId',userAuthenticated,(req,res) => 
     .catch(err => res.status(500).send({error:"Error getting user with that id. "+err}));
     }
 });
+//----------Trusting Garage Owner----------
+router.put('/admin/view-users/trust/:userId',userAuthenticated,(req,res) => {
+    loggedUser = req.user;
+    if(loggedUser.role !== "admin")
+        res.status(401).send({error:"Unauthorized user !"});
+    else
+    {
+        userId = req.params.userId;
+        user.exists(userId)
+        .then(getUserResult => {
+            if(getUserResult == null)
+                res.status(404).send({error:"Error! Didn't find a user with that id."});
+            else
+            {
+                garageOwner.getGarageOwnerByUserId(userId)
+                .then(garageOwnerResult => {
+                    garageOwner.trustGarageOwner(garageOwnerResult._id)
+                    .then(trustResult => {
+                        garageOwner.getGarageOwnerByUserId(userId)
+                        .then(updatedGarageOwnerResult => {
+                            res.status(200).send(updatedGarageOwnerResult);
+                        })
+                        .catch(err => res.status(500).send({error:"Error getting updated garageOwner. "+err}));
+                    })
+                    .catch(err => res.status(500).send({error:"Error trusting the garage owner. "+err}));
+                })
+                .catch(err => res.status(500).send({error:"Error getting garageOwner by user id. "+err}));
+            }
+        })
+        .catch(err => res.status(500).send({error:"Error getting user with that id. "+err}));
+    }
+});
 //----------Update User information----------
 router.put('/user/manage-user-info',userAuthenticated,(req, res) => {
     loggedUser = req.user;

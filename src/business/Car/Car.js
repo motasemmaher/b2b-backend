@@ -8,7 +8,7 @@ module.exports =  class Car {
     {
         const validationResult = CarValidation.validateCarInfo(carInfo);
         if(validationResult !== "pass")
-            return {err:"Error: "+validationResult};
+            return {error:"Error: "+validationResult};
     }
 
     exists(carId)

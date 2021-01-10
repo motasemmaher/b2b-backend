@@ -46,7 +46,7 @@ module.exports = class Product {
         const validationResult = ProductValidation.validateProductInfo(productInfo);
         if (validationResult !== "pass")
             return {
-                err: "Error: " + validationResult
+                error: "Error: " + validationResult
             };
     }
 

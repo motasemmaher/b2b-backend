@@ -16,7 +16,7 @@ module.exports = class Category{
     {
         const validationResult = CategoryValidation.validateCategoryInfo(categoryInfo);
         if(validationResult !== "pass")
-            return {err:"Error: "+validationResult};
+            return {error:"Error: "+validationResult};
     }
 
     createCategory(categoryInfo)

@@ -9,6 +9,24 @@ module.exports =  class User {
         return promiseResult;
     }
 
+    checkUsername(username)
+    {
+        const promiseResult = UserModel.checkUsername({username:username});
+        return promiseResult;
+    }
+
+    checkPhone(phone)
+    {
+        const promiseResult = UserModel.checkPhone({phone:phone});
+        return promiseResult;
+    }
+
+    checkEmail(email)
+    {
+        const promiseResult = UserModel.checkEmail({email:email});
+        return promiseResult;
+    }
+
     countByRole(role)
     {
         const promiseResult = UserModel.countByRole({role:role});
@@ -25,7 +43,7 @@ module.exports =  class User {
     {
         const validationResult = UserValidation.validateUserInfo(userInfo);
         if(validationResult !== "pass")
-            return {err:"Error: "+validationResult};
+            return {error:"Error: "+validationResult};
     }
 
     createUser(userInfo)
