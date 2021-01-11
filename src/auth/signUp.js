@@ -100,17 +100,17 @@ router.post('/auth/garage-owner/create',upload.single('image'),(req, res) => {
                     });
                 }
                 })
-                .catch(res.status(500).send({error:"Error with checking phoneNumber. "+err}));
+                .catch(err => res.status(500).send({error:"Error with checking phoneNumber. "+err}));
             }
             })
-            .catch(res.status(500).send({error:"Error with checking email. "+err}));
+            .catch(err => res.status(500).send({error:"Error with checking email. "+err}));
         }
         })
-        .catch(res.status(500).send({error:"Error with checking username. "+err}));
+        .catch(err => res.status(500).send({error:"Error with checking username. "+err}));
     }
 });
 //----------Creating car owner----------
-router.post('/auth/car-owner/create', (req, res) => {
+router.post('/auth/car-owner/create', (req,res) => {
     
     userInfo = req.body.user;
     const carInfo = req.body.car;
@@ -178,13 +178,13 @@ router.post('/auth/car-owner/create', (req, res) => {
                     });
                 }
                 })
-                .catch(res.status(500).send({error:"Error with checking phoneNumber. "+err}));
+                .catch(err => res.status(500).send({error:"Error with checking phoneNumber. "+err}));
             }
             })
-            .catch(res.status(500).send({error:"Error with checking email. "+err}));
+            .catch(err => res.status(500).send({error:"Error with checking email. "+err}));
         }
         })
-        .catch(res.status(500).send({error:"Error with checking username. "+err}));
+        .catch(err => res.status(500).send({error:"Error with checking username. "+err}));
     }    
 });
 

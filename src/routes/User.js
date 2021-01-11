@@ -57,7 +57,7 @@ router.get('/admin/view-users/:userId',userAuthenticated,(req,res) => {
         res.status(401).send({error:"Unauthorized user !"});
     else
     {
-        if(req.paras.userId == null)
+        if(req.params.userId == null)
         {
             let skip = req.query.skip;
             let limit = req.query.limit;
@@ -91,16 +91,29 @@ router.get('/admin/view-users/:userId',userAuthenticated,(req,res) => {
                 res.status(404).send({error:"Error! Didn't find a user with that id."});
             else
             {
-                garageOwner.getGarageOwnerByUserId(req.params.userId).populate("user").populate("stores")
+                garageOwner.getGarageOwnerByUserId(req.params.userId).populate("stores")
                 .then(garageOwnerResult => {
                 if(garageOwnerResult != null)
-                    res.status(200).send(garageOwnerResult)
+                {
+                    user.getUserById(req.params.userId)
+                    .then(getUserResult => {
+                        res.status(200).send({user:getUserResult,garageOwnerInfo:garageOwnerResult})
+                    })
+                    .catch(err => res.status(500).send({error:"Error with getting user with that user id."+err}));
+                }
+                    
                 else
                 {
-                    carOwner.getCarOwnerByUserId(req.params.userId).populate("user").populate("cars")
+                    carOwner.getCarOwnerByUserId(req.params.userId).populate("cars")
                     .then(carOwnerResult => {
                     if(carOwnerResult != null)
-                        res.status(200).send(carOwnerResult)
+                    {
+                        user.getUserById(req.params.userId)
+                        .then(getUserResult => {
+                        res.status(200).send({user:getUserResult,carOwnerInfo:carOwnerResult})
+                        })
+                        .catch(err => res.status(500).send({error:"Error with getting user with that user id."+err}));
+                    }
                     else
                         res.status(404).send({error:"Error ! Didn't find a garageOwner or a carOwner with that user id."});
                     })

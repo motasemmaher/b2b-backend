@@ -110,6 +110,9 @@ module.exports = {
     findUserById(value) {
         const result = UserModel.findById({
             _id: value.userId
+        },
+        {
+            password:0
         });
         if (result)
             return result;
