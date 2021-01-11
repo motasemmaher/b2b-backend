@@ -51,35 +51,68 @@ router.get('/admin/waiting-users',userAuthenticated,(req,res) => {
     }
 });
 //----------View users----------
-router.get('/admin/view-users',userAuthenticated,(req,res) => {
+router.get('/admin/view-users/:userId',userAuthenticated,(req,res) => {
     loggedUser = req.user;
     if(loggedUser.role !== "admin")
         res.status(401).send({error:"Unauthorized user !"});
     else
     {
-        let skip = req.query.skip;
-        let limit = req.query.limit;
-        const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);
-        skip = limitAndSkipValues.skip;
-        limit = limitAndSkipValues.limit;
+        if(req.paras.userId == null)
+        {
+            let skip = req.query.skip;
+            let limit = req.query.limit;
+            const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);
+            skip = limitAndSkipValues.skip;
+            limit = limitAndSkipValues.limit;
 
-        user.getAllUsersIdOfARole('garageOwner')
-        .then(ids => {
+            user.getAllUsersIdOfARole('garageOwner')
+            .then(ids => {
             garageOwner.getAllGarageOwners(ids,limit,skip)
-            .then(garageOwnersResult => {
-            carOwner.getAllCarOwners(limit,skip)
-                .then(carOwnersResult => {
-                user.countAll()
-                    .then(countResult => {
-                    res.status(200).send({count:countResult,garageOwners:garageOwnersResult,carOwners:carOwnersResult});
+                .then(garageOwnersResult => {
+                carOwner.getAllCarOwners(limit,skip)
+                    .then(carOwnersResult => {
+                    user.countAll()
+                        .then(countResult => {
+                        res.status(200).send({count:countResult,garageOwners:garageOwnersResult,carOwners:carOwnersResult});
+                        })
+                        .catch(err => res.status(500).send({error:"Error getting the count of users. "+err}));
                     })
-                    .catch(err => res.status(500).send({error:"Error getting the count of users. "+err}));
+                    .catch(err => res.status(500).send({error:"Error getting the carOwners. "+err}));
+                })  
+                .catch(err => res.status(500).send({error:"Error getting the garageOwners. "+err}));
+            })
+            .catch(err => res.status(500).send({error:"Error getting the users of that role. "+err}));
+        }
+        else
+        {
+            user.exists(req.params.userId)
+            .then(existResult => {
+            if(existResult == null)
+                res.status(404).send({error:"Error! Didn't find a user with that id."});
+            else
+            {
+                garageOwner.getGarageOwnerByUserId(req.params.userId).populate("user").populate("stores")
+                .then(garageOwnerResult => {
+                if(garageOwnerResult != null)
+                    res.status(200).send(garageOwnerResult)
+                else
+                {
+                    carOwner.getCarOwnerByUserId(req.params.userId).populate("user").populate("cars")
+                    .then(carOwnerResult => {
+                    if(carOwnerResult != null)
+                        res.status(200).send(carOwnerResult)
+                    else
+                        res.status(404).send({error:"Error ! Didn't find a garageOwner or a carOwner with that user id."});
+                    })
+                    .catch(err => res.status(500).send({error:"Error with getting carOwner with that user id."+err}));
+                }
+
                 })
-                .catch(err => res.status(500).send({error:"Error getting the carOwners. "+err}));
-            })  
-            .catch(err => res.status(500).send({error:"Error getting the garageOwners. "+err}));
-        })
-        .catch(err => res.status(500).send({error:"Error getting the users of that role. "+err}));
+                .catch(err => res.status(500).send({error:"Error with getting garageOwner with that user id."+err}));
+            }
+            })
+            .catch(err => res.status(500).send({error:"Error with checking if the user exists. "+err}));
+        }
     }
 });
 //----------Accepting waiting user----------
