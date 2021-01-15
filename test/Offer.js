@@ -49,73 +49,73 @@ describe('Offer Class Tests', () => {
         expect(validationResult).to.be.undefined;
         done();
     });
-/*
+
     it('Validating offer information invalid discount rate (downRange).', (done) => {
         const data = prepareData(downRangeDiscountRate,validDuration,validNewPrice);
         const validationResult = OFFER.validateOfferInfo(data);
-        expect(validationResult.err).to.contain("Invalid offer discountRate !");
+        expect(validationResult.error).to.contain("Invalid offer discountRate !");
         done();
     });
 
     it('Validating offer information invalid discount rate (upRange).', (done) => {
         const data = prepareData(upRangeDiscountRate,validDuration,validNewPrice);
         const validationResult = OFFER.validateOfferInfo(data);
-        expect(validationResult.err).to.contain("Invalid offer discountRate !");
+        expect(validationResult.error).to.contain("Invalid offer discountRate !");
         done();
     });
 
     it('Validating offer information invalid discount rate (invalidType).', (done) => {
         const data = prepareData(invalidDiscountRateType,validDuration,validNewPrice);
         const validationResult = OFFER.validateOfferInfo(data);
-        expect(validationResult.err).to.contain("Invalid offer discountRate !");
+        expect(validationResult.error).to.contain("Invalid offer discountRate !");
         done();
     });
 
     it('Validating offer information invalid discount rate (missing).', (done) => {
         const validationResult = OFFER.validateOfferInfo({duration:validDuration,newPrice:validNewPrice});
-        expect(validationResult.err).to.contain("Invalid offer discountRate !");
+        expect(validationResult.error).to.contain("Invalid offer discountRate !");
         done();
     });
 
     it('Validating offer information invalid duration (downRange).', (done) => {
         const data = prepareData(validDiscountRate,downRangeDuration,validNewPrice);
         const validationResult = OFFER.validateOfferInfo(data);
-        expect(validationResult.err).to.contain("Invalid offer duration !");
+        expect(validationResult.error).to.contain("Invalid offer duration !");
         done();
     });
 
     it('Validating offer information invalid duration (upRange).', (done) => {
         const data = prepareData(validDiscountRate,upRangeDuration,validNewPrice);
         const validationResult = OFFER.validateOfferInfo(data);
-        expect(validationResult.err).to.contain("Invalid offer duration !");
+        expect(validationResult.error).to.contain("Invalid offer duration !");
         done();
     });
 
     it('Validating offer information invalid duration (invalidType).', (done) => {
         const data = prepareData(validDiscountRate,invalidDurationType,validNewPrice);
         const validationResult = OFFER.validateOfferInfo(data);
-        expect(validationResult.err).to.contain("Invalid offer duration !");
+        expect(validationResult.error).to.contain("Invalid offer duration !");
         done();
     });
 
     it('Validating offer information invalid duration (missing).', (done) => {
         const data = prepareData(validDiscountRate,undefined,validNewPrice);
         const validationResult = OFFER.validateOfferInfo(data);
-        expect(validationResult.err).to.contain("Invalid offer duration !");
+        expect(validationResult.error).to.contain("Invalid offer duration !");
         done();
     });
 
     it('Validating offer information invalid new price (invalidType).', (done) => {
         const data = prepareData(validDiscountRate,validDuration,invalidNewPrice);
         const validationResult = OFFER.validateOfferInfo(data);
-        expect(validationResult.err).to.contain("Invalid offer newPrice !");
+        expect(validationResult.error).to.contain("Invalid offer newPrice !");
         done();
     });
 
     it('Validating offer information invalid newPrice (missing).', (done) => {
         const data = prepareData(validDiscountRate,validDuration);
         const validationResult = OFFER.validateOfferInfo(data);
-        expect(validationResult.err).to.contain("Invalid offer newPrice !");
+        expect(validationResult.error).to.contain("Invalid offer newPrice !");
         done();
     });
 
@@ -178,5 +178,5 @@ describe('Offer Class Tests', () => {
         })
         .catch(err => done(err));
     });
-    */
+    
 }); 

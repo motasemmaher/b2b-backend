@@ -48,7 +48,7 @@ describe('Menu Class Tests', () => {
       })
       .catch(err => done(err));
     });
-/*
+
     it('Linking menu without errors.', (done) => {
         MENU.createMenu()
         .then(createResult => {
@@ -154,5 +154,5 @@ describe('Menu Class Tests', () => {
         })
         .catch(err => done(err));
     });
-*/
+
 });

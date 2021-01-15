@@ -48,7 +48,7 @@ describe('GarageOwner Class Tests', () => {
         })
         .catch(err => done(err));
     });
-/*
+
     it('Creating a garageOwner with error.', (done) => {
         GARAGEOWNER.createGarageOwner({})
         .then(createResdult => done())
@@ -174,5 +174,5 @@ describe('GarageOwner Class Tests', () => {
         })
         .catch(err => done(err));
     });
-    */
+   
 });

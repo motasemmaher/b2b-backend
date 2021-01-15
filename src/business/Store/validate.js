@@ -4,6 +4,8 @@ module.exports = {
     
    validateStoreInfo(store)
     {
+        if(store === undefined)
+        return "No data were entered ! !";
         if(store.name === undefined || !validator.matches(store.name,/(^[\p{L} \d\s_'-]{4,64}$)/ugi))
             return "Invalid store name !";
         if(store.address === undefined || !validator.matches(store.address,/(^[\p{L}'-]{4,8}$)/ugi))

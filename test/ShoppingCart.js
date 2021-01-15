@@ -50,7 +50,8 @@ describe('ShoppingCart Class Tests', () => {
             .catch(err => done(err));
         });
        */
-    it('should get ShoppingCart', (done) => {
+  /*
+       it('should get ShoppingCart', (done) => {
         shoppingCart.getShoppingCart(shoppingCartId)
             .then(retrievedShoppingCart => {
                 expect(retrievedShoppingCart.Items).to.be.an('array').that.includes(cartItemId);
@@ -96,5 +97,5 @@ describe('ShoppingCart Class Tests', () => {
             })
             .catch(err => done(err));
     });
-
+*/
 });

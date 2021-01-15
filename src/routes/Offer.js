@@ -58,7 +58,7 @@ router.get('/stores/:storeId/offers',(req,res) => {
     {
         product.getProductsWithOffersOfStore(storeId,limit,skip)
         .then(offersResult => {
-        product.countByOffersByStore(storeId)
+        product.countByOffersOfStore(storeId)
             .then(countResult => {
             offersArray = offersResult;
             if(offersArray.length == 0)

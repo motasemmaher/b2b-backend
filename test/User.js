@@ -88,172 +88,172 @@ describe('User Class Tests', () => {
         expect(validationResult).to.be.undefined;
         done();
     });
-/*
+
     it("Validating user information with invalid fullName (short).", (done) => {
         const data = prepareData(shortFullName,username,email,password,phoneNumber,address,role);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user fullname !");
+        expect(validationResult.error).to.contain("Invalid user fullname !");
         done();
     });
 
     it("Validating user information with invalid fullName (long).", (done) => {
         const data = prepareData(longFullName,username,email,password,phoneNumber,address,role);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user fullname !");
+        expect(validationResult.error).to.contain("Invalid user fullname !");
         done();
     });
 
     it("Validating user information with invalid fullName (format).", (done) => {
         const data = prepareData(invalidFormatFullname,username,email,password,phoneNumber,address,role);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user fullname !");
+        expect(validationResult.error).to.contain("Invalid user fullname !");
         done();
     });
 
     it("Validating user information with invalid fullName (missing).", (done) => {
         const data = prepareData(undefined,username,email,password,phoneNumber,address,role);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user fullname !");
+        expect(validationResult.error).to.contain("Invalid user fullname !");
         done();
     });
 
     it("Validating user information with invalid username (short).", (done) => {
         const data = prepareData(fullName,shortUsername,email,password,phoneNumber,address,role);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user username !");
+        expect(validationResult.error).to.contain("Invalid user username !");
         done();
     });
 
     it("Validating user information with invalid username (long).", (done) => {
         const data = prepareData(fullName,longUsername,email,password,phoneNumber,address,role);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user username !");
+        expect(validationResult.error).to.contain("Invalid user username !");
         done();
     });
 
     it("Validating user information with invalid username (format).", (done) => {
         const data = prepareData(fullName,invalidFormatUsername,email,password,phoneNumber,address,role);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user username !");
+        expect(validationResult.error).to.contain("Invalid user username !");
         done();
     });
 
     it("Validating user information with invalid username (missing).", (done) => {
         const data = prepareData(fullName,undefined,email,password,phoneNumber,address,role);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user username !");
+        expect(validationResult.error).to.contain("Invalid user username !");
         done();
     });
 
     it("Validating user information with invalid email.", (done) => {
         const data = prepareData(fullName,username,invalidEmail,password,phoneNumber,address,role);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user email !");
+        expect(validationResult.error).to.contain("Invalid user email !");
         done();
     });
 
     it("Validating user information with invalid email (missing).", (done) => {
         const data = prepareData(fullName,username,undefined,password,phoneNumber,address,role);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user email !");
+        expect(validationResult.error).to.contain("Invalid user email !");
         done();
     });
 
     it("Validating user information with invalid password (short).", (done) => {
         const data = prepareData(fullName,username,email,shortPassword,phoneNumber,address,role);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user password !");
+        expect(validationResult.error).to.contain("Invalid user password !");
         done();
     });
 
     it("Validating user information with invalid password (long).", (done) => {
         const data = prepareData(fullName,username,email,longPassword,phoneNumber,address,role);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user password !");
+        expect(validationResult.error).to.contain("Invalid user password !");
         done();
     });
 
     it("Validating user information with invalid password (missing).", (done) => {
         const data = prepareData(fullName,username,email,undefined,phoneNumber,address,role);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user password !");
+        expect(validationResult.error).to.contain("Invalid user password !");
         done();
     });
 
     it("Validating user information with invalid phone number (short).", (done) => {
         const data = prepareData(fullName,username,email,password,shortPhoneNumber,address,role);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user phone number !");
+        expect(validationResult.error).to.contain("Invalid user phone number !");
         done();
     });
 
     it("Validating user information with invalid phone number (long).", (done) => {
         const data = prepareData(fullName,username,email,password,longPhoneNumber,address,role);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user phone number !");
+        expect(validationResult.error).to.contain("Invalid user phone number !");
         done();
     });
 
     it("Validating user information with invalid phone number (format).", (done) => {
         const data = prepareData(fullName,username,email,password,invalidFormatPhoneNumber,address,role);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user phone number !");
+        expect(validationResult.error).to.contain("Invalid user phone number !");
         done();
     });
 
     it("Validating user information with invalid phone number (missing).", (done) => {
         const data = prepareData(fullName,username,email,password,undefined,address,role);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user phone number !");
+        expect(validationResult.error).to.contain("Invalid user phone number !");
         done();
     });
 
     it("Validating user information with invalid address (short).", (done) => {
         const data = prepareData(fullName,username,email,password,phoneNumber,shortAddress,role);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user address !");
+        expect(validationResult.error).to.contain("Invalid user address !");
         done();
     });
 
     it("Validating user information with invalid address (long).", (done) => {
         const data = prepareData(fullName,username,email,password,phoneNumber,longAddress,role);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user address !");
+        expect(validationResult.error).to.contain("Invalid user address !");
         done();
     });
 
     it("Validating user information with invalid address (format).", (done) => {
         const data = prepareData(fullName,username,email,password,phoneNumber,invalidFormatAddress,role);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user address !");
+        expect(validationResult.error).to.contain("Invalid user address !");
         done();
     });
 
     it("Validating user information with invalid address (missing).", (done) => {
         const data = prepareData(fullName,username,email,password,phoneNumber,undefined,role);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user address !");
+        expect(validationResult.error).to.contain("Invalid user address !");
         done();
     });
 
     it("Validating user information with invalid role (format).", (done) => {
         const data = prepareData(fullName,username,email,password,phoneNumber,address,invalidRoleFormat);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user role !");
+        expect(validationResult.error).to.contain("Invalid user role !");
         done();
     });
 
     it("Validating user information with invalid role (non-existing).", (done) => {
         const data = prepareData(fullName,username,email,password,phoneNumber,address,invalidRoleNonExisting);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user role !");
+        expect(validationResult.error).to.contain("Invalid user role !");
         done();
     });
 
     it("Validating user information with invalid address (missing).", (done) => {
         const data = prepareData(fullName,username,email,password,phoneNumber,address,undefined);
         const validationResult = USER.validateUserInfo(data);
-        expect(validationResult.err).to.contain("Invalid user role !");
+        expect(validationResult.error).to.contain("Invalid user role !");
         done();
     });
 
@@ -301,6 +301,20 @@ describe('User Class Tests', () => {
         })
         .catch(err => done(err));
     });
+
+
+/*
+    it("Checking if the email is already taken without errors (not taken)", (done) => {
+        USER.checkEmail("nonexisting@gmail.com")
+        .then(checkResult => {
+            
+        })
+        .catch(err => done(err));
+    });
+*/
+
+
+
 
     it("Creating user without error", (done) => {
         USER.createUser(userInformation)
@@ -466,5 +480,5 @@ describe('User Class Tests', () => {
         })
         .catch(err => done(err));
     });
-*/
+
 });

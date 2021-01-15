@@ -98,123 +98,123 @@ describe('Product Class Tests', () => {
         expect(validationResult).to.be.undefined;
         done();
       });
-    /*
+    
       it('Validating product information with invalid product name (long).', (done) => {
         data = prepareData(invalidNameLong,validType,validPrice,validDescription,validTags,null);
         const validationResult = PRODUCT.validateProductInfo(data);
-        expect(validationResult.err).to.contain("name");
+        expect(validationResult.error).to.contain("name");
         done();
       });
     
       it('Validating product information with invalid product name (short).', (done) => {
         data = prepareData(invalidNameShort,validType,validPrice,validDescription,validTags,null);
         const validationResult = PRODUCT.validateProductInfo(data);
-        expect(validationResult.err).to.contain("name");
+        expect(validationResult.error).to.contain("name");
         done();
       });
     
       it('Validating product information with invalid product name (format).', (done) => {
         data = prepareData(invalidNameFormat,validType,validPrice,validDescription,validTags,null);
         const validationResult = PRODUCT.validateProductInfo(data);
-        expect(validationResult.err).to.contain("name");
+        expect(validationResult.error).to.contain("name");
         done();
       });
     
       it('Validating product information with invalid product name (missing).', (done) => {
         data = prepareData(undefined,validType,validPrice,validDescription,validTags,null);
         const validationResult = PRODUCT.validateProductInfo(data);
-        expect(validationResult.err).to.contain("name");
+        expect(validationResult.error).to.contain("name");
         done();
       });
 
       it('Validating product information with invalid product description (long).', (done) => {
         data = prepareData(validName,validType,validPrice,invalidDescriptionLong,validTags,null);
         const validationResult = PRODUCT.validateProductInfo(data);
-        expect(validationResult.err).to.contain("description");
+        expect(validationResult.error).to.contain("description");
         done();
       });
     
       it('Validating product information with invalid product description (short).', (done) => {
         data = prepareData(validName,validType,validPrice,invalidDescriptionShort,validTags,null);
         const validationResult = PRODUCT.validateProductInfo(data);
-        expect(validationResult.err).to.contain("description");
+        expect(validationResult.error).to.contain("description");
         done();
       });
     
       it('Validating product information with invalid product description (format).', (done) => {
         data = prepareData(validName,validType,validPrice,invalidDescriptionFormat,validTags,null);
         const validationResult = PRODUCT.validateProductInfo(data);
-        expect(validationResult.err).to.contain("description");
+        expect(validationResult.error).to.contain("description");
         done();
       });
     
       it('Validating product information with invalid product description (missing).', (done) => {
         data = prepareData(validName,validType,validPrice,undefined,validTags,null);
         const validationResult = PRODUCT.validateProductInfo(data);
-        expect(validationResult.err).to.contain("description");
+        expect(validationResult.error).to.contain("description");
         done();
       });
 
       it('Validating product information with invalid product price (format).', (done) => {
         data = prepareData(validName,validType,invalidPrice,validDescription,validTags,null);
         const validationResult = PRODUCT.validateProductInfo(data);
-        expect(validationResult.err).to.contain("price");
+        expect(validationResult.error).to.contain("price");
         done();
       });
     
       it('Validating product information with invalid product price (missing).', (done) => {
         data = prepareData(validName,validType,undefined,validDescription,validTags,null);
         const validationResult = PRODUCT.validateProductInfo(data);
-        expect(validationResult.err).to.contain("price");
+        expect(validationResult.error).to.contain("price");
         done();
       });
 
       it('Validating product information with invalid product price (type).', (done) => {
         data = prepareData(validName,invalidTypeFormat,validPrice,validDescription,validTags,null);
         const validationResult = PRODUCT.validateProductInfo(data);
-        expect(validationResult.err).to.contain("type");
+        expect(validationResult.error).to.contain("type");
         done();
       });
     
       it('Validating product information with invalid product type (non-existing).', (done) => {
         data = prepareData(validName,invalidTypeNonExisting,validPrice,validDescription,validTags,null);
         const validationResult = PRODUCT.validateProductInfo(data);
-        expect(validationResult.err).to.contain("type");
+        expect(validationResult.error).to.contain("type");
         done();
       });
 
       it('Validating product information with invalid product type (missing).', (done) => {
         data = prepareData(validName,undefined,validPrice,validDescription,validTags,null);
         const validationResult = PRODUCT.validateProductInfo(data);
-        expect(validationResult.err).to.contain("type");
+        expect(validationResult.error).to.contain("type");
         done();
       });
 
       it('Validating product information with invalid product tags (long).', (done) => {
         data = prepareData(validName,validType,validPrice,validDescription,invalidTagsLong,null);
         const validationResult = PRODUCT.validateProductInfo(data);
-        expect(validationResult.err).to.contain("tags");
+        expect(validationResult.error).to.contain("tags");
         done();
       });
     
       it('Validating product information with invalid product tags (short).', (done) => {
         data = prepareData(validName,validType,validPrice,validDescription,invalidTagsShort,null);
         const validationResult = PRODUCT.validateProductInfo(data);
-        expect(validationResult.err).to.contain("tags");
+        expect(validationResult.error).to.contain("tags");
         done();
       });
     
       it('Validating product information with invalid product tags (format).', (done) => {
         data = prepareData(validName,validType,validPrice,validDescription,invalidTagsFormat,null);
         const validationResult = PRODUCT.validateProductInfo(data);
-        expect(validationResult.err).to.contain("tags");
+        expect(validationResult.error).to.contain("tags");
         done();
       });
     
       it('Validating product information with invalid product tags (missing).', (done) => {
         data = prepareData(validName,validType,validPrice,validDescription,undefined,null);
         const validationResult = PRODUCT.validateProductInfo(data);
-        expect(validationResult.err).to.contain("tags");
+        expect(validationResult.error).to.contain("tags");
         done();
       });
 
@@ -983,5 +983,5 @@ describe('Product Class Tests', () => {
         })
         .catch(err => done(err));
     });
-*/
+
 });

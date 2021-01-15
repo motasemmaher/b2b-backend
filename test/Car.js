@@ -67,58 +67,76 @@ describe('Car Class Tests', () => {
     expect(validationResult).to.be.undefined;
     done();
   });
-/*
+
   it('Validating car information invalid make (short).', (done) => {
     const validationResult = car.validateCarInfo({make:shortMake,model:model,year:year});
-    expect(validationResult.err).to.contain("make");
+    expect(validationResult.error).to.contain("make");
     done();
   });
 
   it('Validating car information invalid make (long).', (done) => {
     const validationResult = car.validateCarInfo({make:longMake,model:model,year:year});
-    expect(validationResult.err).to.contain("make");
+    expect(validationResult.error).to.contain("make");
     done();
   });
 
   it('Validating car information invalid make (format).', (done) => {
     const validationResult = car.validateCarInfo({make:invalidFormatMake,model:model,year:year});
-    expect(validationResult.err).to.contain("make");
+    expect(validationResult.error).to.contain("make");
+    done();
+  });
+
+  it('Validating car information invalid make (missing).', (done) => {
+    const validationResult = car.validateCarInfo({make:undefined,model:model,year:year});
+    expect(validationResult.error).to.contain("make");
     done();
   });
 
   it('Validating car information invalid model (short).', (done) => {
     const validationResult = car.validateCarInfo({make:make,model:shortModel,year:year});
-    expect(validationResult.err).to.contain("model");
+    expect(validationResult.error).to.contain("model");
     done();
   });
 
   it('Validating car information invalid model (long).', (done) => {
     const validationResult = car.validateCarInfo({make:make,model:longModel,year:year});
-    expect(validationResult.err).to.contain("model");
+    expect(validationResult.error).to.contain("model");
     done();
   });
   
   it('Validating car information invalid model (format).', (done) => {
     const validationResult = car.validateCarInfo({make:make,model:invalidFormatModel,year:year});
-    expect(validationResult.err).to.contain("model");
+    expect(validationResult.error).to.contain("model");
+    done();
+  });
+
+  it('Validating car information invalid model (missing).', (done) => {
+    const validationResult = car.validateCarInfo({make:make,model:undefined,year:year});
+    expect(validationResult.error).to.contain("model");
     done();
   });
 
   it('Validating car information invalid year (future).', (done) => {
     const validationResult = car.validateCarInfo({make:make,model:model,year:futureYear});
-    expect(validationResult.err).to.contain("year");
+    expect(validationResult.error).to.contain("year");
     done();
   });
 
   it('Validating car information invalid year (too old).', (done) => {
     const validationResult = car.validateCarInfo({make:make,model:model,year:oldYear});
-    expect(validationResult.err).to.contain("year");
+    expect(validationResult.error).to.contain("year");
     done();
   });
 
   it('Validating car information invalid year (format).', (done) => {
     const validationResult = car.validateCarInfo({make:make,model:model,year:invalidFormatYear});
-    expect(validationResult.err).to.contain("year");
+    expect(validationResult.error).to.contain("year");
+    done();
+  });
+
+  it('Validating car information invalid year (missing).', (done) => {
+    const validationResult = car.validateCarInfo({make:make,model:model,year:undefined});
+    expect(validationResult.error).to.contain("year");
     done();
   });
 
@@ -192,5 +210,5 @@ describe('Car Class Tests', () => {
     })
     .catch(err => done(err));
   });
-  */
+
 });

@@ -44,7 +44,7 @@ const limitAndSkipValidation = require('./src/shared/limitAndSkipValidation');
 
 //Setting-up express app
 //Setting-up path for the static files
-app.use('./public', express.static('uploads'));
+app.use('/public', express.static('public'));
 //Setting-up req body parser
 app.use(bodyParser.json({ limit: '5mb', extended: true }));
 app.use(bodyParser.urlencoded({

@@ -42,7 +42,7 @@ describe('Complaint Class Tests', () => {
         })
         .catch(err => done(err))
     });
-/*
+
     it('Count all complaints without errors.', (done) => {
       COMPLAINT.countAllComplaints()
       .then(countResult => {
@@ -135,5 +135,5 @@ describe('Complaint Class Tests', () => {
         })
         .catch(err => done(err))
     });
-   */
+   
 });

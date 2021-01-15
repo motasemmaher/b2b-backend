@@ -147,7 +147,8 @@ router.post('/user/manage-garage-owner/add-store',userAuthenticated,upload.singl
         res.status(401).send({error:"Unauthorized user !"});
     else
     {
-        const storeInfo = {...req.body,image:req.file.path,userId:loggedUser._id};
+        //const storeInfo = {...req.body,image:req.file.path,userId:loggedUser._id};
+        const storeInfo = {...req.body,userId:loggedUser._id};
         const storeValidationResult = store.validateStoreInfo(storeInfo);
         if(typeof storeValidationResult !== 'undefined')
             res.status(400).send({error:storeValidationResult.err});
@@ -272,7 +273,7 @@ router.delete('/user/manage-garage-owner/delete-store/:storeId',userAuthenticate
                                     .then(garageOwnerResult => {
                                     garageOwner.removeStoreFromList(garageOwnerResult._id,storeId)
                                         .then(removeResult => {
-                                        res.status(200).redirect({success:true});
+                                        res.status(200).send({success:true});
                                         })
                                         .catch(err => res.status(500).send({error:"Error removing store from the garageOwner. "+err}));
                                     })

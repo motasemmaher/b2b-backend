@@ -51,7 +51,7 @@ router.get('/products/:productId?',(req,res) => {
         product.countAll(type)
             .then(countResult => {
             // if(productsArray.length == 0)
-            //     res.status(200).send({error:"No documents were found."})
+            //     res.status(200).send({[]})
 
             // productsArray = productResults;
             // productsArray.forEach((productResult,index,productsArray) => {
@@ -131,7 +131,7 @@ router.get('/stores/:storeId/products/:productId?',(req,res) => {
                 .then(countResult => {
                 productsArray = productResults;
                 // if(productsArray.length == 0)
-                //     return res.status(200).send({error:"No documents were found."})
+                //     return res.status(200).send({[]})
 
                 // productsArray.forEach((productResult,index,productsArray) => {
                 //     imageToBase64(productResult.image)
@@ -222,7 +222,7 @@ router.get('/stores/:storeId/category/:categoryId/products/:productId?',(req,res
                 product.countByCategory(categoryId,type)
                     .then(countResult => {
                     // if(productsArray.length == 0)
-                    //     return res.status(200).send({message:"No documents were found."});
+                    //     return res.status(200).send({[]});
                     productsArray = productsResult;
                     // productsArray.forEach((productResult,index,productsArray) => {
                         // imageToBase64(productResult.image)

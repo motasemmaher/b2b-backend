@@ -38,7 +38,7 @@ describe('CartItem Class Tests', () => {
             .then(() => done())
             .catch((err) => done(err));
     });
-
+/*
     it('Creating CartItem without errors.', (done) => {
         cartItem.createCartItem(createdCartItem)
             .then(createResult => {
@@ -49,7 +49,7 @@ describe('CartItem Class Tests', () => {
             })
             .catch(err => done(err));
     });
-
+*/
     // it('should get CartItem', (done) => {
     //     console.log(createdCartItem);
     //     cartItem.getCartItem(createdCartItem)
