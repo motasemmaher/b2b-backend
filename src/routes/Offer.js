@@ -21,7 +21,7 @@ router.get('/offers',(req,res) => {
         .then(countResult => {
         offersArray = offersResult;
         if(offersArray.length == 0)
-            return res.status(200).send({error:"No Offers were found."});
+            return res.status(200).send({count:0,offers:[]});
         // offersArray.forEach((offerResult,index,offersArray) => {
         //     imageToBase64(productRofferResultesult.image)
         //     .then(base64Image => {
@@ -62,7 +62,7 @@ router.get('/stores/:storeId/offers',(req,res) => {
             .then(countResult => {
             offersArray = offersResult;
             if(offersArray.length == 0)
-                return res.status(200).send({error:"No Offers were found."});
+                return res.status(200).send({count:0,offers:[]});
             // offersArray.forEach((offerResult,index,offersArray) => {
             //     imageToBase64(productRofferResultesult.image)
             //     .then(base64Image => {
