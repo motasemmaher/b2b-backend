@@ -81,7 +81,6 @@ module.exports = class CarOwner {
         // .then(cOwner => {
         //     let index = cOwner.stores[0].orders.indexOf(value.orderId);
         //     cOwner.stores[0].orders.splice(index, 1);
-        //     // console.log(cOwner.stores[0].orders.splice(index, 1));
         //     result = Promise.resolve(cOwner);
         // });
         return result;

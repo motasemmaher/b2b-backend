@@ -510,7 +510,6 @@ app.put('/store/:id/category/:categoryId/update-product/:productId',upload.singl
                 
             if(categoryFindByNameResult._id != req.params.categoryId) 
             {
-            console.log(" update product if")
             category.removeProductFromCategory(req.params.categoryId,req.params.productId)
                 .then(removeProductFromCategoryResult => {
                 category.addProduct(updatedProductInfo.categoryId,productResult._id)
@@ -544,7 +543,6 @@ app.put('/store/:id/category/:categoryId/update-product/:productId',upload.singl
         //wecan get rid of this if/else
             else
             {
-            console.log("Inside update product else")
             warehouse.removeProductFromWarehouse(req.params.id,req.params.productId)
             .then(removeProductResultFromWarehouse => {
             warehouse.addProduct(req.params.id,req.params.productId,req.params.categoryId,req.body.amount)

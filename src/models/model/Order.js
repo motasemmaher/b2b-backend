@@ -112,7 +112,6 @@ module.exports = {
     },
 
     getOrderByCarOwnerId(value) {
-        console.log(value);
         const result = OrderModel.find({
             carOwnerId: value.carOwnerId
         }).limit(value.limit).skip(value.skip);

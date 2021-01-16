@@ -42,7 +42,7 @@ router.get('/stores/:storeId/categories/:categoryId?',(req,res) => {
 router.post('/stores/:storeId/create-category',userAuthenticated,(req,res) => {
     loggedUser = req.user;
     storeId = req.params.storeId;
-
+    
     if(loggedUser.role !== "garageOwner")
         res.status(401).send({error:"Unauthorized user !"});
     else

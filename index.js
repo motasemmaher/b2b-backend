@@ -67,7 +67,6 @@ app.get('/user/login', (req, res) => {
 });
 
 app.post('/user/login', (req, res, next) => {
-    // console.log(req.body.username, req.body.password);
     // The HTTP 429 Too Many Requests response status code indicates the user has sent too many 
     // requests in a given amount of time ("rate limiting").        
     // A Retry-After header might be included to this 
