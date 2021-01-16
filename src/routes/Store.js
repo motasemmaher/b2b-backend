@@ -147,7 +147,7 @@ router.post('/user/manage-garage-owner/add-store', userAuthenticated, (req, res)
         const storeInfo = { ...req.body, userId: loggedUser._id };
         const storeValidationResult = store.validateStoreInfo(storeInfo);
         if (typeof storeValidationResult !== 'undefined')
-            res.status(400).send({ error: storeValidationResult.err });
+            res.status(400).send({ error: storeValidationResult.error });
         else {
             menu.createMenu()
                 .then(menuResult => {
@@ -215,7 +215,7 @@ router.put('/user/manage-garage-owner/update-store/:storeId', userAuthenticated,
                     const storeValidationResult = store.validateStoreInfo(storeInfo);
 
                     if (typeof storeValidationResult !== 'undefined')
-                        res.status(400).send({ error: storeValidationResult.err });
+                        res.status(400).send({ error: storeValidationResult.error });
                     else {
                         store.updateStore(storeInfo)
                             .then(storeResult => {

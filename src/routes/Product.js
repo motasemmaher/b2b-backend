@@ -280,9 +280,9 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
                                 const warehouseValidationResult = warehouse.validateWarehouseInfo({ amount: req.body.amount });
 
                                 if (typeof productValidationResult !== 'undefined')
-                                    res.status(400).send({ error: productValidationResult.err });
+                                    res.status(400).send({ error: productValidationResult.error });
                                 else if (typeof warehouseValidationResult !== 'undefined')
-                                    res.status(400).send({ error: warehouseValidationResult.err });
+                                    res.status(400).send({ error: warehouseValidationResult.error });
                                 else {
                                     garageOwner.getGarageOwnerByUserId(loggedUser._id)
                                         .then(garageOwnerResult => {
@@ -349,9 +349,9 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId', us
                                             const warehouseValidationResult = warehouse.validateWarehouseInfo({ amount: req.body.amount });
 
                                             if (typeof productValidationResult !== 'undefined')
-                                                res.status(400).send({ error: productValidationResult.err });
+                                                res.status(400).send({ error: productValidationResult.error });
                                             else if (typeof warehouseValidationResult !== 'undefined')
-                                                res.status(400).send({ error: warehouseValidationResult.err });
+                                                res.status(400).send({ error: warehouseValidationResult.error });
                                             else {
                                                 //Updating product
                                                 category.findCategoryById(categoryId)

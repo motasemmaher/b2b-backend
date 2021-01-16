@@ -346,7 +346,7 @@ router.put('/user/manage-user-info',userAuthenticated,(req, res) => {
         const userValidationResult = user.validateUserInfo(userInfo);
     
         if(typeof userValidationResult !== 'undefined')
-            res.status(400).send({error:userValidationResult.err});
+            res.status(400).send({error:userValidationResult.error});
         else
         {
             hashedPassword = hashPassword(userInfo.password);

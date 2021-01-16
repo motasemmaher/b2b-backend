@@ -29,9 +29,9 @@ router.post('/auth/garage-owner/create',upload.single('image'),(req, res) => {
     const storeValidationResult = store.validateStoreInfo(storeInfo);
     
     if(typeof userValidationResult !== 'undefined')
-        res.status(400).send({error:userValidationResult.err});
+        res.status(400).send({error:userValidationResult.error});
     else if(typeof storeValidationResult !== 'undefined')
-        res.status(400).send({error:storeValidationResult.err});
+        res.status(400).send({error:storeValidationResult.error});
     else
     {
         hashedPassword = hashPassword(userInfo.password);
@@ -119,9 +119,9 @@ router.post('/auth/car-owner/create', (req,res) => {
     const carValidationResult = car.validateCarInfo(carInfo);
     
     if(typeof userValidationResult !== 'undefined')
-        res.status(400).send({error:userValidationResult.err});
+        res.status(400).send({error:userValidationResult.error});
     else if(typeof carValidationResult !== 'undefined')
-        res.status(400).send({error:carValidationResult.err});
+        res.status(400).send({error:carValidationResult.error});
     else
     {
         hashedPassword = hashPassword(userInfo.password);

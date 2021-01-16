@@ -48,7 +48,7 @@ router.post('/user/manage-car-owner/add-car',userAuthenticated,(req, res) => {
         const carValidationResult = car.validateCarInfo(carInfo);
 
         if(typeof carValidationResult !== 'undefined')
-            res.status(400).send({error:carValidationResult.err});
+            res.status(400).send({error:carValidationResult.error});
         else
         {
             car.createCar(carInfo)
@@ -97,7 +97,7 @@ router.put('/user/manage-car-owner/update-car/:carId',userAuthenticated,(req, re
                 carInfo = {_id:carId,...req.body};    
                 const carValidationResult = car.validateCarInfo(carInfo);
                 if(typeof carValidationResult !== 'undefined')
-                    res.status(400).send({error:carValidationResult.err});
+                    res.status(400).send({error:carValidationResult.error});
                 else
                 {
                     car.updateCar(carInfo)

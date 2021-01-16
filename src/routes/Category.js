@@ -60,7 +60,7 @@ router.post('/stores/:storeId/create-category',userAuthenticated,(req,res) => {
             categoryInfo = {...req.body};
             const categoryValidationResult = category.validateCategoryInfo(categoryInfo);
             if(typeof categoryValidationResult !== 'undefined')
-                res.status(400).send({error:categoryValidationResult.err});
+                res.status(400).send({error:categoryValidationResult.error});
             else
             {
                 //Checking if there is a category with the provided name
@@ -123,7 +123,7 @@ router.put('/stores/:storeId/update-category/:categoryId',userAuthenticated,(req
             {
                 const categoryValidationResult = category.validateCategoryInfo(categoryInfo);
                 if(typeof categoryValidationResult !== 'undefined')
-                    res.status(400).send({error:categoryValidationResult.err});
+                    res.status(400).send({error:categoryValidationResult.error});
                 else
                 {
                     //Checking if there is a category with the name that the user provided in the update information

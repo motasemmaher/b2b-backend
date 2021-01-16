@@ -111,7 +111,7 @@ router.post('/stores/:storeId/offers/add-offer',userAuthenticated,(req,res) => {
                                                                            duration:productOffer['duration'],
                                                                            newPrice:newPrice});
                     if(typeof offerValidationResult !== 'undefined'){
-                        errors[productResult._id] = offerValidationResult.err;
+                        errors[productResult._id] = offerValidationResult.error;
                         return;
                     }
                     else

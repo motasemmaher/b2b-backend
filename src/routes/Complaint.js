@@ -80,7 +80,7 @@ router.post('/stores/:storeId/create-complaint',userAuthenticated,(req,res) => {
                     messageBody = req.body.message;
                     const messageValidationResult = message.validateMessageInfo({data:messageBody});
                     if(typeof messageValidationResult !== 'undefined')
-                        res.status(400).send({error:messageValidationResult.err});
+                        res.status(400).send({error:messageValidationResult.error});
                     else
                     {
                         message.createMessage(loggedUser._id,messageBody)
