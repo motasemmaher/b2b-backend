@@ -354,7 +354,7 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId', us
                                                 res.status(400).send({ error: warehouseValidationResult.err });
                                             else {
                                                 //Updating product
-                                                category.findCategoryByName(productInfo.categoryName)
+                                                category.findCategoryById(categoryId)
                                                     .then(categoryFindByNameResult => {
                                                         updatedProductInfo = { _id: productId, ...productInfo, categoryId: categoryFindByNameResult._id } // , image: req.file.path,
                                                         product.updateProduct(updatedProductInfo)
