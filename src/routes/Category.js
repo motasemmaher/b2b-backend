@@ -5,6 +5,8 @@ const {userAuthenticated} = require('../middleware/authentication');
 const category = require('../business/Objects').CATEGORY;
 const store = require('../business/Objects').STORE;
 const menu = require('../business/Objects').MENU;
+const product = require('../business/Objects').PRODUCT;
+const warehouse = require('../business/Objects').WAREHOUSE;
 
 //----------View Categories of a store and View a Category----------
 router.get('/stores/:storeId/categories/:categoryId?',(req,res) => {
