@@ -201,7 +201,7 @@ describe('Category Class Tests', () => {
   });
   */
  //--------------------------------------------------------------------------------------
- /*
+ 
   it('Adding product to category without errors.', (done) => {
     category.addProduct(existingCategoryId,testingProductId)
     .then(addResult => {
@@ -274,5 +274,5 @@ describe('Category Class Tests', () => {
     })
     .catch(err => done(err));
   });
-*/
+
 });

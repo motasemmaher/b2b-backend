@@ -131,8 +131,10 @@ router.get('/admin/view-users/:userId',userAuthenticated,(req,res) => {
 //----------Accepting waiting user----------
 router.put('/admin/waiting-users/accept/:userId',userAuthenticated,(req,res) => {
     loggedUser = req.user;
+    if(Object.keys(req.body).length === 0)
+        return res.status(400).send({error:"No data was sent!"});
     if(loggedUser.role !== "admin")
-        res.status(401).send({error:"Unauthorized user !"});
+        return res.status(401).send({error:"Unauthorized user !"});
     else
     {
         userId = req.params.userId;
@@ -302,8 +304,11 @@ router.delete('/admin/view-users/delete/:userId',userAuthenticated,(req,res) => 
 //----------Trusting Garage Owner----------
 router.put('/admin/view-users/trust/:userId',userAuthenticated,(req,res) => {
     loggedUser = req.user;
+
+    if(Object.keys(req.body).length === 0)
+        return res.status(400).send({error:"No data was sent!"});
     if(loggedUser.role !== "admin")
-        res.status(401).send({error:"Unauthorized user !"});
+        return res.status(401).send({error:"Unauthorized user !"});
     else
     {
         userId = req.params.userId;
@@ -336,7 +341,10 @@ router.put('/user/manage-user-info',userAuthenticated,(req, res) => {
     loggedUser = req.user;
     const userId = loggedUser._id;
     userInfo = {_id:userId,...req.body.user};    
-    
+
+    if(Object.keys(req.body).length === 0)
+        return res.status(400).send({error:"No data was sent!"});
+
     user.exists(userId)
     .then(getUserResult => {
     if(getUserResult == null)

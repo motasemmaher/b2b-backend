@@ -89,8 +89,10 @@ router.post('/stores/:storeId/offers/add-offer',userAuthenticated,(req,res) => {
     loggedUser = req.user;
     storeId = req.params.storeId;
 
+    if(Object.keys(req.body).length === 0)
+        return res.status(400).send({error:"No data was sent!"});
     if(loggedUser.role !== "garageOwner")
-        res.status(401).send({error:"Unauthorized user !"});
+        return res.status(401).send({error:"Unauthorized user !"});
     else
     {
         store.exists(storeId)

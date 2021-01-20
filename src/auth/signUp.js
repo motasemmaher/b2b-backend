@@ -22,9 +22,12 @@ function hashPassword(password)
 }
 //----------Creating garage owner----------
 router.post('/auth/garage-owner/create',upload.single('image'),(req, res) => {
+ 
+    if(Object.keys(req.body).length === 0)
+        return res.status(400).send({error:"No data was sent!"});
+
     userInfo = req.body.user;
     const storeInfo = req.body.store;
-
     const userValidationResult = user.validateUserInfo(userInfo);
     const storeValidationResult = store.validateStoreInfo(storeInfo);
     
@@ -112,9 +115,11 @@ router.post('/auth/garage-owner/create',upload.single('image'),(req, res) => {
 //----------Creating car owner----------
 router.post('/auth/car-owner/create', (req,res) => {
     
+    if(Object.keys(req.body).length === 0)
+        return res.status(400).send({error:"No data was sent!"});
+
     userInfo = req.body.user;
     const carInfo = req.body.car;
-
     const userValidationResult = user.validateUserInfo(userInfo);
     const carValidationResult = car.validateCarInfo(carInfo);
     

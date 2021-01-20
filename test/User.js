@@ -50,22 +50,23 @@ function prepareData (fullName,username,email,password,phoneNumber,address,role)
 }
 
 //Testing functions
-function test(result,fullName,username,email,phoneNumber,address,role)
+function test(result,fullName,username,email,phoneNumber,address,role,returnPass)
 {
     expect(result).to.contain.property('_id');
     expect(result).to.contain.property('fullName').to.equal(fullName);
     expect(result).to.contain.property('username').to.equal(username);
     expect(result).to.contain.property('email').to.equal(email);
-    expect(result).to.contain.property('password');
     expect(result).to.contain.property('phoneNumber').to.equal(phoneNumber);
     expect(result).to.contain.property('address').to.equal(address);
     expect(result).to.contain.property('role').to.equal(role);
+    if(returnPass)
+        expect(result).to.contain.property('password');
 }
 
-function testUpdated(userId,fullName,username,email,phoneNumber,address,role)
+function testUpdated(userId,fullName,username,email,phoneNumber,address,role,returnPass)
 {
     const getPromiseResult = USER.getUserById(userId);
-    getPromiseResult.then(getResult => {test(getResult,fullName,username,email,phoneNumber,address,role);});
+    getPromiseResult.then(getResult => {test(getResult,fullName,username,email,phoneNumber,address,role,returnPass);});
 }
 
 function testDeleted(userId)
@@ -302,24 +303,64 @@ describe('User Class Tests', () => {
         .catch(err => done(err));
     });
 
-
-/*
-    it("Checking if the email is already taken without errors (not taken)", (done) => {
-        USER.checkEmail("nonexisting@gmail.com")
-        .then(checkResult => {
-            
+    it("Checking if the username is already taken without errors (taken)", (done) => {
+        USER.checkUsername("carowner1")
+        .then(checkResult => {  
+            expect(checkResult).to.be.true;
+            done();
         })
         .catch(err => done(err));
     });
-*/
 
+    it("Checking if the username is already taken without errors (not taken)", (done) => {
+        USER.checkUsername("nonExistingUserName")
+        .then(checkResult => {
+            expect(checkResult).to.be.false;
+            done();
+        })
+        .catch(err => done(err));
+    });
 
+    it("Checking if the email is already taken without errors (taken)", (done) => {
+        USER.checkEmail("carowner1@gmail.com")
+        .then(checkResult => {  
+            expect(checkResult).to.be.true;
+            done();
+        })
+        .catch(err => done(err));
+    });
 
+    it("Checking if the email is already taken without errors (not taken)", (done) => {
+        USER.checkEmail("nonexisting@gmail.com")
+        .then(checkResult => {
+            expect(checkResult).to.be.false;
+            done();
+        })
+        .catch(err => done(err));
+    });
+
+    it("Checking if the phone number is already taken without errors (taken)", (done) => {
+        USER.checkPhone("0792924971")
+        .then(checkResult => {  
+            expect(checkResult).to.be.true;
+            done();
+        })
+        .catch(err => done(err));
+    });
+
+    it("Checking if the phone number is already taken without errors (not taken)", (done) => {
+        USER.checkPhone("0000000000")
+        .then(checkResult => {
+            expect(checkResult).to.be.false;
+            done();
+        })
+        .catch(err => done(err));
+    });
 
     it("Creating user without error", (done) => {
         USER.createUser(userInformation)
         .then(createResult => {
-            test(createResult,fullName,username,email,phoneNumber,address,"waitingUser");
+            test(createResult,fullName,username,email,phoneNumber,address,"waitingUser",true);
             USER.deleteUser(createResult._id)
             .then(deleteResult => {
                 done();
@@ -364,7 +405,7 @@ describe('User Class Tests', () => {
         .then(createResult => {
             USER.updateUser({_id:createResult._id,...updatedUserInformation})
             .then(updateResult => {
-                testUpdated(updateResult._id,updatedFullName,updatedUsername,updatedEmail,updatedPhoneNumber,updatedAddress,updatedRole)
+                testUpdated(updateResult._id,updatedFullName,updatedUsername,updatedEmail,updatedPhoneNumber,updatedAddress,updatedRole,true)
                 USER.deleteUser(updateResult._id)
                 .then(deleteResult => {
                     done();
@@ -399,7 +440,7 @@ describe('User Class Tests', () => {
     it("Getting user by id without errors.", (done) => {
         USER.getUserById(existingUserId)
         .then(getResult => {
-            test(getResult,"CarOwner","carowner1","carowner1@gmail.com","0792924971","Amman","carOwner");
+            test(getResult,"CarOwner","carowner1","carowner1@gmail.com","0792924971","Amman","carOwner",false);
             done();
         })
         .catch(err => done(err));
@@ -455,7 +496,7 @@ describe('User Class Tests', () => {
         .then(createResult => {
             USER.acceptWaitingUser(createResult._id)
             .then(acceptResult => {
-                testUpdated(acceptResult._id,fullName,username,email,phoneNumber,address,"garageOwner");
+                testUpdated(acceptResult._id,fullName,username,email,phoneNumber,address,"garageOwner",true);
                 USER.deleteUser(acceptResult._id._id)
                 .then(deleteResult => {
                     testDeleted(deleteResult._id);

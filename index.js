@@ -50,14 +50,17 @@ app.use(bodyParser.json({ limit: '5mb', extended: true }));
 app.use(bodyParser.urlencoded({
     limit: '5mb',
     extended: true
-}))
+}));
+
+
+
 //Setting-up CORS options
 // const corsOptions = {
 //     origin: 'http://localhost:8100',
 //     methods: "*",
 //     optionsSuccessStatus: 200
 // }
-app.use(cors())
+app.use(cors());
 
 // Login User 
 app.get('/user/login', (req, res) => {

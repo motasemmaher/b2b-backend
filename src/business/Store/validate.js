@@ -10,7 +10,7 @@ module.exports = {
             return "Invalid store name !";
         if(store.address === undefined || !validator.matches(store.address,/(^[\p{L}'-]{4,8}$)/ugi))
             return "Invalid store address !";
-        if(store.description === undefined || !validator.matches(store.description,/(^[\p{L}\d\s_\.'-]{8,512}$)/ugi))
+        if(store.description === undefined || !validator.matches(store.description,/(^[\p{L}\d\s_,\.'-]{8,512}$)/ugi))
             return "Invalid store description !";
         if(store.openTime === undefined || !validator.matches(store.openTime,/^(1[0-2]|0?[1-9]):([0-5]?[0-9]) [A-P]M$/))
             return "Invalid store open time !";

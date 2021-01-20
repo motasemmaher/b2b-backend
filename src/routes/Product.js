@@ -5,11 +5,13 @@ const imageToBase64 = require('image-to-base64');
 const { userAuthenticated } = require('../middleware/authentication');
 const limitAndSkipValidation = require('../shared/limitAndSkipValidation');
 
+
 const product = require('../business/Objects').PRODUCT;
 const store = require('../business/Objects').STORE;
 const warehouse = require('../business/Objects').WAREHOUSE;
 const category = require('../business/Objects').CATEGORY;
 const garageOwner = require('../business/Objects').GARAGEOWNER;
+
 
 validateProductType = function (productType) {
     if (["Part", "Accessory", "Service"].includes(productType) || productType === "all")
@@ -257,8 +259,10 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
     storeId = req.params.storeId;
     categoryId = req.params.categoryId;
 
+    if(Object.keys(req.body).length === 0)
+        return res.status(400).send({error:"No data was sent!"});
     if (loggedUser.role !== "garageOwner")
-        res.status(401).send({ error: "Unauthorized user !" });
+        return res.status(401).send({ error: "Unauthorized user !" });
     else {
         store.exists(storeId)
             .then(getStoreResult => {
@@ -275,7 +279,7 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
                             else {
                                 //Creating product
                                 productInfo = { ...req.body, storeId: storeId,  categoryId: categoryId }; // image: req.file.path,
-
+                                console.log(productInfo)
                                 const productValidationResult = product.validateProductInfo(productInfo);
                                 const warehouseValidationResult = warehouse.validateWarehouseInfo({ amount: req.body.amount });
 
@@ -320,8 +324,10 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId', us
     categoryId = req.params.categoryId;
     productId = req.params.productId;
 
+    if(Object.keys(req.body).length === 0)
+        return res.status(400).send({error:"No data was sent!"});
     if (loggedUser.role !== "garageOwner")
-        res.status(401).send({ error: "Unauthorized user !" });
+        return res.status(401).send({ error: "Unauthorized user !" });
     else {
         store.exists(storeId)
             .then(getStoreResult => {
@@ -357,6 +363,9 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId', us
                                                 category.findCategoryById(categoryId)
                                                     .then(categoryFindByNameResult => {
                                                         updatedProductInfo = { _id: productId, ...productInfo, categoryId: categoryFindByNameResult._id } // , image: req.file.path,
+                                                        if (garageOwnerResult.isTrusted)
+                                                            updatedProductInfo = { ...updatedProductInfo, tags: req.body.generalType + tags };
+                                                        
                                                         product.updateProduct(updatedProductInfo)
                                                             .then(productResult => {
                                                                 if (categoryFindByNameResult._id != categoryId) {
