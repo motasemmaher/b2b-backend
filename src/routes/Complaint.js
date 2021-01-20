@@ -61,8 +61,10 @@ router.post('/stores/:storeId/create-complaint',userAuthenticated,(req,res) => {
     const loggedUser = req.user;
     const storeId = req.params.storeId;
 
+    if(Object.keys(req.body).length === 0)
+        return res.status(400).send({error:"No data was sent!"});
     if(loggedUser.role !== "carOwner")
-        res.status(401).send({error:"Unauthorized user !"});
+        return res.status(401).send({error:"Unauthorized user !"});
     else
     {
         store.exists(storeId)

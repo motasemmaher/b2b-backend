@@ -140,8 +140,10 @@ router.get('/user/manage-garage-owner/stores', userAuthenticated, (req, res) => 
 router.post('/user/manage-garage-owner/add-store', userAuthenticated, (req, res) => { // upload.single('image'),
     const loggedUser = req.user;
 
+    if(Object.keys(req.body).length === 0)
+        return res.status(400).send({error:"No data was sent!"});
     if (loggedUser.role !== "garageOwner")
-        res.status(401).send({ error: "Unauthorized user !" });
+        return res.status(401).send({ error: "Unauthorized user !" });
     else {
         //const storeInfo = {...req.body,image:req.file.path,userId:loggedUser._id};
         const storeInfo = { ...req.body, userId: loggedUser._id };
@@ -199,8 +201,10 @@ router.put('/user/manage-garage-owner/update-store/:storeId', userAuthenticated,
     const loggedUser = req.user;
     storeId = req.params.storeId;
 
+    if(Object.keys(req.body).length === 0)
+        return res.status(400).send({error:"No data was sent!"});
     if (loggedUser.role !== "garageOwner")
-        res.status(401).send({ error: "Unauthorized user !" });
+        return res.status(401).send({ error: "Unauthorized user !" });
     else {
         store.exists(storeId)
             .then(getStoreResult => {

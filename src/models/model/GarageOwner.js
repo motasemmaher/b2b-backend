@@ -207,7 +207,7 @@ module.exports = {
     ,
     trustGarageOwner(value)
     {
-        const result = GarageOwnerModel.findOneAndUpdate({_id:value._id},{trusted:true},{ "useFindAndModify": false });
+        const result = GarageOwnerModel.findOneAndUpdate({_id:value._id},{isTrusted:true},{ "useFindAndModify": false });
         if (result)
             return result;
         else

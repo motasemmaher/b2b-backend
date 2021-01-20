@@ -16,7 +16,7 @@ module.exports = {
     },
     checkUsername(value)
     {
-        const result = UserModel.findOne({username: value.username},{id:1});
+        const result = UserModel.exists({username: value.username},{id:1});
         if (result)
             return result;
         else
@@ -27,7 +27,7 @@ module.exports = {
     ,
     checkPhone(value)
     {
-        const result = UserModel.findOne({phoneNumber: value.phone},{id:1});
+        const result = UserModel.exists({phoneNumber: value.phone},{id:1});
         if (result)
             return result;
         else
@@ -38,7 +38,7 @@ module.exports = {
     ,
     checkEmail(value)
     {
-        const result = UserModel.findOne({email: value.email},{id:1});
+        const result = UserModel.exists({email: value.email},{id:1});
         if (result)
             return result;
         else

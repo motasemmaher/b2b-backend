@@ -117,6 +117,8 @@ router.put('/:storeId/order/:orderId', userAuthenticated, (req, res) => {
 
     date = new Date();
 
+    if(Object.keys(req.body).length === 0)
+        return res.status(400).send({error:"No data was sent!"});
     if (userInfo.role === 'garageOwner') {
         garageOwner.getGarageOwnerByUserId(userInfo._id).then(gaOwner => {
             order.getOrder(orderId).then(retrivedOrder => {
@@ -321,6 +323,8 @@ router.put('/car-owner/maintain/:orderId', userAuthenticated, (req, res) => {
     const orderId = req.params.orderId;
     const deliveryAddress = req.body.deliveryAddress;
 
+    if(Object.keys(req.body).length === 0)
+        return res.status(400).send({error:"No data was sent!"});
     const phoneNumber = req.body.phoneNumber.toString();
     const isValidOrderInfo = orderInformationValidator.validateOrderInfo({
         phoneNumber: phoneNumber

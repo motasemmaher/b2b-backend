@@ -39,9 +39,10 @@ router.get('/user/manage-car-owner/cars/:carId?',userAuthenticated,(req, res) =>
 router.post('/user/manage-car-owner/add-car',userAuthenticated,(req, res) => {
 
     const loggedUser = req.user;
-
+    if(Object.keys(req.body).length === 0)
+        return res.status(400).send({error:"No data was sent!"});
     if(loggedUser.role !== "carOwner")
-        res.status(401).send({error:"Unauthorized user !"});
+        return res.status(401).send({error:"Unauthorized user !"});
     else
     {
         const carInfo = req.body;
@@ -72,14 +73,17 @@ router.post('/user/manage-car-owner/add-car',userAuthenticated,(req, res) => {
             .catch(err => res.status(500).send({error:"Error with creating car: "+err}));
         }    
     }
+    
 });
 //----------Update Car----------
 router.put('/user/manage-car-owner/update-car/:carId',userAuthenticated,(req, res) => {
     const loggedUser = req.user;
     const carId = req.params.carId;
 
+    if(Object.keys(req.body).length === 0)
+        return res.status(400).send({error:"No data was sent!"});
     if(loggedUser.role !== "carOwner")
-        res.status(401).send({error:"Unauthorized user !"});
+        return res.status(401).send({error:"Unauthorized user !"});
     else
     {
         car.exists(carId)
