@@ -101,9 +101,9 @@ router.post('/stores/:storeId/offers/add-offer',userAuthenticated,(req,res) => {
             res.status(401).send({error:"Error! The requested store doesn't belong to this garage owner."});
         else
         {
-            let errors;
+            let errors = {};
             productOffers = req.body.productOffers;
-            productOffers.forEach((productOffer,index,productOffers) => {
+            productOffers.forEach((productOffer,index) => {
                 product.getProductById(productOffer['productId'])
                 .then(productResult => {
                     newPrice = productResult.price - (productResult.price*(productOffer['discountRate']/100));

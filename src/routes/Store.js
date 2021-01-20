@@ -98,6 +98,21 @@ router.get('/stores/nearby', (req, res) => {
         })
         .catch(err => res.status(500).send({ error: "Error getting all nearby stores. " + err }));
 });
+//----------View Garage Owner's storesId----------
+router.get('/user/manage-garage-owner/stores/storesId', userAuthenticated, (req, res) => {
+    const loggedUser = req.user;
+    
+    if (loggedUser.role !== "garageOwner")
+    res.status(401).send({ error: "Unauthorized user !" });
+    else {
+        store.getStoresIdByUserId(loggedUser._id)
+        .then(storesResult => {
+            res.status(200).send({ storesId: storesResult });
+        })
+        .catch(err => res.status(500).send({ error: "Error with getting stores of the garageowner. " + err }));
+    }
+});
+
 //----------View Garage Owner's stores----------
 router.get('/user/manage-garage-owner/stores', userAuthenticated, (req, res) => {
     const loggedUser = req.user;

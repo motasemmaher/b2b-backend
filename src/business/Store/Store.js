@@ -75,6 +75,13 @@ module.exports = class Store {
         return promiseResult;
     }
 
+    getStoresIdByUserId(userId) {
+        const promiseResult = StoreModel.findStoresIdAndName({
+            userId: userId
+        });
+        return promiseResult;
+    }
+
     getFullStoresByUserId(userId, limit, skip) {
         const promiseResult = StoreModel.findStoresByUserId({
             userId: userId,
