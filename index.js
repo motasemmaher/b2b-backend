@@ -44,6 +44,8 @@ const limitAndSkipValidation = require('./src/shared/limitAndSkipValidation');
 
 //Setting-up express app
 //Setting-up path for the static files
+app.use(express.static(__dirname + '/public'));
+// app.use('/public', express.static('public'));0
 app.use('./public', express.static('uploads'));
 //Setting-up req body parser
 app.use(bodyParser.json({ limit: '5mb', extended: true }));
@@ -311,77 +313,6 @@ const adminReport = schedule.scheduleJob('0 0 1 * *', () => {
             error: "Error getting all the garage owners. " + err
         }));
 });
-
-app.get('/products/:productId?', (req, res) => {
-    let nameSort = parseInt(req.query.nameSort);
-    let priceSort = parseInt(req.query.priceSort);
-
-    if (req.params.productId == null) {
-        let skip = req.query.skip;
-        let limit = req.query.limit;
-        const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);
-        skip = limitAndSkipValues.skip;
-        limit = limitAndSkipValues.limit;
-
-        if (nameSort == null)
-            nameSort = 0;
-        if (priceSort == null)
-            priceSort = 0;
-
-        product.getAllProducts(limit, skip, nameSort, priceSort)
-            .then(productResults => {
-                product.countAll()
-                    .then(countResult => {
-                        // productsArray = productResults;
-                        return res.status(200).send({
-                            count: countResult,
-                            products: productResults,
-                        });
-                        // .forEach((productResult,index,productsArray) => {
-                        //     imageToBase64(productResult.image)
-                        //     .then(base64Image => {
-                        //     productResult.image = base64Image;       
-                        //     if(index  === productsArray.length - 1)
-                        //         res.send({productsCountByStore:countResult,products:productsArray});
-                        //     })
-                        //     .catch(err => {
-                        //         console.log({error:"Error converting image.    "+err})
-                        //         if (!res.headersSent)
-                        //         res.send({count:countResult,products:productsArray});
-                        //     });  
-                        //     }) //End of foreach
-                    })
-                // .catch((err => res.send({error:"Error getting count of all products. "+err})));
-            })
-            .catch(err => res.send({
-                error: "Error getting all products. " + err
-            }));
-    } else {
-        product.getProductById(req.params.productId)
-            .then(productResult => {
-                if (productResult == null)
-                    res.send({
-                        error: "Error! Didn't find a product with that id."
-                    });
-                else {
-                    return res.send(productResult);
-                    // imageToBase64(productResult.image)
-                    //     .then((base64Image) => {
-                    //         product.image = base64Image;
-                    //         res.send(productResult);
-                    //     })
-                    //     .catch(err => res.send({
-                    //         error: "Error converting image.    " + err
-                    //     }));
-                }
-            })
-            .catch(err => res.send({
-                error: "Error getting products of the requested category. " + err
-            }));
-    }
-
-});
-
 
 //--------------------Chat--------------------\\
 let userForChat = new Set();

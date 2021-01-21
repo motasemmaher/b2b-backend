@@ -238,18 +238,7 @@ module.exports = {
                 error: "Error in getStoresAssociatedWithGarageOwner"                
             };
     },
-
-    deleteAllStore() {
-        const result = StoreModel.deleteMany({});
-        
-        if (result)
-            return result;
-        else
-            return {
-                error: "Error with the getting Stores by user id"
-            };
-    },
-
+    
     getOrderFromeStore(value) {
         const result = StoreModel.findOne({
             _id: value._id

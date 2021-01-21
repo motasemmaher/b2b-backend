@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const {userAuthenticated} = require('../middleware/authentication');
+const {
+    userAuthenticated
+} = require('../middleware/authentication');
 const limitAndSkipValidation = require('../shared/limitAndSkipValidation');
 
 const product = require('../business/Objects').PRODUCT;
@@ -25,16 +27,30 @@ router.get('/:storeId/orders', userAuthenticated, (req, res) => {
 
     skip = limitAndSkipValues.skip;
     limit = limitAndSkipValues.limit;
-
+    let populateAllProducts = [];
     if (userInfo.role === 'garageOwner') {
         garageOwner.getGarageOwnerByUserId(userInfo._id).then(garageOwnerInfo => {
             if (garageOwnerInfo.stores.includes(storeId)) {
                 if (status) {
                     if (status === 'pending' || status === 'cancel' || status === 'delivered') {
-                        order.getOrdersByStoreIdAndStatus(storeId, status, limit, skip)
+                        order.getOrdersByStoreIdAndStatus(storeId, status, limit, skip).populate('shoppingCart')
                             .then(orders => {
                                 if (orders.length > 0) {
-                                    return res.send(orders);
+                                    orders.forEach((orderInfo, orderIndex) => {
+                                        orderInfo.shoppingCart.Items.forEach((cartItemId, cartIndex) => {
+                                            cartItem.getCartItem(cartItemId).populate('product').then(prod => {
+                                                populateAllProducts.push({
+                                                    order: orderInfo,
+                                                    product: prod.product
+                                                });
+                                                if (orderIndex === orders.length - 1) {
+                                                    return res.send(populateAllProducts);
+                                                }
+                                            });
+                                        });
+                                    });
+                                    // Promise.all(populateAllProducts).then(done => {
+                                    // });
                                 } else {
                                     return res.status(404).send({
                                         error: `Error_THERE_IS_NO_ORDERS_IN_THIS_STATUS_IN_YOUR_STORES`
@@ -43,13 +59,26 @@ router.get('/:storeId/orders', userAuthenticated, (req, res) => {
                             });
                     } else {
                         return res.status(400).send({
-                            error: 'error status is wrong it must be pending or cancel or delivered'
+                            error: 'ERROR_STATUS_IS_WRONG_IT_MUST_BE_PENDING_OR_CANCEL_OR_DELIVERED'
                         });
                     }
                 } else {
                     order.getOrdersByStoreId(storeId, limit, skip)
                         .then(orders => {
-                            return res.send(orders);
+                            orders.forEach((orderInfo, orderIndex) => {
+                                orderInfo.shoppingCart.Items.forEach((cartItemId, cartIndex) => {
+                                    cartItem.getCartItem(cartItemId).populate('product').then(prod => {
+                                        populateAllProducts.push({
+                                            order: orderInfo,
+                                            product: prod.product
+                                        });
+                                        if (orderIndex === orders.length - 1) {
+                                            return res.send(populateAllProducts);
+                                        }
+                                    });
+                                });
+                            });
+                            // return res.send(orders);
                         });
                 }
             } else {
@@ -75,7 +104,7 @@ router.get('/:storeId/order/:orderId', userAuthenticated, (req, res) => {
     const userInfo = req.user;
     const storeId = req.params.storeId;
     const orderId = req.params.orderId;
-
+    let populateAllProducts = [];
     if (userInfo.role === 'garageOwner') {
         garageOwner.getGarageOwnerByUserId(userInfo._id).then(garageOwnerInfo => {
             if (garageOwnerInfo.stores.includes(storeId)) {
@@ -83,7 +112,24 @@ router.get('/:storeId/order/:orderId', userAuthenticated, (req, res) => {
                     .populate('orders')
                     .then(storeInfo => {
                         if (storeInfo.orders.length > 0) {
-                            res.send(storeInfo.orders);
+                            storeInfo.orders.forEach((orderInfo, orderIndex) => {
+                                shoppingCart.getShoppingCart(orderInfo.shoppingCart).then(shoppingCartInfo => {
+                                    // res.send(shoppingCartInfo);
+                                    shoppingCartInfo.Items.forEach((cartItemId, cartIndex) => {
+                                        cartItem.getCartItem(cartItemId).populate('product').then(prod => {
+                                            populateAllProducts.push({
+                                                order: orderInfo,
+                                                product: prod.product
+                                            });
+                                            if (orderIndex === storeInfo.orders.length - 1) {
+                                                return res.send(populateAllProducts);
+                                            }
+                                        });
+                                    });
+                                });
+                            });
+
+                            // res.send(storeInfo.orders);
                         } else {
                             res.status(404).send({
                                 error: 'ERROR_ORDER_DOES_NOT_EXISTS'
@@ -123,62 +169,72 @@ router.put('/:storeId/order/:orderId', userAuthenticated, (req, res) => {
                 if (retrivedOrder.status === "pending") {
                     if ((date.getTime() - retrivedOrder.date.getTime()) >= 3600000) {
                         if (status === 'delivered' || status === 'cancel') {
-                        store.updateOrderStatus(storeId, orderId, status)
-                            .then(updatedOrderStatus => {
-                                shoppingCart.getShoppingCart(updatedOrderStatus.shoppingCart).populate('Items').then(retrivedSoppingCart => {
-                                    store.getStore(storeId).then(retrivedStore => {
-                                        retrivedSoppingCart.Items.forEach((item, index) => {
-                                            if (status === 'delivered') {
-                                                // warehouse.decreaseAmaountOfProduct(retrivedStore.warehouse, item.product, item.quantity).then(updatedWarehouse => {
-                                                if (index === retrivedSoppingCart.Items.length - 1) {
-                                                    report.addOrder(gaOwner.reportId, orderId).then(updatedReport => {
-                                                        res.status(200).send(updatedOrderStatus);
-                                                    }).catch(err => {
-                                                        res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
-                                                    });
-                                                }
-                                                // }).catch(err => {
-                                                //     res.status(400).send('There is no available quantity in this store');
-                                                // });
-                                            } else if (status === 'cancel') {
-                                                warehouse.increaseAmaountOfProduct(retrivedStore.warehouse, item.product, item.quantity).then(updatedWarehouse => {
-                                                    product.getProductById(item.product).then(retrivedProduct => {
-                                                        retrivedProduct[0].isInStock = true;
-                                                        product.updateProduct(retrivedProduct[0]).then(updatedProduct => {
-                                                            if (index === retrivedSoppingCart.Items.length - 1) {
-                                                                report.addCancelOrder(gaOwner.reportId, orderId).then(updatedReport => {
-                                                                    return res.status(200).send(updatedOrderStatus);
-                                                                }).catch(err => {
-                                                                    return res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
-                                                                });
-                                                            }
-                                                        })
-                                                        .catch(err => {
-                                                            return res.status(500).send({
-                                                                error: 'INTERNAL_SERVER_ERRORt'
+                            store.updateOrderStatus(storeId, orderId, status)
+                                .then(updatedOrderStatus => {
+                                    shoppingCart.getShoppingCart(updatedOrderStatus.shoppingCart).populate('Items').then(retrivedSoppingCart => {
+                                        store.getStore(storeId).then(retrivedStore => {
+                                            retrivedSoppingCart.Items.forEach((item, index) => {
+                                                if (status === 'delivered') {
+                                                    // warehouse.decreaseAmaountOfProduct(retrivedStore.warehouse, item.product, item.quantity).then(updatedWarehouse => {
+                                                    if (index === retrivedSoppingCart.Items.length - 1) {
+                                                        report.addOrder(gaOwner.reportId, orderId).then(updatedReport => {
+                                                            res.status(200).send(updatedOrderStatus);
+                                                        }).catch(err => {
+                                                            res.status(500).send({
+                                                                error: 'INTERNAL_SERVER_ERROR'
                                                             });
                                                         });
+                                                    }
+                                                    // }).catch(err => {
+                                                    //     res.status(400).send('There is no available quantity in this store');
+                                                    // });
+                                                } else if (status === 'cancel') {
+                                                    warehouse.increaseAmaountOfProduct(retrivedStore.warehouse, item.product, item.quantity).then(updatedWarehouse => {
+                                                        product.getProductById(item.product).then(retrivedProduct => {
+                                                            retrivedProduct[0].isInStock = true;
+                                                            product.updateProduct(retrivedProduct[0]).then(updatedProduct => {
+                                                                    if (index === retrivedSoppingCart.Items.length - 1) {
+                                                                        report.addCancelOrder(gaOwner.reportId, orderId).then(updatedReport => {
+                                                                            return res.status(200).send(updatedOrderStatus);
+                                                                        }).catch(err => {
+                                                                            return res.status(500).send({
+                                                                                error: 'INTERNAL_SERVER_ERROR'
+                                                                            });
+                                                                        });
+                                                                    }
+                                                                })
+                                                                .catch(err => {
+                                                                    return res.status(500).send({
+                                                                        error: 'INTERNAL_SERVER_ERRORt'
+                                                                    });
+                                                                });
                                                         }).catch(err => {
-                                                        return res.status(500).send({
-                                                            error: 'INTERNAL_SERVER_ERROR'
+                                                            return res.status(500).send({
+                                                                error: 'INTERNAL_SERVER_ERROR'
+                                                            });
                                                         });
-                                                    });
                                                     }).catch(err => {
                                                         return res.status(500).send({
                                                             error: 'INTERNAL_SERVER_ERROR'
                                                         });
-                                                    });                                                                                                    
-                                            }
-                                        })
+                                                    });
+                                                }
+                                            })
+                                        }).catch(err => {
+                                            res.status(404).send({
+                                                error: 'ERROR_STORE_DOES_NOT_EXIST'
+                                            });
+                                        });
                                     }).catch(err => {
-                                        res.status(404).send({ error:'ERROR_STORE_DOES_NOT_EXIST'});
+                                        res.status(404).send({
+                                            error: 'ERROR_SHOPPINGCART_DOES_NOT_EXIST'
+                                        });
                                     });
                                 }).catch(err => {
-                                    res.status(404).send({ error:'ERROR_SHOPPINGCART_DOES_NOT_EXIST'});
+                                    res.status(404).send({
+                                        error: 'ERROR_STORE_OR_ORDER_DOES_NOT_EXIST'
+                                    });
                                 });
-                            }).catch(err => {
-                                res.status(404).send({ error: 'ERROR_STORE_OR_ORDER_DOES_NOT_EXIST'});
-                            });
                         }
                     } else {
                         res.send({
@@ -191,7 +247,9 @@ router.put('/:storeId/order/:orderId', userAuthenticated, (req, res) => {
                     });
                 }
             }).catch(err => {
-                res.status(404).send({error: 'ERROR_ORDER_ID_IS_NOT_FOUND'});
+                res.status(404).send({
+                    error: 'ERROR_ORDER_ID_IS_NOT_FOUND'
+                });
             });
         });
     } else {
@@ -219,31 +277,45 @@ router.delete('/:storeId/order/:orderId', userAuthenticated, (req, res) => {
                                                             msg: "successfully deleted order"
                                                         });
                                                     }).catch(err => {
-                                                        res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
+                                                        res.status(500).send({
+                                                            error: 'INTERNAL_SERVER_ERROR'
+                                                        });
                                                     });
                                                 }).catch(err => {
-                                                    res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
+                                                    res.status(500).send({
+                                                        error: 'INTERNAL_SERVER_ERROR'
+                                                    });
                                                 });
                                             })
                                             .catch(err => {
-                                                res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
+                                                res.status(500).send({
+                                                    error: 'INTERNAL_SERVER_ERROR'
+                                                });
                                             });
                                     })
                                     .catch(err => {
-                                        res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
+                                        res.status(500).send({
+                                            error: 'INTERNAL_SERVER_ERROR'
+                                        });
                                     });
 
                             })
                             .catch(err => {
-                                res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
+                                res.status(500).send({
+                                    error: 'INTERNAL_SERVER_ERROR'
+                                });
                             });
                     })
                     .catch(err => {
-                        res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
+                        res.status(500).send({
+                            error: 'INTERNAL_SERVER_ERROR'
+                        });
                     });
             })
             .catch(err => {
-                res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
+                res.status(500).send({
+                    error: 'INTERNAL_SERVER_ERROR'
+                });
             });
     } else {
         res.status(401).send({
@@ -346,7 +418,9 @@ router.put('/car-owner/maintain/:orderId', userAuthenticated, (req, res) => {
                             order.updateOrder(retrivedOrder).then(updatedOrder => {
                                 res.send(updatedOrder);
                             }).catch(err => {
-                                res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
+                                res.status(500).send({
+                                    error: 'INTERNAL_SERVER_ERROR'
+                                });
                             });
                         } else {
                             res.status(500).send({
@@ -364,10 +438,14 @@ router.put('/car-owner/maintain/:orderId', userAuthenticated, (req, res) => {
                     });
                 }
             }).catch(err => {
-                res.status(404).send({error: 'ERROR_ORDER_ID_IS_NOT_FOUND'});
+                res.status(404).send({
+                    error: 'ERROR_ORDER_ID_IS_NOT_FOUND'
+                });
             });
         }).catch(err => {
-            res.status(404).send({error: 'ERROR_CAR_OWNER_IS_NOT_FOUND'});
+            res.status(404).send({
+                error: 'ERROR_CAR_OWNER_IS_NOT_FOUND'
+            });
         });
     } else {
         res.status(401).send({

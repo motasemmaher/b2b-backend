@@ -15,18 +15,19 @@ module.exports = {
         }
     },
 
-    updateCartItem(value) {
+        updateCartItem(value) {
         const result = CartItemModel.findOneAndUpdate({
             _id: value._id
         }, {
             $set: {
-                productId: value.productId,
+                product: value.productId,
                 quantity: value.quantity,
                 date: value.date,
                 totalPrice: value.totalPrice
             }
         }, {
-            "useFindAndModify": false
+            "useFindAndModify": false,
+            new: true
         });
 
         if (result) {
