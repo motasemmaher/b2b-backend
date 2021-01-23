@@ -11,7 +11,11 @@ let server = http.Server(app);
 // let io = socketIO(server, );
 
 
-
+let {
+    userForChat
+} = require('./chat');
+userForChat = userForChat || [];
+// let userForChat = getUserForChat();
 connection.connect()
     .then(() => {
         server.listen(PORT, () => {
@@ -19,9 +23,23 @@ connection.connect()
             //     console.log('user connected');
             // });
             const io = require('./socket').init(server);
-            io.on('connection', socket => {
-                console.log("dff");
-            })
+            io.on('connection', (socket) => {
+                // console.log('connected', socket)
+                userForChat.forEach(Element => {
+                    socket.on(Element, (message) => {
+                        chat.pushMessage(Element, message).then(result => {
+                            socket.broadcast.emit(Element, message);
+                        }).catch(err => {
+                            if (err) {
+                                // console.log(err)
+                                res.status(400).send({
+                                    error: err
+                                });
+                            }
+                        });
+                    });
+                });
+            });
             Promise.all([
                 permissions.createPermissions('carOwner'),
                 permissions.createPermissions('garageOwner'),
@@ -35,6 +53,6 @@ connection.connect()
             console.log(`Listening to server http://localhost:${PORT}`)
         });
     })
-    .catch (() => console.log("Didn't open port"));
+    .catch(() => console.log("Didn't open port"));
 
-    // zone-evergreen.js:2845 GET http://localhost:3000/socket.io/?EIO=3&transport=polling&t=NSliDjj 404 (Not Found)
+// zone-evergreen.js:2845 GET http://localhost:3000/socket.io/?EIO=3&transport=polling&t=NSliDjj 404 (Not Found)

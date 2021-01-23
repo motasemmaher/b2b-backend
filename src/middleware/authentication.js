@@ -3,7 +3,7 @@ module.exports = {
     userAuthenticated: function (req, res, next) {
     //    if (req.isAuthenticated()) {
             try {
-                const token = req.headers?.authorization?.split(' ')[0];   
+                const token = req.headers.authorization.split(' ')[0];   
                 // console.log(token); 
                 // console.log(req.headers);          
                 if (!token) return res.status(401).send({

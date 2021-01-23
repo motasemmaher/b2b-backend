@@ -39,11 +39,8 @@ app.use(session({
 require('./src/models/model');
 
 //Objects
-const product = require('./src/business/Objects').PRODUCT;
 const user = require('./src/business/Objects').USER;
 const garageOwner = require('./src/business/Objects').GARAGEOWNER;
-const contact = require('./src/business/Objects').CONTACT;
-const chat = require('./src/business/Objects').CHAT;
 const report = require('./src/business/Objects').REPORT;
 
 // validation by thaer
@@ -321,213 +318,12 @@ const adminReport = schedule.scheduleJob('0 0 1 * *', () => {
         }));
 });
 
-app.get('/products/:productId?', (req, res) => {
-    let nameSort = parseInt(req.query.nameSort);
-    let priceSort = parseInt(req.query.priceSort);
-
-    if (req.params.productId == null) {
-        let skip = req.query.skip;
-        let limit = req.query.limit;
-        const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);
-        skip = limitAndSkipValues.skip;
-        limit = limitAndSkipValues.limit;
-
-        if (nameSort == null)
-            nameSort = 0;
-        if (priceSort == null)
-            priceSort = 0;
-
-        product.getAllProducts(limit, skip, nameSort, priceSort)
-            .then(productResults => {
-                product.countAll()
-                    .then(countResult => {
-                        // productsArray = productResults;
-                        return res.status(200).send({
-                            count: countResult,
-                            products: productResults,
-                        });
-                        // .forEach((productResult,index,productsArray) => {
-                        //     imageToBase64(productResult.image)
-                        //     .then(base64Image => {
-                        //     productResult.image = base64Image;       
-                        //     if(index  === productsArray.length - 1)
-                        //         res.send({productsCountByStore:countResult,products:productsArray});
-                        //     })
-                        //     .catch(err => {
-                        //         console.log({error:"Error converting image.    "+err})
-                        //         if (!res.headersSent)
-                        //         res.send({count:countResult,products:productsArray});
-                        //     });  
-                        //     }) //End of foreach
-                    })
-                // .catch((err => res.send({error:"Error getting count of all products. "+err})));
-            })
-            .catch(err => res.send({
-                error: "Error getting all products. " + err
-            }));
-    } else {
-        product.getProductById(req.params.productId)
-            .then(productResult => {
-                if (productResult == null)
-                    res.send({
-                        error: "Error! Didn't find a product with that id."
-                    });
-                else {
-                    return res.send(productResult);
-                    // imageToBase64(productResult.image)
-                    //     .then((base64Image) => {
-                    //         product.image = base64Image;
-                    //         res.send(productResult);
-                    //     })
-                    //     .catch(err => res.send({
-                    //         error: "Error converting image.    " + err
-                    //     }));
-                }
-            })
-            .catch(err => res.send({
-                error: "Error getting products of the requested category. " + err
-            }));
-    }
-
-});
-
-
 //--------------------Chat--------------------\\
-let userForChat = new Set();
-
-
-app.get('/user/contacts', userAuthenticated, (req, res) => {
-    const userInfo = req.user;
-    contact.getContactByOwnerId(userInfo._id).then(results => {
-        if (results != null) {
-            results.contacts.forEach(Element => {
-                if (Element._id > results.ownerId) {
-                    userForChat.add(Element._id + "-" + results.ownerId)
-                } else {
-                    userForChat.add(results.ownerId + "-" + Element._id)
-                }
-            })
-        }
-        res.status(200).send(results);
-    }).catch(err => {
-        res.status(400).send({
-            error: err
-        });
-    });
-});
-
-app.delete('/user/contact', userAuthenticated, (req, res) => {
-    const userInfo = req.user;
-    contact.deleteOne(
-        userInfo._id
-    ).then(results => {
-        res.status(201).send(results);
-    }).catch(err => {
-        console.log(err);
-        res.status(400).send({
-            error: err
-        });
-    });
-});
-
-app.get('/user/chat/:contactID', userAuthenticated, (req, res) => {
-    let chatBetween = "";
-    const userInfo = req.user;
-    const contactId = req.params.contactID;
-    if (userInfo._id < contactId) {
-        chatBetween = contactId + "-" + userInfo._id
-    } else {
-        chatBetween = userInfo._id + "-" + contactId
-    }
-    chat.getChat(chatBetween).then(results => {
-        res.status(200).send(results);
-    }).catch(err => {
-        if (err) {
-            console.log(err);
-            res.status(400).send({
-                error: err
-            })
-        }
-    });
-});
-
-app.get('/user/chat/hasContactId/:subcontactId', userAuthenticated, (req, res) => {
-    const userInfo = req.user;
-    const subcontactId = req.params.subcontactId;
-    contact.getContactByOwnerIdAndSubContactId(userInfo._id, subcontactId).then(result => {
-        return res.status(200).send({
-            has: result ? true : false,
-        })
-    }).catch(err => {
-        if (err) {
-            return res.status(400).send({
-                error: err
-            })
-        }
-    });
-});
-
-app.post('/user/contact', userAuthenticated, (req, res) => {
-    let contactBetween = "";
-    const garageOwnerId = req.body.garageOwnerId;
-    const userInfo = req.user;
-    if (userInfo._id > garageOwnerId) {
-        contactBetween = userInfo._id + "-" + garageOwnerId
-    } else {
-        contactBetween = garageOwnerId + "-" + userInfo._id
-    }
-    contact.updateContact({
-        ownerId: userInfo._id,
-        name: req.body.storeName,
-        otherUserId: garageOwnerId
-    }).then(retrivedUserContact => {
-        contact.updateContact({
-            ownerId: garageOwnerId,
-            name: userInfo.userName,
-            otherUserId: userInfo._id
-        }).then(retrivedGarageOwnerContact => {
-            chat.createChat({
-                contactBetween
-            }).then(CreatedChat => {
-                userForChat.add(contactBetween)
-                res.status(200).send({ created: true });
-            }).catch(err => {
-                res.status(400).send({
-                    error: err
-                });
-            });
-        }).catch(err => {
-            res.status(400).send({
-                error: err
-            });
-        });
-    }).catch(err => {
-        res.status(400).send({
-            error: err
-        });
-    });
-});
 
 // const server = require('http').Server(app);
 // const io = require('socket.io')(server);
 
-// io.on('connection', (socket) => {
-//     console.log('connected', socket)
-//     // userForChat.forEach(Element => {
-//     //     socket.on(Element, (message) => {
-//     //         chat.pushMessage(Element, message).then(result => {
-//     //             socket.broadcast.emit(Element, message);
-//     //         }).catch(err => {
-//     //             if (err) {
-//     //                 console.log(err)
-//     //                 res.status(400).send({
-//     //                     error: err
-//     //                 });
-//     //             }
-//     //         });
-//     //     });
-//     // });
-// });
+
 
 
 
@@ -537,6 +333,7 @@ const orderRoute = require('./src/routes/Order');
 const searchRoute = require('./src/routes/Search');
 const permissionsRoute = require('./src/routes/Permissions');
 const carOwnerRoute = require('./src/routes/CarOwner');
+const chatRoute = require('./src/routes/Chat').router;
 
 // Use Routes
 app.use(shoppingCartRoute);
@@ -544,6 +341,7 @@ app.use(orderRoute);
 app.use(carOwnerRoute);
 app.use(searchRoute);
 app.use(permissionsRoute);
+app.use(chatRoute);
 
 carvaldation = require('./src/business/Car/validate')
 app.get("/test", (req, res) => {
