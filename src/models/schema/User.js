@@ -53,7 +53,7 @@ const User = new schema({
         type: String,
         require: true,
         enum: ["admin", "garageOwner", "carOwner", "waitingUser"]
-    }
+    },
 
 });
 

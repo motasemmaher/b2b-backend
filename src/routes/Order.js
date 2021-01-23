@@ -16,11 +16,10 @@ const garageOwner = require('../business/Objects').GARAGEOWNER;
 const report = require('../business/Objects').REPORT;
 
 //----------------------get Orders from Store----------------------\\
-router.get('/:storeId/orders', userAuthenticated, (req, res) => {
+router.get('/store/:storeId/orders', userAuthenticated, (req, res) => {
     const userInfo = req.user;
     const storeId = req.params.storeId;
     const status = req.query.status;
-
     let skip = req.query.skip;
     let limit = req.query.limit;
     const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);
@@ -38,14 +37,36 @@ router.get('/:storeId/orders', userAuthenticated, (req, res) => {
                                 if (orders.length > 0) {
                                     orders.forEach((orderInfo, orderIndex) => {
                                         orderInfo.shoppingCart.Items.forEach((cartItemId, cartIndex) => {
-                                            cartItem.getCartItem(cartItemId).populate('product').then(prod => {
-                                                populateAllProducts.push({
-                                                    order: orderInfo,
-                                                    product: prod.product
+                                            cartItem.getCartItem(cartItemId).populate('product').then(cartInfo => {
+                                                carOwner.getCarOwner(orderInfo.carOwnerId).populate('user').then(carOwnerInfo => {
+                                                    populateAllProducts.push({
+                                                        order: {
+                                                            _id: orderInfo._id,
+                                                            date: orderInfo.date,
+                                                            deliveryAddress: orderInfo.deliveryAddress,
+                                                            phoneNumber: orderInfo.phoneNumber,
+                                                            status: orderInfo.status,
+                                                            storeId: orderInfo.storeId,
+                                                            totalBill: orderInfo.shoppingCart.totalBill,
+                                                            quantity: cartInfo.quantity,
+                                                            carOwner: {
+                                                                fullName: carOwnerInfo.user.fullName,
+                                                                username: carOwnerInfo.user.username,
+                                                                email: carOwnerInfo.user.email
+                                                            },
+                                                            product: {
+                                                                _id: cartInfo.product._id,
+                                                                name: cartInfo.product.name,
+                                                                price: cartInfo.product.price,
+                                                                image: cartInfo.product.image,
+                                                                productType: cartInfo.product.productType,
+                                                            }
+                                                        }
+                                                    });
+                                                    if (orderIndex === orders.length - 1) {
+                                                        return res.send(populateAllProducts);
+                                                    }
                                                 });
-                                                if (orderIndex === orders.length - 1) {
-                                                    return res.send(populateAllProducts);
-                                                }
                                             });
                                         });
                                     });
@@ -67,14 +88,36 @@ router.get('/:storeId/orders', userAuthenticated, (req, res) => {
                         .then(orders => {
                             orders.forEach((orderInfo, orderIndex) => {
                                 orderInfo.shoppingCart.Items.forEach((cartItemId, cartIndex) => {
-                                    cartItem.getCartItem(cartItemId).populate('product').then(prod => {
-                                        populateAllProducts.push({
-                                            order: orderInfo,
-                                            product: prod.product
+                                    cartItem.getCartItem(cartItemId).populate('product').then(cartInfo => {
+                                        carOwner.getCarOwner(orderInfo.carOwnerId).populate('user').then(carOwnerInfo => {
+                                            populateAllProducts.push({
+                                                order: {
+                                                    _id: orderInfo._id,
+                                                    date: orderInfo.date,
+                                                    deliveryAddress: orderInfo.deliveryAddress,
+                                                    phoneNumber: orderInfo.phoneNumber,
+                                                    status: orderInfo.status,
+                                                    storeId: orderInfo.storeId,
+                                                    totalBill: orderInfo.shoppingCart.totalBill,
+                                                    quantity: cartInfo.quantity,
+                                                    carOwner: {
+                                                        fullName: carOwnerInfo.user.fullName,
+                                                        username: carOwnerInfo.user.username,
+                                                        email: carOwnerInfo.user.email
+                                                    },
+                                                    product: {
+                                                        _id: cartInfo.product._id,
+                                                        name: cartInfo.product.name,
+                                                        price: cartInfo.product.price,
+                                                        image: cartInfo.product.image,
+                                                        productType: cartInfo.product.productType,
+                                                    }
+                                                }
+                                            });
+                                            if (orderIndex === orders.length - 1) {
+                                                return res.send(populateAllProducts);
+                                            }
                                         });
-                                        if (orderIndex === orders.length - 1) {
-                                            return res.send(populateAllProducts);
-                                        }
                                     });
                                 });
                             });
@@ -99,7 +142,7 @@ router.get('/:storeId/orders', userAuthenticated, (req, res) => {
 });
 
 //----------------------get Order from Store----------------------\\
-router.get('/:storeId/order/:orderId', userAuthenticated, (req, res) => {
+router.get('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
 
     const userInfo = req.user;
     const storeId = req.params.storeId;
@@ -116,14 +159,37 @@ router.get('/:storeId/order/:orderId', userAuthenticated, (req, res) => {
                                 shoppingCart.getShoppingCart(orderInfo.shoppingCart).then(shoppingCartInfo => {
                                     // res.send(shoppingCartInfo);
                                     shoppingCartInfo.Items.forEach((cartItemId, cartIndex) => {
-                                        cartItem.getCartItem(cartItemId).populate('product').then(prod => {
-                                            populateAllProducts.push({
-                                                order: orderInfo,
-                                                product: prod.product
+                                        cartItem.getCartItem(cartItemId).populate('product').then(cartInfo => {
+                                            carOwner.getCarOwner(orderInfo.carOwnerId).populate('user').then(carOwnerInfo => {
+                                                populateAllProducts.push({
+                                                    order: {
+                                                        _id: orderInfo._id,
+                                                        date: orderInfo.date,
+                                                        deliveryAddress: orderInfo.deliveryAddress,
+                                                        phoneNumber: orderInfo.phoneNumber,
+                                                        status: orderInfo.status,
+                                                        storeId: orderInfo.storeId,
+                                                        totalBill: orderInfo.shoppingCart.totalBill,
+                                                        quantity: cartInfo.quantity,
+                                                        carOwner: {
+                                                            fullName: carOwnerInfo.user.fullName,
+                                                            username: carOwnerInfo.user.username,
+                                                            email: carOwnerInfo.user.email
+                                                        },
+                                                        product: {
+                                                            _id: cartInfo.product._id,
+                                                            name: cartInfo.product.name,
+                                                            price: cartInfo.product.price,
+                                                            image: cartInfo.product.image,
+                                                            productType: cartInfo.product.productType,
+                                                        }
+                                                    }
+                                                });
+                                                if (orderIndex === storeInfo.orders.length - 1) {
+                                                    return res.send(populateAllProducts);
+                                                }
                                             });
-                                            if (orderIndex === storeInfo.orders.length - 1) {
-                                                return res.send(populateAllProducts);
-                                            }
+
                                         });
                                     });
                                 });
@@ -154,7 +220,7 @@ router.get('/:storeId/order/:orderId', userAuthenticated, (req, res) => {
 });
 
 //----------------processing order (accept order by garage owner or cancel the order)----------------\\
-router.put('/:storeId/order/:orderId', userAuthenticated, (req, res) => {
+router.put('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
 
     const userInfo = req.user;
     const status = req.body.status;
@@ -260,7 +326,7 @@ router.put('/:storeId/order/:orderId', userAuthenticated, (req, res) => {
 });
 
 //-------------------removeOrder----------------------\\
-router.delete('/:storeId/order/:orderId', userAuthenticated, (req, res) => {
+router.delete('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
     const userInfo = req.user;
     const storeId = req.params.storeId;
     const orderId = req.params.orderId;
@@ -326,7 +392,6 @@ router.delete('/:storeId/order/:orderId', userAuthenticated, (req, res) => {
 
 router.get('/car-owner/orders', userAuthenticated, (req, res) => {
     const userInfo = req.user;
-
     let skip = req.query.skip;
     let limit = req.query.limit;
     const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);
@@ -334,11 +399,51 @@ router.get('/car-owner/orders', userAuthenticated, (req, res) => {
     skip = limitAndSkipValues.skip;
     limit = limitAndSkipValues.limit;
 
+    let populateAllProducts = [];
     if (userInfo.role === 'carOwner') {
         carOwner.getCarOwnerByUserId(userInfo._id).then(cOwner => {
             order.getOrderByCarOwnerId(cOwner._id, limit, skip)
                 .then(orders => {
-                    res.send(orders);
+                    orders.forEach((orderInfo, orderIndex) => {
+                        shoppingCart.getShoppingCart(orderInfo.shoppingCart).then(shoppingCartInfo => {
+                            // res.send(shoppingCartInfo);
+                            shoppingCartInfo.Items.forEach((cartItemId, cartIndex) => {
+                                cartItem.getCartItem(cartItemId).populate('product').then(cartInfo => {
+                                    carOwner.getCarOwner(orderInfo.carOwnerId).populate('user').then(carOwnerInfo => {
+                                        populateAllProducts.push({
+                                            order: {
+                                                _id: orderInfo._id,
+                                                date: orderInfo.date,
+                                                deliveryAddress: orderInfo.deliveryAddress,
+                                                phoneNumber: orderInfo.phoneNumber,
+                                                status: orderInfo.status,
+                                                storeId: orderInfo.storeId,
+                                                totalBill: orderInfo.shoppingCart.totalBill,
+                                                quantity: cartInfo.quantity,
+                                                carOwner: {
+                                                    fullName: carOwnerInfo.user.fullName,
+                                                    username: carOwnerInfo.user.username,
+                                                    email: carOwnerInfo.user.email
+                                                },
+                                                product: {
+                                                    _id: cartInfo.product._id,
+                                                    name: cartInfo.product.name,
+                                                    price: cartInfo.product.price,
+                                                    image: cartInfo.product.image,
+                                                    productType: cartInfo.product.productType,
+                                                }
+                                            }
+                                        });
+                                        if (orderIndex === orders.length - 1) {
+                                            return res.send(populateAllProducts);
+                                        }
+                                    });
+                                });
+                            });
+                        });
+                    });
+
+                    // res.send(orders);
                 })
                 .catch(err => {
                     res.status(404).send({
@@ -360,11 +465,48 @@ router.get('/car-owner/orders', userAuthenticated, (req, res) => {
 router.get('/car-owner/orders/:orderId', userAuthenticated, (req, res) => {
     const userInfo = req.user;
     const orderId = req.params.orderId;
+    let populateAllProducts = [];
     if (userInfo.role === 'carOwner') {
         carOwner.getCarOwnerByUserId(userInfo._id).then(cOwner => {
             carOwner.getOrder(cOwner._id, orderId).then(orderId => {
-                order.getOrder(orderId).then(retrivedOrder => {
-                    res.send(retrivedOrder);
+                order.getOrder(orderId).then(orderInfo => {
+                    shoppingCart.getShoppingCart(orderInfo.shoppingCart).then(shoppingCartInfo => {
+                        // res.send(shoppingCartInfo);
+                        shoppingCartInfo.Items.forEach((cartItemId, cartIndex) => {
+                            cartItem.getCartItem(cartItemId).populate('product').then(cartInfo => {
+                                carOwner.getCarOwner(orderInfo.carOwnerId).populate('user').then(carOwnerInfo => {
+                                    populateAllProducts.push({
+                                        order: {
+                                            _id: orderInfo._id,
+                                            date: orderInfo.date,
+                                            deliveryAddress: orderInfo.deliveryAddress,
+                                            phoneNumber: orderInfo.phoneNumber,
+                                            status: orderInfo.status,
+                                            storeId: orderInfo.storeId,
+                                            totalBill: orderInfo.shoppingCart.totalBill,
+                                            quantity: cartInfo.quantity,
+                                            carOwner: {
+                                                fullName: carOwnerInfo.user.fullName,
+                                                username: carOwnerInfo.user.username,
+                                                email: carOwnerInfo.user.email
+                                            },
+                                            product: {
+                                                _id: cartInfo.product._id,
+                                                name: cartInfo.product.name,
+                                                price: cartInfo.product.price,
+                                                image: cartInfo.product.image,
+                                                productType: cartInfo.product.productType,
+                                            }
+                                        }
+                                    });
+                                    if (cartIndex === shoppingCartInfo.Items.length - 1) {
+                                        return res.send(populateAllProducts);
+                                    }
+                                });
+                            });
+                        });
+                    });
+                    // res.send(OrderInfo);
                 }).catch(err => {
                     res.status(404).send({
                         error: 'ERROR_THIS_ORDER_IS_NOT_FOUND'

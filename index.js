@@ -36,7 +36,7 @@ const product = require('./src/business/Objects').PRODUCT;
 const user = require('./src/business/Objects').USER;
 const garageOwner = require('./src/business/Objects').GARAGEOWNER;
 const contact = require('./src/business/Objects').CONTACT;
-// const Chat = require('./src/business/Objects');
+const Chat = require('./src/business/Objects').CHAT;
 const report = require('./src/business/Objects').REPORT;
 
 // validation by thaer
@@ -107,7 +107,9 @@ app.post('/user/login', (req, res, next) => {
     }    
 });
 
-app.delete('/user/logout', (req, res) => {
+app.delete('/user/logout', userAuthenticated, (req, res) => {
+    // console.log(req.session.token)
+    // req.headers.authorization.split(' ')[0]
     req.session.token = null;
     res.send({sucess: true})
     // res.redirect('/user/login');
