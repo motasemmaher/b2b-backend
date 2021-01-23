@@ -1,7 +1,7 @@
 //Requiring packages
 const express = require("express");
-const bodyParser = require('body-parser');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const session = require('express-session');
 const bcrypt = require('bcrypt');
 const upload = require('./src/shared/imageUpload');
@@ -19,8 +19,15 @@ const {
 //Setting-up express app
 const app = express();
 require('dotenv').config()
-const server = require('http').Server(app);
-const io = require('socket.io')(server);
+
+
+
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "http://localhost:8100/");
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 
 //Setting-up session and authintication
 app.use(session({
@@ -36,7 +43,7 @@ const product = require('./src/business/Objects').PRODUCT;
 const user = require('./src/business/Objects').USER;
 const garageOwner = require('./src/business/Objects').GARAGEOWNER;
 const contact = require('./src/business/Objects').CONTACT;
-// const Chat = require('./src/business/Objects');
+const chat = require('./src/business/Objects').CHAT;
 const report = require('./src/business/Objects').REPORT;
 
 // validation by thaer
@@ -55,12 +62,12 @@ app.use(bodyParser.urlencoded({
 
 
 //Setting-up CORS options
-// const corsOptions = {
-//     origin: 'http://localhost:8100',
-//     methods: "*",
-//     optionsSuccessStatus: 200
-// }
-app.use(cors());
+const corsOptions = {
+    origin: 'http://localhost:8100',
+    methods: "*",
+    optionsSuccessStatus: 200
+}
+app.use(cors(corsOptions));
 
 // Login User 
 app.get('/user/login', (req, res) => {
@@ -104,12 +111,12 @@ app.post('/user/login', (req, res, next) => {
         res.send({
             msg: 'already logged in'
         });
-    }    
+    }
 });
 
 app.delete('/user/logout', (req, res) => {
     req.session.token = null;
-    res.send({sucess: true})
+    res.send({ sucess: true })
     // res.redirect('/user/login');
 });
 
@@ -224,7 +231,7 @@ const reportTransporter = nodemailer.createTransport({
 //----------Send garage owner report----------
 const garageOwnerReport = schedule.scheduleJob('0 0 1 * *', () => {
 
-        user.getAllUsersIdOfARole('garageOwner')
+    user.getAllUsersIdOfARole('garageOwner')
         .then(garageOwners => {
             garageOwners.forEach(garageOwnerId => {
                 user.getUserById(garageOwnerId._id)
@@ -388,54 +395,10 @@ app.get('/products/:productId?', (req, res) => {
 //--------------------Chat--------------------\\
 let userForChat = new Set();
 
-app.post('/user/contact/create', userAuthenticated, (req, res) => {
-    let chatBetween = "";
-    const garageOwnerId = req.body.garageOwnerId;
-    const userInfo = req.user;
-    if (userInfo._id > garageOwnerId) {
-        chatBetween = userInfo._id + "-" + garageOwnerId
-    } else {
-        chatBetween = garageOwnerId + "-" + userInfo._id
-    }
-    contact.updateContact({
-        ownerId: userInfo._id,
-        name: req.body.storeName,
-        otherUserId: garageOwnerId
-    }).then(retrivedUserContact => {
-        contact.updateContact({
-            ownerId: garageOwnerId,
-            name: req.body.userName,
-            otherUserId: userInfo._id
-        }).then(retrivedGarageOwnerContact => {
-            if (userInfo._id > garageOwnerId) {
-                userForChat.add(userInfo._id + "-" + garageOwnerId)
-            } else {
-                userForChat.add(garageOwnerId + "-" + userInfo._id)
-            }
-            chat.create({
-                contactBetween: chatBetween
-            }).then(CreatedChat => {
-                res.status(200).send(retrivedGarageOwnerContact);
-            }).catch(err => {
-                res.status(400).send({
-                    error: err
-                });
-            });
-        }).catch(err => {
-            res.status(400).send({
-                error: err
-            });
-        });
-    }).catch(err => {
-        res.status(400).send({
-            error: err
-        });
-    });
-});
 
-app.get('/user/contact/get', userAuthenticated, (req, res) => {
+app.get('/user/contacts', userAuthenticated, (req, res) => {
     const userInfo = req.user;
-    Contact.getContactByOwnerId(userInfo._id).then(results => {
+    contact.getContactByOwnerId(userInfo._id).then(results => {
         if (results != null) {
             results.contacts.forEach(Element => {
                 if (Element._id > results.ownerId) {
@@ -471,10 +434,10 @@ app.get('/user/chat/:contactID', userAuthenticated, (req, res) => {
     let chatBetween = "";
     const userInfo = req.user;
     const contactId = req.params.contactID;
-    if (contactId > userInfo._Id) {
-        chatBetween = contactId + "-" + userInfo._Id
+    if (userInfo._id < contactId) {
+        chatBetween = contactId + "-" + userInfo._id
     } else {
-        chatBetween = userInfo._Id + "-" + contactId
+        chatBetween = userInfo._id + "-" + contactId
     }
     chat.getChat(chatBetween).then(results => {
         res.status(200).send(results);
@@ -492,46 +455,81 @@ app.get('/user/chat/hasContactId/:subcontactId', userAuthenticated, (req, res) =
     const userInfo = req.user;
     const subcontactId = req.params.subcontactId;
     contact.getContactByOwnerIdAndSubContactId(userInfo._id, subcontactId).then(result => {
-        if (result.error) {
-            return res.status(200).send({
-                has: false
-            })
-        } else if (result) {
-            return res.status(200).send({
-                has: true
-            })
-        }
+        return res.status(200).send({
+            has: result ? true : false,
+        })
     }).catch(err => {
         if (err) {
-            console.log(err)
-            res.status(400).send({
+            return res.status(400).send({
                 error: err
             })
         }
     });
 });
 
-var chatIO = io.of('/user/chat/start')
-    .on('connection', (socket) => {
-        userForChat.forEach(Element => {
-            socket.on(Element, (message) => {
-                chat.pushMessage(Element, message).then(result => {
-                    socket.broadcast.emit(Element, message);
-                }).catch(err => {
-                    if (err) {
-                        console.log(err)
-                        res.status(400).send({
-                            error: err
-                        })
-                    }
+app.post('/user/contact', userAuthenticated, (req, res) => {
+    let contactBetween = "";
+    const garageOwnerId = req.body.garageOwnerId;
+    const userInfo = req.user;
+    if (userInfo._id > garageOwnerId) {
+        contactBetween = userInfo._id + "-" + garageOwnerId
+    } else {
+        contactBetween = garageOwnerId + "-" + userInfo._id
+    }
+    contact.updateContact({
+        ownerId: userInfo._id,
+        name: req.body.storeName,
+        otherUserId: garageOwnerId
+    }).then(retrivedUserContact => {
+        contact.updateContact({
+            ownerId: garageOwnerId,
+            name: userInfo.userName,
+            otherUserId: userInfo._id
+        }).then(retrivedGarageOwnerContact => {
+            chat.createChat({
+                contactBetween
+            }).then(CreatedChat => {
+                userForChat.add(contactBetween)
+                res.status(200).send({ created: true });
+            }).catch(err => {
+                res.status(400).send({
+                    error: err
                 });
-
             });
-
+        }).catch(err => {
+            res.status(400).send({
+                error: err
+            });
         });
-
+    }).catch(err => {
+        res.status(400).send({
+            error: err
+        });
     });
-    
+});
+
+// const server = require('http').Server(app);
+// const io = require('socket.io')(server);
+
+// io.on('connection', (socket) => {
+//     console.log('connected', socket)
+//     // userForChat.forEach(Element => {
+//     //     socket.on(Element, (message) => {
+//     //         chat.pushMessage(Element, message).then(result => {
+//     //             socket.broadcast.emit(Element, message);
+//     //         }).catch(err => {
+//     //             if (err) {
+//     //                 console.log(err)
+//     //                 res.status(400).send({
+//     //                     error: err
+//     //                 });
+//     //             }
+//     //         });
+//     //     });
+//     // });
+// });
+
+
 
 //Load Routes
 const shoppingCartRoute = require('./src/routes/ShoppingCart');
@@ -548,12 +546,11 @@ app.use(searchRoute);
 app.use(permissionsRoute);
 
 carvaldation = require('./src/business/Car/validate')
-app.get("/test",(req,res)=> {
+app.get("/test", (req, res) => {
     let model = req.body.model;
     let make = req.body.make;
     let year = req.body.year;
-    let result = carvaldation.validateCarInfo({model,make,year});
+    let result = carvaldation.validateCarInfo({ model, make, year });
     res.send(result);
 })
-
 module.exports = app;

@@ -120,7 +120,7 @@ module.exports = {
 
     findFullStores(value)
     {
-        const result = StoreModel.find({}).select('name , address , image , openTime , closeTime').skip(value.skip).limit(value.limit)//.pretty();
+        const result = StoreModel.find({}).select('name , address , image , openTime , closeTime, userId, garageOwnerId').skip(value.skip).limit(value.limit)//.pretty();
         if (result) 
             return result;
         else

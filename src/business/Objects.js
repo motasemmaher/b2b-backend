@@ -15,7 +15,7 @@ const ShoppingCart = require('./ShoppingCart/ShoppingCart');
 const CartItem = require('./CartItem/CartItem');
 const Order = require('./Order/Order');
 const Contact = require('./Contact/Contact');
-// const Chat = require('./Chat/Chat');
+const Chat = require('./Chat/Chat');
 const Report = require('./Report/Report');
 const Permissions = require('./Permissions/Permissions');
 
@@ -36,8 +36,8 @@ const SHOPPINGCART = new ShoppingCart();
 const CARTITEM = new CartItem();
 const ORDER = new Order();
 const CONTACT = new Contact();
-// const Chat = new 
+const CHAT = new Chat();
 const REPORT = new Report();
 const PERMISSIONS = new Permissions();
 
-module.exports = {USER,GARAGEOWNER,CAROWNER,STORE,WAREHOUSE,MENU,CATEGORY,PRODUCT,COMPLAINT,MESSAGE,OFFER,CAR,SHOPPINGCART, CARTITEM, ORDER, PERMISSIONS, REPORT, CONTACT};
+module.exports = {USER,GARAGEOWNER, CHAT,CAROWNER,STORE,WAREHOUSE,MENU,CATEGORY,PRODUCT,COMPLAINT,MESSAGE,OFFER,CAR,SHOPPINGCART, CARTITEM, ORDER, PERMISSIONS, REPORT, CONTACT};

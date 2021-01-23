@@ -34,8 +34,7 @@ module.exports = class Contact {
 
     getContactByOwnerIdAndSubContactId(ownerId, subContactId) {
         const result = ContactModel.getContactByOwnerIdAndSubContactId({
-            ownerId: ownerId,
-            subContactId: subContactId
+            ownerId, subContactId
         });
         return result;
     }

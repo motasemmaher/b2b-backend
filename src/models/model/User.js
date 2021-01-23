@@ -124,7 +124,7 @@ module.exports = {
 
     getUser(value) {
         const result = UserModel.findById({
-            _id: value._id
+            _id: value
         });
         if (result)
             return result;
