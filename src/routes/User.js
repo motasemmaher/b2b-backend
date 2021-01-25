@@ -26,7 +26,7 @@ const hrTransporter = nodemailer.createTransport({
 router.get('/admin/waiting-users',userAuthenticated,(req,res) => {
     loggedUser = req.user;
     if(loggedUser.role !== "admin")
-        res.status(401).send({error:"Unauthorized user !"});
+        return res.status(401).send({error:"Unauthorized user !"});
     else
     {
         let skip = req.query.skip;
@@ -41,20 +41,20 @@ router.get('/admin/waiting-users',userAuthenticated,(req,res) => {
             .then(waitingUsersResult => {
             user.countByRole('waitingUser')
                 .then(countResult => {
-                res.status(200).send({count:countResult,waitingUsers:waitingUsersResult});
+                 return res.status(200).send({count:countResult,waitingUsers:waitingUsersResult});
                 })
-                .catch(err => res.status(500).send({error:"Error getting the count of waiting users. "+err}))
+                .catch(err => {return res.status(500).send({error:"Error getting the count of waiting users. "+err})})
             })
-            .catch(err => res.status(500).send({error:"Error getting the waiting users. "+err}));
+            .catch(err => {return res.status(500).send({error:"Error getting the waiting users. "+err})});
         })
-        .catch(err => res.status(500).send({error:"Error getting the users of that role. "+err}));
+        .catch(err => {return res.status(500).send({error:"Error getting the users of that role. "+err})});
     }
 });
 //----------View users----------
 router.get('/admin/view-users/:userId',userAuthenticated,(req,res) => {
     loggedUser = req.user;
     if(loggedUser.role !== "admin")
-        res.status(401).send({error:"Unauthorized user !"});
+        return res.status(401).send({error:"Unauthorized user !"});
     else
     {
         if(req.params.userId == null)
@@ -73,22 +73,22 @@ router.get('/admin/view-users/:userId',userAuthenticated,(req,res) => {
                     .then(carOwnersResult => {
                     user.countAll()
                         .then(countResult => {
-                        res.status(200).send({count:countResult,garageOwners:garageOwnersResult,carOwners:carOwnersResult});
+                            return res.status(200).send({count:countResult,garageOwners:garageOwnersResult,carOwners:carOwnersResult});
                         })
-                        .catch(err => res.status(500).send({error:"Error getting the count of users. "+err}));
+                        .catch(err => {return res.status(500).send({error:"Error getting the count of users. "+err})});
                     })
-                    .catch(err => res.status(500).send({error:"Error getting the carOwners. "+err}));
+                    .catch(err => {return res.status(500).send({error:"Error getting the carOwners. "+err})});
                 })  
-                .catch(err => res.status(500).send({error:"Error getting the garageOwners. "+err}));
+                .catch(err => {return res.status(500).send({error:"Error getting the garageOwners. "+err})});
             })
-            .catch(err => res.status(500).send({error:"Error getting the users of that role. "+err}));
+            .catch(err => {return res.status(500).send({error:"Error getting the users of that role. "+err})});
         }
         else
         {
             user.exists(req.params.userId)
             .then(existResult => {
             if(existResult == null)
-                res.status(404).send({error:"Error! Didn't find a user with that id."});
+                return res.status(404).send({error:"Error! Didn't find a user with that id."});
             else
             {
                 garageOwner.getGarageOwnerByUserId(req.params.userId).populate("stores")
@@ -97,11 +97,10 @@ router.get('/admin/view-users/:userId',userAuthenticated,(req,res) => {
                 {
                     user.getUserById(req.params.userId)
                     .then(getUserResult => {
-                        res.status(200).send({user:getUserResult,garageOwnerInfo:garageOwnerResult})
+                        return res.status(200).send({user:getUserResult,garageOwnerInfo:garageOwnerResult})
                     })
-                    .catch(err => res.status(500).send({error:"Error with getting user with that user id."+err}));
+                    .catch(err => {return res.status(500).send({error:"Error with getting user with that user id."+err})});
                 }
-                    
                 else
                 {
                     carOwner.getCarOwnerByUserId(req.params.userId).populate("cars")
@@ -110,21 +109,20 @@ router.get('/admin/view-users/:userId',userAuthenticated,(req,res) => {
                     {
                         user.getUserById(req.params.userId)
                         .then(getUserResult => {
-                        res.status(200).send({user:getUserResult,carOwnerInfo:carOwnerResult})
+                            return res.status(200).send({user:getUserResult,carOwnerInfo:carOwnerResult})
                         })
-                        .catch(err => res.status(500).send({error:"Error with getting user with that user id."+err}));
+                        .catch(err => {return res.status(500).send({error:"Error with getting user with that user id."+err})});
                     }
                     else
-                        res.status(404).send({error:"Error ! Didn't find a garageOwner or a carOwner with that user id."});
+                        return res.status(404).send({error:"Error ! Didn't find a garageOwner or a carOwner with that user id."});
                     })
-                    .catch(err => res.status(500).send({error:"Error with getting carOwner with that user id."+err}));
+                    .catch(err => {return res.status(500).send({error:"Error with getting carOwner with that user id."+err})});
                 }
-
                 })
-                .catch(err => res.status(500).send({error:"Error with getting garageOwner with that user id."+err}));
+                .catch(err => {return res.status(500).send({error:"Error with getting garageOwner with that user id."+err})});
             }
             })
-            .catch(err => res.status(500).send({error:"Error with checking if the user exists. "+err}));
+            .catch(err => {return res.status(500).send({error:"Error with checking if the user exists. "+err})});
         }
     }
 });
@@ -141,7 +139,7 @@ router.put('/admin/waiting-users/accept/:userId',userAuthenticated,(req,res) => 
         user.exists(userId)
         .then(getUserResult => {
             if(getUserResult == null)
-                res.status(404).send({error:"Error! Didn't find a user with that id."});
+                return res.status(404).send({error:"Error! Didn't find a user with that id."});
             else
             {
                 user.acceptWaitingUser(userId)
@@ -162,29 +160,29 @@ router.put('/admin/waiting-users/accept/:userId',userAuthenticated,(req,res) => 
                     console.log('Email sent: ' + info.response); 
                 user.getUserById(acceptanceResult._id)
                     .then(acceptedUserResult => {
-                        res.status(200).send(acceptedUserResult);
+                        return res.status(200).send(acceptedUserResult);
                     })
-                    .catch(err => res.status(500).send({error:"Error with getting the accepted . "+err}));
+                    .catch(err => {return res.status(500).send({error:"Error with getting the accepted . "+err})});
                 });  
                 })
-                .catch(err => res.status(500).send({error:"Error accepting the waiting user. "+err}));
+                .catch(err => {return res.status(500).send({error:"Error accepting the waiting user. "+err})});
             }
         })
-        .catch(err => res.status(500).send({error:"Error getting user with that id. "+err}));
+        .catch(err => {return res.status(500).send({error:"Error getting user with that id. "+err})});
     }
 });
 //----------Rejecting waiting user----------
 router.delete('/admin/waiting-users/reject/:userId',userAuthenticated,(req,res) => {
     loggedUser = req.user;
     if(loggedUser.role !== "admin")
-        res.status(401).send({error:"Unauthorized user !"});
+        return res.status(401).send({error:"Unauthorized user !"});
     else
     {
         userId = req.params.userId;
         user.exists(userId)
         .then(getUserResult => {
             if(getUserResult == null)
-                res.status(404).send({error:"Error! Didn't find a user with that id."});
+                return res.status(404).send({error:"Error! Didn't find a user with that id."});
             else
             {
                 user.deleteUser(userId)
@@ -212,37 +210,37 @@ router.delete('/admin/waiting-users/reject/:userId',userAuthenticated,(req,res) 
                                         console.log(error);
                                     else
                                         console.log('Email sent: ' + info.response); 
-                                    res.status(200).send({success:true});  
+                                    return res.status(200).send({success:true});  
                                     });  
                                     })
-                                    .catch(err => res.status(500).send({error:"Error deleting the stores. "+err}));
+                                    .catch(err => {return res.status(500).send({error:"Error deleting the stores. "+err})});
                                 })    
-                                .catch(err => res.status(500).send({error:"Error deleting the warehouse. "+err}));
+                                .catch(err => {return res.status(500).send({error:"Error deleting the warehouse. "+err})});
                             })
-                            .catch(err => res.status(500).send({error:"Error deleting the menu. "+err}));
+                            .catch(err => {return res.status(500).send({error:"Error deleting the menu. "+err})});
                         })
-                        .catch(err => res.status(500).send({error:"Error getting the stores. "+err}));
+                        .catch(err => {return res.status(500).send({error:"Error getting the stores. "+err})});
                     })
-                    .catch(err => res.status(500).send({error:"Error deleting the garageOwner. "+err}));
+                    .catch(err => {return res.status(500).send({error:"Error deleting the garageOwner. "+err})});
                 })
-                .catch(err => res.status(500).send({error:"Error rejecting the waiting user. "+err}));
+                .catch(err => {return res.status(500).send({error:"Error rejecting the waiting user. "+err})});
             }
         })
-        .catch(err => res.status(500).send({error:"Error getting user with that id. "+err}));
+        .catch(err => {return res.status(500).send({error:"Error getting user with that id. "+err})});
     }
 });
 //----------Remove user----------
 router.delete('/admin/view-users/delete/:userId',userAuthenticated,(req,res) => {
     loggedUser = req.user;
     if(loggedUser.role !== "admin")
-        res.status(401).send({error:"Unauthorized user !"});
+        return res.status(401).send({error:"Unauthorized user !"});
     else
     {   
         userId = req.params.userId;
         user.exists(req.params.userId)
         .then(getUserResult => {
         if(getUserResult == null)
-            res.status(404).send({error:"Error! Didn't find a user with that id."});
+            return res.status(404).send({error:"Error! Didn't find a user with that id."});
         else
         {
             user.deleteUser(userId)
@@ -276,29 +274,29 @@ router.delete('/admin/view-users/delete/:userId',userAuthenticated,(req,res) => 
                                                 console.log(error);
                                             else
                                                 console.log('Email sent: ' + info.response); 
-                                            res.status(200).send({success:true});
+                                            return res.status(200).send({success:true});
                                             });  
                                             })
-                                            .catch(err => res.status(500).send({error:"Error deleting the stores. "+err}));
+                                            .catch(err => {return res.status(500).send({error:"Error deleting the stores. "+err})});
                                         })
-                                        .catch(err => res.status(500).send({error:"Error deleting the products of these categories. "+err}));
+                                        .catch(err => {return res.status(500).send({error:"Error deleting the products of these categories. "+err})});
                                     })
-                                    .catch(err => res.status(500).send({error:"Error deleting caegoriesof these stores. "+err}));
+                                    .catch(err => {return res.status(500).send({error:"Error deleting caegoriesof these stores. "+err})});
                                 })
-                                .catch(err => res.status(500).send({error:"Error getting category ids of these stores. "+err}));    
+                                .catch(err => {return res.status(500).send({error:"Error getting category ids of these stores. "+err})});    
                             })
-                            .catch(err => res.status(500).send({error:"Error deleting the warehouse. "+err}));
+                            .catch(err => {return res.status(500).send({error:"Error deleting the warehouse. "+err})});
                         })
-                        .catch(err => res.status(500).send({error:"Error deleting the menu. "+err}));
+                        .catch(err => {return res.status(500).send({error:"Error deleting the menu. "+err})});
                     })
-                    .catch(err => res.status(500).send({error:"Error getting the stores. "+err}));
+                    .catch(err => {return res.status(500).send({error:"Error getting the stores. "+err})});
                 })
-                .catch(err => res.status(500).send({error:"Error deleting the garageOwner. "+err}));
+                .catch(err => {return res.status(500).send({error:"Error deleting the garageOwner. "+err})});
             })
-            .catch(err => res.status(500).send({error:"Error rejecting the waiting user. "+err}));
+            .catch(err => {return res.status(500).send({error:"Error rejecting the waiting user. "+err})});
         }
     })
-    .catch(err => res.status(500).send({error:"Error getting user with that id. "+err}));
+    .catch(err => {return res.status(500).send({error:"Error getting user with that id. "+err})});
     }
 });
 //----------Trusting Garage Owner----------
@@ -315,7 +313,7 @@ router.put('/admin/view-users/trust/:userId',userAuthenticated,(req,res) => {
         user.exists(userId)
         .then(getUserResult => {
             if(getUserResult == null)
-                res.status(404).send({error:"Error! Didn't find a user with that id."});
+                return res.status(404).send({error:"Error! Didn't find a user with that id."});
             else
             {
                 garageOwner.getGarageOwnerByUserId(userId)
@@ -324,16 +322,16 @@ router.put('/admin/view-users/trust/:userId',userAuthenticated,(req,res) => {
                     .then(trustResult => {
                         garageOwner.getGarageOwnerByUserId(userId)
                         .then(updatedGarageOwnerResult => {
-                            res.status(200).send(updatedGarageOwnerResult);
+                            return res.status(200).send(updatedGarageOwnerResult);
                         })
-                        .catch(err => res.status(500).send({error:"Error getting updated garageOwner. "+err}));
+                        .catch(err => {return res.status(500).send({error:"Error getting updated garageOwner. "+err})});
                     })
-                    .catch(err => res.status(500).send({error:"Error trusting the garage owner. "+err}));
+                    .catch(err => {return res.status(500).send({error:"Error trusting the garage owner. "+err})});
                 })
-                .catch(err => res.status(500).send({error:"Error getting garageOwner by user id. "+err}));
+                .catch(err => {return res.status(500).send({error:"Error getting garageOwner by user id. "+err})});
             }
         })
-        .catch(err => res.status(500).send({error:"Error getting user with that id. "+err}));
+        .catch(err => {return res.status(500).send({error:"Error getting user with that id. "+err})});
     }
 });
 //----------Update User information----------
@@ -348,13 +346,13 @@ router.put('/user/manage-user-info',userAuthenticated,(req, res) => {
     user.exists(userId)
     .then(getUserResult => {
     if(getUserResult == null)
-        res.status(404).send({error:"Error! Didn't find a user with that id."})
+        return res.status(404).send({error:"Error! Didn't find a user with that id."})
     else
     {
         const userValidationResult = user.validateUserInfo(userInfo);
     
         if(typeof userValidationResult !== 'undefined')
-            res.status(400).send({error:userValidationResult.error});
+            return res.status(400).send({error:userValidationResult.error});
         else
         {
             hashedPassword = hashPassword(userInfo.password);
@@ -364,15 +362,15 @@ router.put('/user/manage-user-info',userAuthenticated,(req, res) => {
             .then(userResult => {
                 user.getUserById(userResult._id)
                 .then(updatedResult => {
-                    res.status(200).send(updatedResult);
+                    return res.status(200).send(updatedResult);
                 })
-                .catch(err => res.status(500).send({error:"Error with getting the updated User. "+err}));
+                .catch(err => {return res.status(500).send({error:"Error with getting the updated User. "+err})});
             })
-            .catch(err => res.status(500).send({error:"Error with updating User. "+err}));
+            .catch(err => {return res.status(500).send({error:"Error with updating User. "+err})});
         }
     }
     })
-    .catch(err => res.status(500).send({error:"Error with getting User. "+err}));
+    .catch(err => {return res.status(500).send({error:"Error with getting User. "+err})});
 });
 
 module.exports = router;

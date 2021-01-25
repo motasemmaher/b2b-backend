@@ -30,7 +30,7 @@ const Store = new schema({
         required: true,
         trim: true,
         minLength: 4,
-        maxlength: 8
+        maxlength: 9
     },
 
     image: {type: String},

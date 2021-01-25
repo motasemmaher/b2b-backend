@@ -1,9 +1,8 @@
 process.env.NODE_ENV = 'test';
-const Warehouse = require('../src/business/Warehouse/Warehouse');
 const expect = require('chai').expect;
 const connection = require('../connect');
+const warehouse = require('../src/business/Objects').WAREHOUSE;
 
-const warehouse = new Warehouse();
 
 //Carowner information
 let warehouseId = "5fd89fdf8b5299203ce67bc7";

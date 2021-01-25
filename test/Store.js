@@ -46,7 +46,7 @@ const invalidNameShort = "St1";
 const invalidNameFormat = "Testing Store @1";
 
 //Invalid store address
-const invalidAddressLong = new Array(10).join('A'); //Produces AAAAAAAAA
+const invalidAddressLong = new Array(11).join('A'); //Produces AAAAAAAAAA
 const invalidAddressShort = "Add";
 const invalidAddressFormat = "Amm@n";
 

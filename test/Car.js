@@ -1,9 +1,8 @@
 process.env.NODE_ENV = 'test';
-const Car = require('../src/business/Car/Car');
 const expect = require('chai').expect;
 const connection = require('../connect');
+const car = require('../src/business/Objects').CAR;
 
-const car = new Car();
 
 let existingCarId = "5fd866fc6add9a31e0779906";
 

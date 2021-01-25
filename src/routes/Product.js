@@ -50,7 +50,7 @@ router.get('/products/:productId?', (req, res) => {
                 product.countAll(type)
                     .then(countResult => {
                         // if(productsArray.length == 0)
-                        //     res.status(200).send({count:0,products:[]})
+                        //     return res.status(200).send({count:0,products:[]})
 
                         // productsArray = productResults;
                         // productsArray.forEach((productResult,index,productsArray) => {
@@ -58,34 +58,34 @@ router.get('/products/:productId?', (req, res) => {
                         //     .then(base64Image => {
                         //     productResult.image = base64Image;       
                         //     if(index  === productsArray.length - 1)
-                        res.status(200).send({ count: countResult || 0, products: productResults || [] });
+                        return res.status(200).send({ count: countResult || 0, products: productResults || [] });
                         //     })
                         //     .catch(err => {
                         //         console.log({error:"Error converting image.    "+err})
-                        //         if (!res.headersSent)
-                        //         res.status(200).send({count:countResult,products:productsArray});
+                        //         if (!return res.headersSent)
+                        //         return res.status(200).send({count:countResult,products:productsArray});
                         //     });  
                         //     }) //End of foreach
                     })
-                    .catch((err => res.status(500).send({ error: "Error getting count of all products. " + err })));
+                    .catch(err => {return res.status(500).send({ error: "Error getting count of all products. " + err })});
             })
-            .catch(err => res.status(500).send({ error: "Error getting all products. " + err }));
+            .catch(err => {return res.status(500).send({ error: "Error getting all products. " + err })});
     }
     else {
         product.getProductById(req.params.productId)
             .then(productResult => {
                 if (productResult == null)
-                    res.status(404).send({ error: "Error! Didn't find a product with that id." });
+                    return res.status(404).send({ error: "Error! Didn't find a product with that id." });
                 else {
                     // imageToBase64(productResult.image)
                     // .then((base64Image) => {
                     //     product.image = base64Image;
-                    res.status(200).send(productResult);
+                    return res.status(200).send(productResult);
                     // })
-                    // .catch(err => res.status(500).send({error:"Error converting image.    "+err}));
+                    // .catch(err => {return res.status(500).send({error:"Error converting image.    "+err})});
                 }
             })
-            .catch(err => res.status(500).send({ error: "Error getting productby id. " + err }));
+            .catch(err => {return res.status(500).send({ error: "Error getting productby id. " + err })});
     }
 
 });
@@ -116,7 +116,7 @@ router.get('/stores/:storeId/products/:productId?', (req, res) => {
     store.exists(storeId)
         .then(getStoreResult => {
             if (getStoreResult == null)
-                res.status(404).send({ error: "Error! Didn't find a store with thats id." });
+                returnres.status(404).send({ error: "Error! Didn't find a store with thats id." });
             else {
                 if (req.params.productId == null) {
                     product.getProductsOfStore(storeId, type, limit, skip, nameSort, priceSort)
@@ -137,33 +137,33 @@ router.get('/stores/:storeId/products/:productId?', (req, res) => {
                                     //     .catch(err => {
                                     //         console.log({error:"Error converting image.    "+err})
                                     //         if (!res.headersSent)
-                                    //         res.status(200).send({productsCountByStore:countResult,products:productsArray});
+                                    //         return res.status(200).send({productsCountByStore:countResult,products:productsArray});
                                     //     });  
                                     //     }) //End of foreach
                                 })
-                                .catch((err => res.status(500).send({ error: "Error getting count of products of the store. " + err })));
+                                .catch(err => {return res.status(500).send({ error: "Error getting count of products of the store. " + err })});
                         })
-                        .catch(err => res.status(500).send({ error: "Error getting products of the store. " + err }));
+                        .catch(err => {return res.status(500).send({ error: "Error getting products of the store. " + err })});
                 }
                 else {
                     product.getProductById(req.params.productId)
                         .then(productResult => {
                             if (productResult == null)
-                                res.status(404).send({ error: "Error! Didn't find a product with that id." });
+                                return res.status(404).send({ error: "Error! Didn't find a product with that id." });
                             else {
                                 // imageToBase64(productResult.image)
                                 // .then((base64Image) => {
                                 //     product.image = base64Image;
-                                res.send(productResult);
+                                return res.send(productResult);
                                 // })
-                                // .catch(err => res.status(500).send({error:"Error converting image.    "+err}));
+                                // .catch(err => {return res.status(500).send({error:"Error converting image.    "+err})});
                             }
                         })
-                        .catch(err => res.status(500).send({ error: "Error getting products of the requested category. " + err }));
+                        .catch(err => {return res.status(500).send({ error: "Error getting products of the requested category. " + err })});
                 }
             }
         })
-        .catch(err => res.status(500).send({ error: "Error getting the store. " + err }));
+        .catch(err => {return res.status(500).send({ error: "Error getting the store. " + err })});
 });
 //----------View products of a category and View Product----------
 router.get('/stores/:storeId/category/:categoryId/products/:productId?', (req, res) => {
@@ -196,12 +196,12 @@ router.get('/stores/:storeId/category/:categoryId/products/:productId?', (req, r
     store.getStoreById(storeId)
         .then(getStoreResult => {
             if (getStoreResult == null)
-                res.status(404).send({ error: "Error! Didn't find a store with thats id." });
+                return res.status(404).send({ error: "Error! Didn't find a store with thats id." });
             else {
                 category.findCategoryById(categoryId)
                     .then(getCategoryResult => {
                         if (getCategoryResult == null)
-                            res.status(404).send({ error: "Error! Didn't find a category with that id." });
+                            return res.status(404).send({ error: "Error! Didn't find a category with that id." });
                         else {
                             if (productId == null) {
                                 //Getting the products of that category
@@ -217,41 +217,41 @@ router.get('/stores/:storeId/category/:categoryId/products/:productId?', (req, r
                                                 // .then(base64Image => {
                                                 // productResult.image = base64Image;       
                                                 // if(index  === productsArray.length - 1)
-                                                res.status(200).send({ productsCountByStore: countResult, products: productsArray });
+                                                return res.status(200).send({ productsCountByStore: countResult, products: productsArray });
                                                 // })
                                                 // .catch(err => {
                                                 //     console.log({error:"Error converting image.    "+err})
                                                 //     if (!res.headersSent)
-                                                //         res.status(200).send({productsCountByStore:countResult,products:productsArray});
+                                                //         return res.status(200).send({productsCountByStore:countResult,products:productsArray});
                                                 // });  
                                                 // }) //End of foreach
                                             })
-                                            .catch((err => res.status(500).send({ error: "Error getting count of products of the category. " + err })));
+                                            .catch(err => {return res.status(500).send({ error: "Error getting count of products of the category. " + err })});
                                     })
-                                    .catch(err => res.status(500).send({ error: "Error getting products of the requested category. " + err }));
+                                    .catch(err => {return res.status(500).send({ error: "Error getting products of the requested category. " + err })});
                             }
                             else {
                                 product.getProductById(productId)
                                     .then(productResult => {
                                         if (productResult == null)
-                                            res.status(400).send({ error: "Error! Didn't find a product with that id." });
+                                            return res.status(400).send({ error: "Error! Didn't find a product with that id." });
                                         else {
                                             // imageToBase64(productResult.image)
                                             // .then((base64Image) => {
                                             // product.image = base64Image;
-                                            res.status(200).send(productResult);
+                                            return res.status(200).send(productResult);
                                             // })
-                                            // .catch(err => res.status(500).send({error:"Error converting image.    "+err}));
+                                            // .catch(err => {return res.status(500).send({error:"Error converting image.    "+err})});
                                         }
                                     })
-                                    .catch(err => res.status(500).send({ error: "Error getting products of the requested category. " + err }));
+                                    .catch(err => {return res.status(500).send({ error: "Error getting products of the requested category. " + err })});
                             }
                         }
                     })
-                    .catch(err => res.status(500).send({ error: "Error getting caetgory id. " + err }));
+                    .catch(err => {return res.status(500).send({ error: "Error getting caetgory id. " + err })});
             }
         })
-        .catch(err => res.status(500).send({ error: "Error getting the store. " + err }));
+        .catch(err => {return res.status(500).send({ error: "Error getting the store. " + err })});
 });
 //----------Create Product----------
 router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenticated, (req, res) => { //  upload.single('image'), 
@@ -267,31 +267,31 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
         store.exists(storeId)
             .then(getStoreResult => {
                 if (getStoreResult == null)
-                    res.status(404).send({ error: "Error! Didn't find a store with that id." });
+                    return res.status(404).send({ error: "Error! Didn't find a store with that id." });
                 else if (getStoreResult.userId != loggedUser._id)
-                    res.status(401).send({ error: "Error! The requested store doesn't belong to this garage owner." });
+                    return res.status(401).send({ error: "Error! The requested store doesn't belong to this garage owner." });
                 else {
                     //Checking if the category exists by it's ID
                     category.exists(categoryId)
                         .then(getCategoryResult => {
                             if (getCategoryResult == null)
-                                res.status(404).send({ error: "Error! Didn't find a category with that id." })
+                                return res.status(404).send({ error: "Error! Didn't find a category with that id." })
                             else {
                                 //Creating product
                                 productInfo = { ...req.body, storeId: storeId,  categoryId: categoryId }; // image: req.file.path,
-                                console.log(productInfo)
                                 const productValidationResult = product.validateProductInfo(productInfo);
                                 const warehouseValidationResult = warehouse.validateWarehouseInfo({ amount: req.body.amount });
 
                                 if (typeof productValidationResult !== 'undefined')
-                                    res.status(400).send({ error: productValidationResult.error });
+                                    return res.status(400).send({ error: productValidationResult.error });
                                 else if (typeof warehouseValidationResult !== 'undefined')
-                                    res.status(400).send({ error: warehouseValidationResult.error });
+                                    return res.status(400).send({ error: warehouseValidationResult.error });
                                 else {
                                     garageOwner.getGarageOwnerByUserId(loggedUser._id)
                                         .then(garageOwnerResult => {
                                             if (garageOwnerResult != null && garageOwnerResult.isTrusted)
                                                 productInfo = { ...productInfo, tags: req.body.generalType + tags };
+
                                             product.createProduct(productInfo)
                                                 .then(productResult => {
                                                     //Adding a ref of the product to the category
@@ -300,21 +300,21 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
                                                             //Adding the product and its quantity to the warehouse
                                                             warehouse.addProduct(storeId, productResult._id, categoryId, req.body.amount)
                                                                 .then(warehouseResult => {
-                                                                    res.status(200).send(productResult);
+                                                                    return res.status(200).send(productResult);
                                                                 })
-                                                                .catch(err => res.status(500).send({ error: "Error updating warehouse. " + err }));
+                                                                .catch(err => {return res.status(500).send({ error: "Error updating warehouse. " + err })});
                                                         })
-                                                        .catch(err => res.status(500).send({ error: "Error updating category. " + err }));
+                                                        .catch(err => {return res.status(500).send({ error: "Error updating category. " + err })});
                                                 })
-                                                .catch(err => res.status(500).send({ error: "Error creating product. " + err }));
+                                                .catch(err => {return res.status(500).send({ error: "Error creating product. " + err })});
                                         })
-                                        .catch(err => res.status(500).send({ error: "Error getting garageOwner by user id. " + err }));
+                                        .catch(err => {return res.status(500).send({ error: "Error getting garageOwner by user id. " + err })});
                                 }
                             }
-                        }).catch(err => res.status(500).send({ error: "Error getting category id. " + err }));
+                        }).catch(err => {return res.status(500).send({ error: "Error getting category id. " + err })});
                 }
             })
-            .catch(err => res.status(500).send({ error: "Error getting store id. " + err }));
+            .catch(err => {return res.status(500).send({ error: "Error getting store id. " + err })});
     }
 });
 //----------Update Product----------
@@ -332,20 +332,20 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId', us
         store.exists(storeId)
             .then(getStoreResult => {
                 if (getStoreResult == null)
-                    res.status(404).send({ error: "Error! Didn't find a store with that id." });
+                    return res.status(404).send({ error: "Error! Didn't find a store with that id." });
                 else if (getStoreResult.userId != loggedUser._id)
-                    res.status(401).send({ error: "Error! The requested store doesn't belong to this garage owner." });
+                    return res.status(401).send({ error: "Error! The requested store doesn't belong to this garage owner." });
                 else {
                     //Checking if the category exists by it's ID
                     category.exists(categoryId)
                         .then(getCategoryResult => {
                             if (getCategoryResult == null)
-                                res.status(404).send({ error: "Error! Didn't find a category with that id." })
+                                return res.status(404).send({ error: "Error! Didn't find a category with that id." })
                             else {
                                 product.exists(productId)
                                     .then(getProductResult => {
                                         if (getProductResult == null)
-                                            res.status(404).send({ error: "Error! Didn't find a product with that id." })
+                                            return res.status(404).send({ error: "Error! Didn't find a product with that id." })
                                         else {
                                             productInfo = { ...req.body }; //  image: req.file.path
                                             if (req.body.amount === 0)
@@ -355,9 +355,9 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId', us
                                             const warehouseValidationResult = warehouse.validateWarehouseInfo({ amount: req.body.amount });
 
                                             if (typeof productValidationResult !== 'undefined')
-                                                res.status(400).send({ error: productValidationResult.error });
+                                                return res.status(400).send({ error: productValidationResult.error });
                                             else if (typeof warehouseValidationResult !== 'undefined')
-                                                res.status(400).send({ error: warehouseValidationResult.error });
+                                                return res.status(400).send({ error: warehouseValidationResult.error });
                                             else {
                                                 //Updating product
                                                 category.findCategoryById(categoryId)
@@ -379,17 +379,17 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId', us
                                                                                                 .then(addProductToWarehouseResult => {
                                                                                                     product.getProductById(productId)
                                                                                                         .then(productFindResult => {
-                                                                                                            res.status(200).send(productFindResult);
+                                                                                                            return res.status(200).send(productFindResult);
                                                                                                         })
-                                                                                                        .catch(err => res.status(500).send({ error: "Error finding updated product.  " + err }))
+                                                                                                        .catch(err => {return res.status(500).send({ error: "Error finding updated product.  " + err })});
                                                                                                 })
-                                                                                                .catch(err => res.status(500).send({ error: "Error adding product to warehouse. " + err }));
+                                                                                                .catch(err => {return res.status(500).send({ error: "Error adding product to warehouse. " + err })});
                                                                                         })
-                                                                                        .catch(err => res.status(500).send({ error: "Error removing product from warehouse. " + err }));
+                                                                                        .catch(err => {return res.status(500).send({ error: "Error removing product from warehouse. " + err })});
                                                                                 })
-                                                                                .catch(err => res.status(500).send({ error: "Error adding product to category. " + err }));
+                                                                                .catch(err => {return res.status(500).send({ error: "Error adding product to category. " + err })});
                                                                         })
-                                                                        .catch(err => res.status(500).send({ error: "Error removing product from category. " + err }));
+                                                                        .catch(err => {return res.status(500).send({ error: "Error removing product from category. " + err })});
                                                                 }
                                                                 //wecan get rid of this if/else
                                                                 else {
@@ -399,28 +399,28 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId', us
                                                                                 .then(addProductToWarehouseResult => {
                                                                                     product.getProductById(productId)
                                                                                         .then(productFindResult => {
-                                                                                            res.status(200).send(productFindResult);
+                                                                                            return res.status(200).send(productFindResult);
                                                                                         })
-                                                                                        .catch(err => res.status(500).send({ error: "Error finding updated product.  " + err }))
+                                                                                        .catch(err => {return res.status(500).send({ error: "Error finding updated product.  " + err })})
                                                                                 })
-                                                                                .catch(err => res.status(500).send({ error: "Error adding product to warehouse. " + err }));
+                                                                                .catch(err => {return res.status(500).send({ error: "Error adding product to warehouse. " + err })});
                                                                         })
-                                                                        .catch(err => res.status(500).send({ error: "Error removing product from warehouse. " + err }));
+                                                                        .catch(err => {return res.status(500).send({ error: "Error removing product from warehouse. " + err })});
                                                                 }
                                                             })
-                                                            .catch(err => res.status(500).send({ error: "Error updating product. " + err }));
+                                                            .catch(err => {return res.status(500).send({ error: "Error updating product. " + err })});
                                                     })
-                                                    .catch(err => res.status(500).send({ error: "Couldn't find a category with that name. " + err }));
+                                                    .catch(err => {return res.status(500).send({ error: "Couldn't find a category with that name. " + err })});
                                             }
                                         }
                                     })
-                                    .catch(err => res.status(500).send({ error: "Error getting product by id.    " + err }));
+                                    .catch(err => {return res.status(500).send({ error: "Error getting product by id.    " + err })});
                             }
                         })
-                        .catch(err => res.status(500).send({ error: "Error getting category id. " + err }))
+                        .catch(err => {return res.status(500).send({ error: "Error getting category id. " + err })})
                 }
             })
-            .catch(err => res.status(500).send({ error: "Error getting store id. " + err }));
+            .catch(err => {return res.status(500).send({ error: "Error getting store id. " + err })});
     }
 });
 //----------Delete Product----------
@@ -431,25 +431,25 @@ router.delete('/stores/:storeId/category/:categoryId/delete-product/:productId',
     productId = req.params.productId;
 
     if (loggedUser.role !== "garageOwner")
-        res.status(401).send({ error: "Unauthorized user !" });
+        return res.status(401).send({ error: "Unauthorized user !" });
     else {
         store.exists(storeId)
             .then(getStoreResult => {
                 if (getStoreResult == null)
-                    res.status(404).send({ error: "Error! Didn't find a store with that id." });
+                    return res.status(404).send({ error: "Error! Didn't find a store with that id." });
                 else if (getStoreResult.userId != loggedUser._id)
-                    res.status(401).send({ error: "Error! The requested store doesn't belong to this garage owner." });
+                    return res.status(401).send({ error: "Error! The requested store doesn't belong to this garage owner." });
                 else {
                     //Checking if the category exists by it's ID
                     category.exists(categoryId)
                         .then(getCategoryResult => {
                             if (getCategoryResult == null)
-                                res.status(404).send({ error: "Error! Didn't find a category with that id." })
+                                return res.status(404).send({ error: "Error! Didn't find a category with that id." })
                             else {
                                 product.exists(productId)
                                     .then(getProductResult => {
                                         if (getProductResult == null)
-                                            res.status(404).send({ error: "Error! Didn't find a produt with that id." })
+                                            return res.status(404).send({ error: "Error! Didn't find a produt with that id." })
                                         else {
                                             //Deleting product
                                             product.deleteProduct(productId)
@@ -461,22 +461,22 @@ router.delete('/stores/:storeId/category/:categoryId/delete-product/:productId',
                                                             //Updating the warehouse
                                                             warehouse.removeProductFromWarehouse(storeId, productId)
                                                                 .then(warehouseResult => {
-                                                                    res.status(200).send({ success: true });
+                                                                    return res.status(200).send({ success: true });
                                                                 })
-                                                                .catch(err => res.status(500).send({ error: "Error updating warehouse. " + err }));
+                                                                .catch(err => {return res.status(500).send({ error: "Error updating warehouse. " + err })});
                                                         })
-                                                        .catch(err => res.status(500).send({ error: "Error updating category. " + err }));
+                                                        .catch(err => {return res.status(500).send({ error: "Error updating category. " + err })});
                                                 })
-                                                .catch(err => res.status(500).send({ error: "Error deleting product. " + err }));
+                                                .catch(err => {return res.status(500).send({ error: "Error deleting product. " + err })});
                                         }
                                     })
-                                    .catch(err => res.status(500).send({ error: "Error getting product by id.    " + err }));
+                                    .catch(err => {return res.status(500).send({ error: "Error getting product by id.    " + err })});
                             }
                         })
-                        .catch(err => res.status(500).send({ error: "Error getting category id. " + err }))
+                        .catch(err => {return res.status(500).send({ error: "Error getting category id. " + err })});
                 }
             })
-            .catch(err => res.status(500).send({ error: "Error getting store id. " + err }));
+            .catch(err => {return res.status(500).send({ error: "Error getting store id. " + err })});
     }
 });
 

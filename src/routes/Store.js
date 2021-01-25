@@ -73,7 +73,7 @@ router.get('/stores/nearby', (req, res) => {
     skip = limitAndSkipValues.skip;
     limit = limitAndSkipValues.limit;
 
-    store.getSameAddressStores(loggedUser.role, limit, skip)
+    store.getSameAddressStores(loggedUser.address, limit, skip)
         .then(storesResult => {
             store.countBySameAddress()
                 .then(countResult => {

@@ -42,14 +42,14 @@ router.get('/:storeId/orders', userAuthenticated, (req, res) => {
                                 }
                             });
                     } else {
-                        return res.status(400).send({
+                        res.status(400).send({
                             error: 'error status is wrong it must be pending or cancel or delivered'
                         });
                     }
                 } else {
                     order.getOrdersByStoreId(storeId, limit, skip)
                         .then(orders => {
-                            return res.send(orders);
+                            res.send(orders);
                         });
                 }
             } else {

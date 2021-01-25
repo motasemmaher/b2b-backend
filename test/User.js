@@ -37,7 +37,7 @@ const shortPhoneNumber="07929";
 const longPhoneNumber = "0792924975000";
 const invalidFormatPhoneNumber = "0007929249";
 //Invalid user address
-const longAddress = new Array(10).join('A'); //Produces AAAAAAAAA
+const longAddress = new Array(11).join('A'); //Produces AAAAAAAAAA
 const shortAddress = "Ad";
 const invalidFormatAddress = "Amm@n";
 //Invalid user role
