@@ -16,15 +16,14 @@ function test(result) {
     expect(result).to.contain.property('_id');
 }
 
-describe('ShoppingCart Class Tests', () => {
-
-
+describe('ShoppingCart Class Tests', () => {    
+    
     before((done) => {
         connection.connect()
             .then(() => done())
             .catch((err) => done(err));
     });
-
+/*
     it('Creating shoppingcart without errors.', (done) => {
         shoppingCart.createShoppingCart()
             .then(createResult => {
@@ -51,7 +50,8 @@ describe('ShoppingCart Class Tests', () => {
             .catch(err => done(err));
         });
        */
-    it('should get ShoppingCart', (done) => {
+  /*
+       it('should get ShoppingCart', (done) => {
         shoppingCart.getShoppingCart(shoppingCartId)
             .then(retrievedShoppingCart => {
                 expect(retrievedShoppingCart.Items).to.be.an('array').that.includes(cartItemId);
@@ -97,5 +97,5 @@ describe('ShoppingCart Class Tests', () => {
             })
             .catch(err => done(err));
     });
-
+*/
 });

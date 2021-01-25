@@ -4,16 +4,20 @@ module.exports = {
     
    validateProductInfo(product)
    {
-       if(!validator.matches(product.name,/(^[A-Z a-z \s\d-']{4,64}$)/))
+       console.log("General type inside validation: "+product.generalType)
+       if(product.name === undefined || !validator.matches(product.name,/(^[\p{L}\s\d'-]{4,64}$)/ugi))
               return "Invalid product name !";
-       if(!validator.matches(product.description,/(^[A-Z a-z \s\d-'\.]{8,254}$)/))  
+       if(product.description === undefined || !validator.matches(product.description,/(^[\p{L}\s\d',\.-]{8,254}$)/ugi))  
               return "Invalid product description !";
-       if(!validator.matches(product.price,/(^[\d\.]+$)/))
+       if(product.price === undefined || !validator.matches(product.price.toString(),/(^[\d\.]+$)/))
               return "Invalid product price !";
-       if(!validator.matches(product.tags,/(^[A-Z a-z\s\d-,']{2,256}$)/))
+       if(product.tags === undefined || !validator.matches(product.tags,/(^[\p{L}\s\d',-]{2,256}$)/ugi))
               return "Invalid category tags !";   
-       if(!["Part", "Accessory", "Service"].includes(product.productType))  
+       if(product.productType === undefined || !["Part", "Accessory", "Service"].includes(product.productType))  
               return "Invalid product type !";
+       if(product.generalType === undefined || !validator.matches(product.generalType,/(^[\p{L}\s\d'-]{4,64}$)/ugi))  
+              return "Invalid product general type !";
+
 
        return "pass";
    }

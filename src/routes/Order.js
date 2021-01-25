@@ -229,6 +229,10 @@ router.put('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
 
     date = new Date();
 
+    if (Object.keys(req.body).length === 0)
+        return res.status(400).send({
+            error: "No data was sent!"
+        });
     if (userInfo.role === 'garageOwner') {
         garageOwner.getGarageOwnerByUserId(userInfo._id).then(gaOwner => {
             order.getOrder(orderId).then(retrivedOrder => {
@@ -334,55 +338,53 @@ router.delete('/store/:storeId/order/:orderId', userAuthenticated, (req, res) =>
     if (userInfo.role === 'garageOwner') {
         garageOwner.getGarageOwnerByUserId(userInfo._id).then(owner => {
                 garageOwner.removeOrder(owner._id, storeId, orderId).then(updateGarageOwner => {
-                        order.getOrder(orderId).then(orderInfo => {
-                                carOwner.removeOrder(orderInfo.carOwnerId, orderId).then(updateCarOwner => {
-                                        order.deleteOrder(orderId).then(deletedOrder => {
-                                                shoppingCart.deleteShoppingCart(deletedOrder.shoppingCart).then(deletedShoppingCart => {
-                                                    cartItem.deleteAllCartItemsAssociatedWithShoppingCartId(deletedOrder.shoppingCart).then(deletedCartItem => {
-                                                        res.status(200).send({
-                                                            msg: "successfully deleted order"
-                                                        });
-                                                    }).catch(err => {
-                                                        res.status(500).send({
-                                                            error: 'INTERNAL_SERVER_ERROR'
-                                                        });
-                                                    });
-                                                }).catch(err => {
-                                                    res.status(500).send({
-                                                        error: 'INTERNAL_SERVER_ERROR'
-                                                    });
+                    order.getOrder(orderId).then(orderInfo => {
+                        carOwner.removeOrder(orderInfo.carOwnerId, orderId).then(updateCarOwner => {
+                                order.deleteOrder(orderId).then(deletedOrder => {
+                                        shoppingCart.deleteShoppingCart(deletedOrder.shoppingCart).then(deletedShoppingCart => {
+                                            cartItem.deleteAllCartItemsAssociatedWithShoppingCartId(deletedOrder.shoppingCart).then(deletedCartItem => {
+                                                res.status(200).send({
+                                                    msg: "successfully deleted order"
                                                 });
-                                            })
-                                            .catch(err => {
+                                            }).catch(err => {
                                                 res.status(500).send({
                                                     error: 'INTERNAL_SERVER_ERROR'
                                                 });
                                             });
+                                        }).catch(err => {
+                                            res.status(500).send({
+                                                error: 'INTERNAL_SERVER_ERROR'
+                                            });
+                                        });
                                     })
                                     .catch(err => {
                                         res.status(500).send({
                                             error: 'INTERNAL_SERVER_ERROR'
                                         });
                                     });
-
                             })
                             .catch(err => {
                                 res.status(500).send({
                                     error: 'INTERNAL_SERVER_ERROR'
                                 });
                             });
-                    })
-                    .catch(err => {
+                    }).catch(err => {
                         res.status(500).send({
                             error: 'INTERNAL_SERVER_ERROR'
                         });
                     });
+                }).catch(err => {
+                    res.status(500).send({
+                        error: 'INTERNAL_SERVER_ERROR'
+                    });
+                });
             })
             .catch(err => {
                 res.status(500).send({
                     error: 'INTERNAL_SERVER_ERROR'
                 });
             });
+
     } else {
         res.status(401).send({
             error: 'UNAUTHORIZED_USER'
@@ -461,6 +463,7 @@ router.get('/car-owner/orders', userAuthenticated, (req, res) => {
         });
     }
 });
+
 //------------------this method for retrived order to car owner------------------\\
 router.get('/car-owner/orders/:orderId', userAuthenticated, (req, res) => {
     const userInfo = req.user;
@@ -535,6 +538,10 @@ router.put('/car-owner/maintain/:orderId', userAuthenticated, (req, res) => {
     const orderId = req.params.orderId;
     const deliveryAddress = req.body.deliveryAddress;
 
+    if (Object.keys(req.body).length === 0)
+        return res.status(400).send({
+            error: "No data was sent!"
+        });
     const phoneNumber = req.body.phoneNumber.toString();
     const isValidOrderInfo = orderInformationValidator.validateOrderInfo({
         phoneNumber: phoneNumber

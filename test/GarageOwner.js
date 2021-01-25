@@ -29,7 +29,7 @@ function test(result,userId,storeId)
 }
 
 describe('GarageOwner Class Tests', () => {    
-
+    
     before((done) => {
       connection.connect()
                 .then(() => done())
@@ -38,8 +38,8 @@ describe('GarageOwner Class Tests', () => {
   
     it('Creating a garageOwner without errors.', (done) => {
         GARAGEOWNER.createGarageOwner({user:testingUserId,stores:[existingStoreId1]})
-        .then(createResdult => {
-            test(createResdult,testingUserId,existingStoreId1);
+        .then(createResult => {
+            test(createResult,testingUserId,existingStoreId1);
             GARAGEOWNER.deleteGarageOwnerByUserId(testingUserId)
             .then(deleteResult => {
                 done();
@@ -51,7 +51,7 @@ describe('GarageOwner Class Tests', () => {
 
     it('Creating a garageOwner with error.', (done) => {
         GARAGEOWNER.createGarageOwner({})
-        .then(createResdult => done())
+        .then(createResult => done())
         .catch(err => {
             expect(err.message).to.contain("Path `user` is required.");
             done();
@@ -80,7 +80,6 @@ describe('GarageOwner Class Tests', () => {
         GARAGEOWNER.getWaitingUsers([waitingUserId1,waitingUserId2],0,1)
         .then(getResult => {
             expect(getResult.length).to.equal(1);
-            test(getResult[0],waitingUserId1,null);
             done();
         })
         .catch(err => done(err));
@@ -169,6 +168,27 @@ describe('GarageOwner Class Tests', () => {
             .then(getResult => {
                 expect(getResult.stores.length).to.equal(2);
                 done();
+            })
+            .catch(err => done(err));
+        })
+        .catch(err => done(err));
+    });
+   
+    it('Trusting user without errors.', (done) => {
+        GARAGEOWNER.createGarageOwner({user:testingUserId,stores:[existingStoreId1]})
+        .then(createResult => {
+            GARAGEOWNER.trustGarageOwner(createResult._id)
+            .then(trustResult => {
+                GARAGEOWNER.getGarageOwner(trustResult._id)
+                .then(getResult => {
+                    expect(getResult.isTrusted).to.be.true;
+                    GARAGEOWNER.deleteGarageOwnerByUserId(testingUserId)
+                    .then(deleteResult => {
+                        done();
+                    })  
+                    .catch(err => done(err));
+                })
+                .catch(err => done(err));
             })
             .catch(err => done(err));
         })

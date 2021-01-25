@@ -166,6 +166,19 @@ module.exports =
     ,
     findProductsWithOffers(value)
     {
+        const result = ProductModel.find({offer: { $ne: null } })
+                                   .skip(value.skip).limit(value.limit)
+                                   .populate("offer");
+        
+        if(result)
+            return result;
+        else
+            return {
+                error: "Error with the getting all Products with offers"
+            };
+    },
+    findProductsWithOffersByStore(value)
+    {
         const result = ProductModel.find({ storeId:value.storeId,offer: { $ne: null } })
                                    .skip(value.skip).limit(value.limit)
                                    .populate("offer");
@@ -174,7 +187,7 @@ module.exports =
             return result;
         else
             return {
-                error: "Error with the getting all Products inside a category"
+                error: "Error with the getting products with offers of a store"
             };
     },
     addOffer(value) {
@@ -211,23 +224,6 @@ module.exports =
                 error: "Error with removing an offer to the product"
             };
     },
-    findProductsWithOffers(value) {
-        const result = ProductModel.find({
-                storeId: value.storeId,
-                offer: {
-                    $ne: null
-                }
-            })
-            .skip(value.skip).limit(value.limit)
-            .populate("offer");
-
-        if (result)
-            return result;
-        else
-            return {
-                error: "Error with getting products with offers"
-            };
-    },
     expiredOffers() {
         today = addDays(0);
         const result = ProductModel.where("offer").ne(null).populate({
@@ -258,25 +254,25 @@ module.exports =
             result = ProductModel.find({productType: {$in:type}})
                                  .skip(skip).limit(limit)
                                  .populate('offer')
-                                 .select('name price image offer description');                                     
+                                 .select('name price image offer description categoryId storeId');                                     
         else if (nameSort == 0 && priceSort != 0)
             result = ProductModel.find({productType: {$in:type}})
                                  .skip(skip).limit(limit)
                                  .sort({price:priceSort})
                                  .populate('offer')
-                                 .select('name price image offer description');                                     
+                                 .select('name price image offer description categoryId storeId');                                     
         else if (nameSort != 0 && priceSort == 0)
             result = ProductModel.find({productType: {$in:type}})
                                  .skip(skip).limit(limit)
                                  .sort({name:nameSort})
                                  .populate('offer')
-                                 .select('name price image offer description');                                     
+                                 .select('name price image offer description categoryId storeId');                                     
         else if (nameSort != 0 && priceSort != 0)
             result = ProductModel.find({productType: {$in:type}})
                                  .skip(skip).limit(limit)
                                  .sort({name:nameSort,price:priceSort})
                                  .populate('offer')
-                                 .select('name price image offer description');                                     
+                                 .select('name price image offer description categoryId storeId');                                     
         
         if(result)
             return result;
@@ -298,26 +294,26 @@ module.exports =
             result = ProductModel.find({storeId:value.storeId,productType: {$in:type}})
                                  .skip(skip).limit(limit)
                                  .populate('offer')
-                                 .select('name price image offer description');                                     
+                                 .select('name price image offer description categoryId storeId');                                     
         else if (nameSort == 0 && priceSort != 0)
             //result = ProductModel.find({storeId:value.storeId})
             result = ProductModel.find({storeId:value.storeId,productType: {$in:type}})
                                  .skip(skip).limit(limit)
                                  .sort({price:priceSort})
                                  .populate('offer')
-                                 .select('name price image offer description');                                     
+                                 .select('name price image offer description categoryId storeId');                                     
         else if (nameSort != 0 && priceSort == 0)
             result = ProductModel.find({storeId:value.storeId,productType: {$in:type}})
                                  .skip(skip).limit(limit)
                                  .sort({name:nameSort})
                                  .populate('offer')
-                                 .select('name price image offer description');    
+                                 .select('name price image offer description categoryId storeId');    
         else if (nameSort != 0 && priceSort != 0)
             result = ProductModel.find({storeId:value.storeId,productType: {$in:type}})
                                  .skip(skip).limit(limit)
                                  .sort({name:nameSort,price:priceSort})
                                  .populate('offer')
-                                 .select('name price image offer description');                                     
+                                 .select('name price image offer description categoryId storeId');                                     
         
         if(result)
             return result;
@@ -338,8 +334,15 @@ module.exports =
         const count = ProductModel.countDocuments({categoryId: value.categoryId,productType:{$in:type}});
         return count;
     },
-
     countByOffers(value) {
+        const count = ProductModel.countDocuments({
+            offer: {
+                $ne: null
+            }
+        });
+        return count;
+    },
+    countByOffersOfStore(value) {
         const count = ProductModel.countDocuments({
             storeId: value.storeId,
             offer: {

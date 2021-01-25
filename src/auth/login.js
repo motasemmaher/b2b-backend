@@ -46,7 +46,6 @@ module.exports = {
         //     },
         // async function (req, username, password, done) {
         const usernameIPkey = `${username}_${req.ip}`;
-        // console.log(usernameIPkey);
         let resUsernameAndIP;
         try {
             let retrySecs = 0;
@@ -76,7 +75,7 @@ module.exports = {
 
         } catch (err) {
             return {
-                err: err
+                error: err
             }
         }
         await User.findUserByUsername(username).then(async (user) => {
@@ -153,11 +152,9 @@ module.exports = {
                             username: user.username,
                             role: user.role
                         }
-                        // console.log(user._id);
                         const token = await jwt.sign(payload, process.env.token_pass, {
                             expiresIn: '1h'
                         });
-                        console.log(token);
                         //  (err, token) => {
                             // if (err) return {
                             //     user: null,                            

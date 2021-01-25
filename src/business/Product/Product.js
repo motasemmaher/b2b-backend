@@ -30,15 +30,13 @@ module.exports = class Product {
         return promiseResult;
     }
 
-    countByCategory(categoryId) {
-        const promiseResult = ProductModel.countByCategory({
-            categoryId: categoryId
-        });
+    countByOffers() {
+        const promiseResult = ProductModel.countByOffers();
         return promiseResult;
     }
 
-    countByOffers(storeId) {
-        const promiseResult = ProductModel.countByOffers({
+    countByOffersOfStore(storeId) {
+        const promiseResult = ProductModel.countByOffersOfStore({
             storeId: storeId
         });
         return promiseResult;
@@ -48,7 +46,7 @@ module.exports = class Product {
         const validationResult = ProductValidation.validateProductInfo(productInfo);
         if (validationResult !== "pass")
             return {
-                err: "Error: " + validationResult
+                error: "Error: " + validationResult
             };
     }
 
@@ -81,12 +79,20 @@ module.exports = class Product {
         return promiseResult;
     }
 
-    getProduct(categoryId) {
-        const promiseResult = ProductModel.getProduct({
+    /*
+    getProductsOfCategory(categoryId) {
+        const promiseResult = ProductModel.findProductsOfCategory({
             categoryId: categoryId
         });
         return promiseResult;
     }
+    */
+    getProductsOfCategory(categoryId,type,limit,skip,nameSort,priceSort)
+    {
+        const promiseResult = ProductModel.findProductsOfCategory({categoryId,type,skip,limit,nameSort,priceSort});
+        return promiseResult;
+    }
+
     deleteProductsOfCategoriesId(categoriesIds)
     {
         const promiseResult = ProductModel.deleteProductsOfCategoriesId({categoriesIds:categoriesIds});
@@ -108,8 +114,16 @@ module.exports = class Product {
         return promiseResult;
     }
 
-    getProductsWithOffers(storeId, limit, skip) {
+    getProductsWithOffers(limit, skip) {
         const promiseResult = ProductModel.findProductsWithOffers({
+            limit: limit,
+            skip: skip
+        });
+        return promiseResult;
+    }
+
+    getProductsWithOffersOfStore(storeId, limit, skip) {
+        const promiseResult = ProductModel.findProductsWithOffersByStore({
             storeId: storeId,
             limit: limit,
             skip: skip
@@ -117,15 +131,7 @@ module.exports = class Product {
         return promiseResult;
     }
 
-    getProductsWithOffers(storeId, limit, skip) {
-        const promiseResult = ProductModel.findProductsWithOffers({
-            storeId: storeId,
-            limit: limit,
-            skip: skip
-        });
-        return promiseResult;
-    }
-
+    /*
     getAllProducts(limit, skip, nameSort, priceSort) {
         const promiseResult = ProductModel.findAllProducts({
             limit: limit,
@@ -135,6 +141,7 @@ module.exports = class Product {
         });
         return promiseResult;
     }
+    */
 
     getAllProducts(type,limit,skip,nameSort,priceSort)
     {

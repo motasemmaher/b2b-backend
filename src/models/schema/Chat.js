@@ -12,18 +12,18 @@ const Chat = new schema({
         text: {
             require: true,
             type: String,
-            uique: true
+            // uique: true
         },
         date: {
             type: Date,
             default: Date.now
         },
-        files: [],
+        // files: [],
         // type: String,
         reply: String,
         user: {
             name: String,
-            avatar: String,
+            // avatar: String,
             receiver: String,
             sender: String
         }

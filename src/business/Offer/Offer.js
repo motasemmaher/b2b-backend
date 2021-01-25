@@ -12,7 +12,7 @@ module.exports = class Offer{
     {
         const validationResult = OfferValidation.validateOfferInfo(offer);
         if(validationResult !== "pass")
-            return {err:"Error: "+validationResult};
+            return {error:"Error: "+validationResult};
     }
 
     exists(offerId)
@@ -32,7 +32,7 @@ module.exports = class Offer{
         const promiseResult = OfferModel.deleteOffer({_id:offerId});
         return promiseResult;
     }
-
+/*
     removeExpiredOffers()
     {
         //----------Clear Offers----------
@@ -62,4 +62,5 @@ module.exports = class Offer{
             .catch(err => console.log("Error with getting expired offers. "+err));
         });
     }
+    */
 }

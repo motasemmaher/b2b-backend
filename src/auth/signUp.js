@@ -4,34 +4,15 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const upload = require('../shared/imageUpload');
 
-//Setting-up path for the static files
-router.use('./public', express.static('uploads'));
-//Setting-up req body parser
-router.use(bodyParser.json());
-router.use(bodyParser.urlencoded({
-    extended: true
-}))
-
-//Requiring classes
-const Warehouse = require('../business/Warehouse/Warehouse');
-const Menu = require('../business/Menu/Menu');
-const User = require('../business/User/User');
-const GarageOwner = require('../business/GarageOwner/GarageOwner');
-const CarOwner = require('../business/CarOwner/CarOwner');
-const Store = require('../business/Store/Store');
-const Car = require('../business/Car/Car');
-const ShoppingCart = require('../business/ShoppingCart/ShoppingCart');
-const Contact = require('../business/Contact/Contact');
 //Objects
-const user = new User();
-const garageOwner = new GarageOwner();
-const carOwner = new CarOwner();
-const store = new Store();
-const warehouse = new Warehouse();
-const menu = new Menu();
-const car = new Car();
-const shoppingCart = new ShoppingCart();
-const contact = new Contact();
+const user = require('../business/Objects').USER;
+const garageOwner = require('../business/Objects').GARAGEOWNER;
+const carOwner = require('../business/Objects').CAROWNER;
+const store = require('../business/Objects').STORE;
+const warehouse = require('../business/Objects').WAREHOUSE;
+const menu = require('../business/Objects').MENU;
+const car = require('../business/Objects').CAR;
+const shoppingCart = require('../business/Objects').SHOPPINGCART;
 
 //----------Hashing password----------
 function hashPassword(password) {
@@ -39,108 +20,114 @@ function hashPassword(password) {
     return hash;
 }
 //----------Creating garage owner----------
-router.post('/auth/garage-owner/create', upload.single('image'), (req, res) => {
+router.post('/auth/garage-owner/create',upload.single('image'),(req, res) => {
+ 
+    if(Object.keys(req.body).length === 0)
+        return res.status(400).send({error:"No data was sent!"});
+
     userInfo = req.body.user;
     const storeInfo = req.body.store;
-
     const userValidationResult = user.validateUserInfo(userInfo);
     const storeValidationResult = store.validateStoreInfo(storeInfo);
-
-    if (typeof userValidationResult !== 'undefined')
-        res.send(userValidationResult.err);
-    else if (typeof storeValidationResult !== 'undefined')
-        res.send(storeValidationResult.err);
-    else {
+    
+    if(typeof userValidationResult !== 'undefined')
+        res.status(400).send({error:userValidationResult.error});
+    else if(typeof storeValidationResult !== 'undefined')
+        res.status(400).send({error:storeValidationResult.error});
+    else
+    {
         hashedPassword = hashPassword(userInfo.password);
-        userInfo = {
-            ...userInfo,
-            password: hashedPassword,
-            role: "waitingUser"
-        };
-
-        user.createUser(userInfo)
-            .then(userResult => {
-                menu.createMenu()
-                    .then(menuResult => {
+        userInfo = {...userInfo,password:hashedPassword,role:"waitingUser"};
+        
+        user.checkUsername(userInfo.username)
+        .then(usernameCheckResult => {
+        if(usernameCheckResult != null)
+            res.status(400).send({error:"Error! The username you entered is already in use by another user."});
+        else
+        {
+            user.checkEmail(userInfo.email)
+            .then(emailCheckResult => {
+            if(emailCheckResult != null)
+                res.status(400).send({error:"Error! The email you entered is already in use by another user."});
+            else
+            {
+                user.checkPhone(userInfo.phoneNumber)
+                .then(phoneNumberCheckResult => {
+                if(phoneNumberCheckResult != null)
+                    res.status(400).send({error:"Error! The phone number you entered is already in use by another user."});
+                else
+                {
+                    user.createUser(userInfo)
+                    .then(userResult => {
+                    menu.createMenu()
+                        .then(menuResult =>{
                         warehouse.createWarehouse()
-                            .then(warehouseResult => {
-                                store.createStore({
-                                        ...storeInfo,
-                                        userId: userResult._id,
-                                        menu: menuResult,
-                                        warehouse: warehouseResult
-                                    }) //,image:req.file.path
-                                    .then(storeResult => {
-                                        garageOwner.createGarageOwner({
-                                                user: userResult,
-                                                stores: [storeResult]
-                                            })
-                                            .then(garageOwnerResult => {
-                                                warehouse.linkWarehouse({
-                                                    _id: warehouseResult._id,
-                                                    storeId: storeResult._id
-                                                });
-                                                menu.linkMenu({
-                                                    _id: menuResult._id,
-                                                    storeId: storeResult._id
-                                                });
-                                                contact.createContact({
-                                                    ownerId: userResult._id
-                                                }).then(createdContact => {
-                                                    res.send("Successfully created GarageOwner (waiting user)");
-                                                }).catch(err => {
-                                                    user.deleteUser(userResult._id);
-                                                    menu.deleteMenu(menuResult._id);
-                                                    warehouse.deleteWarehouse(warehouseResult._id);
-                                                    store.deleteStore(storeResult._id);
-                                                    res.send("Error with creating GarageOwner: " + err);
-                                                });
-                                            })
-                                            .catch(err => {
-                                                user.deleteUser(userResult._id);
-                                                menu.deleteMenu(menuResult._id);
-                                                warehouse.deleteWarehouse(warehouseResult._id);
-                                                store.deleteStore(storeResult._id);
-                                                res.send("Error with creating GarageOwner: " + err);
-                                            });
+                            .then(warehouseResult =>{
+                            store.createStore({...storeInfo,userId:userResult._id,menu:menuResult,warehouse:warehouseResult})//,image:req.file.path
+                                .then(storeResult => {
+                                garageOwner.createGarageOwner({user:userResult,stores:[storeResult]})
+                                    .then(garageOwnerResult => {
+                                    warehouse.linkWarehouse({_id:warehouseResult._id,storeId:storeResult._id});
+                                    menu.linkMenu({_id:menuResult._id,storeId:storeResult._id});
+                                    res.status(200).send({created:true,message:"SUCCESSFULLY_CREATED_GARAGEOWNER_(WAITING_USER)"});
                                     })
                                     .catch(err => {
-                                        user.deleteUser(userResult._id);
-                                        menu.deleteMenu(menuResult._id);
-                                        warehouse.deleteWarehouse(warehouseResult._id);
-                                        res.send("Error with creating Store: " + err);
+                                    user.deleteUser(userResult._id);
+                                    menu.deleteMenu(menuResult._id);
+                                    warehouse.deleteWarehouse(warehouseResult._id);
+                                    store.deleteStore(storeResult._id);
+                                    res.status(500).send({error:"Error with creating GarageOwner: "+err});
                                     });
-                            })
-                            .catch(err => {
+                                })    
+                                .catch(err =>{
                                 user.deleteUser(userResult._id);
                                 menu.deleteMenu(menuResult._id);
-                                res.send("Error with creating Warehouse: " + err);
+                                warehouse.deleteWarehouse(warehouseResult._id);
+                                res.status(500).send({error:"Error with creating Store: "+err});
+                                });
+                            })
+                            .catch( err =>{
+                            user.deleteUser(userResult._id);
+                            menu.deleteMenu(menuResult._id);
+                            res.status(500).send({error:"Error with creating Warehouse: "+err});
                             });
-                    })
-                    .catch(err => {
+                        })
+                        .catch(err =>{
                         user.deleteUser(userResult._id);
-                        res.send("Error with creating Menu: " + err);
+                        res.status(500).send({error:"Error with creating Menu: "+err});
+                        });
+                    })
+                    .catch(err =>{
+                    res.status(500).send({error:"Error with creating User: "+err});
                     });
+                }
+                })
+                .catch(err => res.status(500).send({error:"Error with checking phoneNumber. "+err}));
+            }
             })
-            .catch(err => {
-                res.send("Error with creating User: " + err);
-            });
+            .catch(err => res.status(500).send({error:"Error with checking email. "+err}));
+        }
+        })
+        .catch(err => res.status(500).send({error:"Error with checking username. "+err}));
     }
 });
 //----------Creating car owner----------
-router.post('/auth/car-owner/create', (req, res) => {
+router.post('/auth/car-owner/create', (req,res) => {
+    
+    if(Object.keys(req.body).length === 0)
+        return res.status(400).send({error:"No data was sent!"});
 
     userInfo = req.body.user;
     const carInfo = req.body.car;
-
     const userValidationResult = user.validateUserInfo(userInfo);
     const carValidationResult = car.validateCarInfo(carInfo);
-
-    if (typeof userValidationResult !== 'undefined')
-        res.send(userValidationResult.err);
-    else if (typeof carValidationResult !== 'undefined')
-        res.send(carValidationResult.err);
-    else {
+    
+    if(typeof userValidationResult !== 'undefined')
+        res.status(400).send({error:userValidationResult.error});
+    else if(typeof carValidationResult !== 'undefined')
+        res.status(400).send({error:carValidationResult.error});
+    else
+    {
         hashedPassword = hashPassword(userInfo.password);
         userInfo = {
             ...userInfo,
@@ -148,51 +135,65 @@ router.post('/auth/car-owner/create', (req, res) => {
             role: "carOwner"
         };
 
-        user.createUser(userInfo)
-            .then(userResult => {
-                car.createCar(carInfo)
-                    .then(carResult => {
+        user.checkUsername(userInfo.username)
+        .then(usernameCheckResult => {
+        if(usernameCheckResult != null)
+            res.status(400).send({error:"Error! The username you entered is already in use by another user."});
+        else
+        {
+            user.checkEmail(userInfo.email)
+            .then(emailCheckResult => {
+            if(emailCheckResult != null)
+                res.status(400).send({error:"Error! The email you entered is already in use by another user."});
+            else
+            {
+                user.checkPhone(userInfo.phoneNumber)
+                .then(phoneNumberCheckResult => {
+                if(phoneNumberCheckResult != null)
+                    res.status(400).send({error:"Error! The phone number you entered is already in use by another user."});
+                else
+                {
+                    user.createUser(userInfo) 
+                    .then(userResult =>{
+                    car.createCar(carInfo)
+                        .then(carResult => {
                         shoppingCart.createShoppingCart()
                             .then(shoppingCartResult => {
-                                carOwner.createCarOwner({
-                                        user: userResult,
-                                        cars: [carResult],
-                                        shoppingCart: shoppingCartResult._id
-                                    })
-                                    .then(carOwnerResult => {
-                                        contact.createContact({
-                                            ownerId: userResult._id
-                                        }).then(createdContact => {
-                                            res.send("Successfully created CarOwner");
-                                        }).catch(err => {
-                                            user.deleteUser(userResult._id);
-                                            car.deleteCar(carResult._id);
-                                            shoppingCart.deleteShoppingCart(shoppingCartResult._id);
-                                            res.send("Error with creating CarOwner: " + err);
-                                        });
-                                    })
-                                    .catch(err => {
-                                        user.deleteUser(userResult._id);
-                                        car.deleteCar(carResult._id);
-                                        shoppingCart.deleteShoppingCart(shoppingCartResult._id);
-                                        res.send("Error with creating CarOwner: " + err);
-                                    });
-                            })
-                            .catch(err => {
+                            carOwner.createCarOwner({user:userResult,cars:[carResult],shoppingCart:shoppingCartResult._id}) 
+                                .then(carOwnerResult => {
+                                res.status(200).send({created:true,message:"SUCCESSFULLY_CREATED_CAROWNER"});
+                                })
+                                .catch(err =>{
                                 user.deleteUser(userResult._id);
                                 car.deleteCar(carResult._id);
-                                res.send("Error with creating ShoppingCart: " + err);
+                                shoppingCart.deleteShoppingCart(shoppingCartResult._id);
+                                res.status(500).send({error:"Error with creating CarOwner: "+err});
+                                });
+                            })
+                            .catch(err =>{
+                            user.deleteUser(userResult._id);
+                            car.deleteCar(carResult._id);
+                            res.status(500).send({error:"Error with creating ShoppingCart: "+err});
                             });
+                        })
+                        .catch(err => {
+                        user.deleteUser(userResult._id);    
+                        res.status(500).send({error:"Error with creating Car: "+err});
+                        });
                     })
                     .catch(err => {
-                        user.deleteUser(userResult._id);
-                        res.send("Error with creating Car: " + err);
+                    res.status(500).send({error:"Error with creating User: "+err});
                     });
+                }
+                })
+                .catch(err => res.status(500).send({error:"Error with checking phoneNumber. "+err}));
+            }
             })
-            .catch(err => {
-                res.send("Error with creating User: " + err);
-            });
-    }
+            .catch(err => res.status(500).send({error:"Error with checking email. "+err}));
+        }
+        })
+        .catch(err => res.status(500).send({error:"Error with checking username. "+err}));
+    }    
 });
 
 module.exports = router;

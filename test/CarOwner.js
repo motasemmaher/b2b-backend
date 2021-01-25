@@ -30,20 +30,16 @@ function test(result, userId, carId, shoppingCart, get) {
 }
 
 
-describe('CarOwner Class Tests', () => {
-
-  before((done) => {
-    connection.connect()
-      .then(() => done())
-      .catch((err) => done(err));
-  });
-
-  it('Creating car owner without errors.', (done) => {
-    carOwner.createCarOwner({
-        user: userId,
-        cars: [carId],
-        shoppingCart: shoppingCartId
-      })
+describe('CarOwner Class Tests', () => {    
+    
+    before((done) => {
+      connection.connect()
+                .then(() => done())
+                .catch((err) => done(err));
+    });
+  
+    it('Creating car owner without errors.', (done) => {
+      carOwner.createCarOwner({user:userId,cars:[carId],shoppingCart:shoppingCartId})
       .then(carOwnerResult => {
         test(carOwnerResult, userId, carId, shoppingCartId);
         carOwner.deleteCarOwner(carOwnerResult._id)
@@ -53,24 +49,15 @@ describe('CarOwner Class Tests', () => {
           .catch(err => done(err));
       })
       .catch(err => done(err));
-  });
-  /*
-      it('Getting car owner by user id without errors.', (done) => {
-          carOwner.getCarOwnerByUserId(userId)
-          .then(carOwnerResult => {
-            test(carOwnerResult,userId,carId,shoppingCartId,true);
-            done();
-          })
-          .catch(err => done(err));
-        });
+    });
 
-      it('Getting all car owners without errors (nolimit&noskip).', (done) => {
-          carOwner.getAllCarOwners(0,0)
-          .then(getAllResult => {
-            expect(getAllResult.length).to.equal(2);
-            done();
-          })
-          .catch(err => done(err));
+    it('Getting car owner by user id without errors.', (done) => {
+        carOwner.getCarOwnerByUserId(userId)
+        .then(carOwnerResult => {
+          test(carOwnerResult,userId,carId,shoppingCartId,true);
+          done();
+        })
+        .catch(err => done(err));
       });
 
       it('Getting all car owners without errors (limit=1&noskip).', (done) => {
@@ -78,53 +65,34 @@ describe('CarOwner Class Tests', () => {
           .then(getAllResult => {
             expect(getAllResult.length).to.equal(1);
             done();
-          })
-          .catch(err => done(err));
-      });
+        })
+        .catch(err => done(err));
+    });
 
-      it('Getting all car owners without errors (nolimit&skip=1).', (done) => {
-          carOwner.getAllCarOwners(0,1)
-          .then(getAllResult => {
-              test(getAllResult[0],"5fd87fd45fc4e8351c158dfe",otherCarId,"5fd87fd55fc4e8351c158e00");
-              expect(getAllResult.length).to.equal(1);
-              done();
-          })
-          .catch(err => done(err));
-      });
+    it("Adding car to car owner's list without errors ", (done) => {
+        carOwner.addCarToList(carOwnerId,otherCarId)
+        .then(addResult => {
+        carOwner.getCarOwnerByUserId(userId)
+            .then(getResult => {
+            expect(getResult.cars.length).to.equal(2);
+            done();
+            })
+            .catch(err => done(err));
+        })
+        .catch(err => done(err));
+    });
 
-      it("Adding car to car owner's list without errors ", (done) => {
-          carOwner.addCarToList(carOwnerId,otherCarId)
-          .then(addResult => {
-          carOwner.getCarOwnerByUserId(userId)
-              .then(getResult => {
-              expect(getResult.cars.length).to.equal(2);
-              done();
-              })
-              .catch(err => done(err));
-          })
-          .catch(err => done(err));
-      });
-
-      it("Removing car to car owner's list without errors ", (done) => {
-          carOwner.removeCarFromList(carOwnerId,otherCarId)
-          .then(removeResult => {
-          carOwner.getCarOwnerByUserId(userId)
-              .then(getResult => {
-              expect(getResult.cars.length).to.equal(1);
-              done();
-              })
-              .catch(err => done(err));
-          })
-          .catch(err => done(err));
-      });
-   */
-
-  // it("add order to carOwner without errors ", (done) => {
-  //   carOwner.addOrder(carOwnerId, orderId)
-  //     .then(addedResult => {
-        
-  //     })
-  //     .catch(err => done(err));
-  // });
-
+    it("Removing car to car owner's list without errors ", (done) => {
+        carOwner.removeCarFromList(carOwnerId,otherCarId)
+        .then(removeResult => {
+        carOwner.getCarOwnerByUserId(userId)
+            .then(getResult => {
+            expect(getResult.cars.length).to.equal(1);
+            done();
+            })
+            .catch(err => done(err));
+        })
+        .catch(err => done(err));
+    });
+ 
 });

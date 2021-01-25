@@ -4,8 +4,8 @@ module.exports = {
     
    validateWarehouseInfo(warehouse)
    {
-      if(!validator.matches(warehouse.amount+"",/(^[\d]{1,4}$)/))
-         return "invalid warehouse's product amount";
+      if(warehouse.amount === undefined || !validator.matches(warehouse.amount.toString(),/(^[\d]{1,4}$)/))
+         return "Invalid warehouse's product amount !";
 
       return "pass";
    }

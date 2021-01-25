@@ -47,7 +47,7 @@ const invalidNameFormat = "Testing Store @1";
 
 //Invalid store address
 const invalidAddressLong = new Array(10).join('A'); //Produces AAAAAAAAA
-const invalidAddressShort = "Addr";
+const invalidAddressShort = "Add";
 const invalidAddressFormat = "Amm@n";
 
 //Invalid store description
@@ -108,7 +108,7 @@ function testDeleted(storeId)
 }
 
 describe('Store Class Tests', () => {    
-
+  
   before((done) => {
     connection.connect()
               .then(() => done())
@@ -121,116 +121,158 @@ describe('Store Class Tests', () => {
     expect(validationResult).to.be.undefined;
     done();
   });
-/*
+
   it('Validating store information with invalid store name (long).', (done) => {
     data = prepareData(invalidNameLong,validAddress,validDescription,validOpenTime,validCloseTime,validTags);
     const validationResult = STORE.validateStoreInfo(data);
-    expect(validationResult.err).to.contain("name");
+    expect(validationResult.error).to.contain("name");
     done();
   });
 
   it('Validating store information with invalid store name (short).', (done) => {
     data = prepareData(invalidNameShort,validAddress,validDescription,validOpenTime,validCloseTime,validTags);
     const validationResult = STORE.validateStoreInfo(data);
-    expect(validationResult.err).to.contain("name");
+    expect(validationResult.error).to.contain("name");
     done();
   });
 
   it('Validating store information with invalid store name (format).', (done) => {
     data = prepareData(invalidNameFormat,validAddress,validDescription,validOpenTime,validCloseTime,validTags);
     const validationResult = STORE.validateStoreInfo(data);
-    expect(validationResult.err).to.contain("name");
+    expect(validationResult.error).to.contain("name");
+    done();
+  });
+
+  it('Validating store information with invalid store name (missing).', (done) => {
+    data = prepareData(undefined,validAddress,validDescription,validOpenTime,validCloseTime,validTags);
+    const validationResult = STORE.validateStoreInfo(data);
+    expect(validationResult.error).to.contain("name");
     done();
   });
 
   it('Validating store information with invalid store address (long).', (done) => {
     data = prepareData(validName,invalidAddressLong,validDescription,validOpenTime,validCloseTime,validTags);
     const validationResult = STORE.validateStoreInfo(data);
-    expect(validationResult.err).to.contain("address");
+    expect(validationResult.error).to.contain("address");
     done();
   });
 
   it('Validating store information with invalid store address (short).', (done) => {
     data = prepareData(validName,invalidAddressShort,validDescription,validOpenTime,validCloseTime,validTags);
     const validationResult = STORE.validateStoreInfo(data);
-    expect(validationResult.err).to.contain("address");
+    expect(validationResult.error).to.contain("address");
     done();
   });
 
   it('Validating store information with invalid store address (format).', (done) => {
     data = prepareData(validName,invalidAddressFormat,validDescription,validOpenTime,validCloseTime,validTags);
     const validationResult = STORE.validateStoreInfo(data);
-    expect(validationResult.err).to.contain("address");
+    expect(validationResult.error).to.contain("address");
+    done();
+  });
+
+  it('Validating store information with invalid store address (missing).', (done) => {
+    data = prepareData(validName,undefined,validDescription,validOpenTime,validCloseTime,validTags);
+    const validationResult = STORE.validateStoreInfo(data);
+    expect(validationResult.error).to.contain("address");
     done();
   });
 
   it('Validating store information with invalid store description (long).', (done) => {
     data = prepareData(validName,validAddress,invalidDescriptionLong,validOpenTime,validCloseTime,validTags);
     const validationResult = STORE.validateStoreInfo(data);
-    expect(validationResult.err).to.contain("description");
+    expect(validationResult.error).to.contain("description");
     done();
   });
 
   it('Validating store information with invalid store Description (short).', (done) => {
     data = prepareData(validName,validAddress,invalidDescriptionShort,validOpenTime,validCloseTime,validTags);
     const validationResult = STORE.validateStoreInfo(data);
-    expect(validationResult.err).to.contain("description");
+    expect(validationResult.error).to.contain("description");
     done();
   });
 
   it('Validating store information with invalid store Description (format).', (done) => {
     data = prepareData(validName,validAddress,invalidDescriptionFormat,validOpenTime,validCloseTime,validTags);
     const validationResult = STORE.validateStoreInfo(data);
-    expect(validationResult.err).to.contain("description");
+    expect(validationResult.error).to.contain("description");
+    done();
+  });
+
+  it('Validating store information with invalid store Description (missing).', (done) => {
+    data = prepareData(validName,validAddress,undefined,validOpenTime,validCloseTime,validTags);
+    const validationResult = STORE.validateStoreInfo(data);
+    expect(validationResult.error).to.contain("description");
     done();
   });
 
   it('Validating store information with invalid store openTime (format).', (done) => {
     data = prepareData(validName,validAddress,validDescription,invalidOpenTimeFormat,validCloseTime,validTags);
     const validationResult = STORE.validateStoreInfo(data);
-    expect(validationResult.err).to.contain("open time");
+    expect(validationResult.error).to.contain("open time");
     done();
   });
 
   it('Validating store information with invalid store openTime (time).', (done) => {
     data = prepareData(validName,validAddress,validDescription,invalidOpenTimeNum,validCloseTime,validTags);
     const validationResult = STORE.validateStoreInfo(data);
-    expect(validationResult.err).to.contain("open time");
+    expect(validationResult.error).to.contain("open time");
+    done();
+  });
+
+  it('Validating store information with invalid store openTime (missing).', (done) => {
+    data = prepareData(validName,validAddress,validDescription,undefined,validCloseTime,validTags);
+    const validationResult = STORE.validateStoreInfo(data);
+    expect(validationResult.error).to.contain("open time");
     done();
   });
 
   it('Validating store information with invalid store closeTime (format).', (done) => {
     data = prepareData(validName,validAddress,validDescription,validOpenTime,invalidCloseTimeFormat,validTags);
     const validationResult = STORE.validateStoreInfo(data);
-    expect(validationResult.err).to.contain("close time");
+    expect(validationResult.error).to.contain("close time");
     done();
   });
 
   it('Validating store information with invalid store closeTime (time).', (done) => {
     data = prepareData(validName,validAddress,validDescription,validOpenTime,invalidCloseTimeNum,validTags);
     const validationResult = STORE.validateStoreInfo(data);
-    expect(validationResult.err).to.contain("close time");
+    expect(validationResult.error).to.contain("close time");
+    done();
+  });
+
+  it('Validating store information with invalid store closeTime (missing).', (done) => {
+    data = prepareData(validName,validAddress,validDescription,validOpenTime,undefined,validTags);
+    const validationResult = STORE.validateStoreInfo(data);
+    expect(validationResult.error).to.contain("close time");
     done();
   });
 
   it('Validating store information with invalid store tags (long).', (done) => {
     data = prepareData(validName,validAddress,validDescription,validOpenTime,validCloseTime,invalidTagsLong);
     const validationResult = STORE.validateStoreInfo(data);
-    expect(validationResult.err).to.contain("tags");
+    expect(validationResult.error).to.contain("tags");
     done();
   });
 
   it('Validating store information with invalid store tags (short).', (done) => {
     data = prepareData(validName,validAddress,validDescription,validOpenTime,validCloseTime,invalidTagsShort);
     const validationResult = STORE.validateStoreInfo(data);
-    expect(validationResult.err).to.contain("tags");
+    expect(validationResult.error).to.contain("tags");
     done();
   });
 
   it('Validating store information with invalid store tags (format).', (done) => {
     data = prepareData(validName,validAddress,validDescription,validOpenTime,validCloseTime,invalidTagsFormat);
     const validationResult = STORE.validateStoreInfo(data);
-    expect(validationResult.err).to.contain("tags");
+    expect(validationResult.error).to.contain("tags");
+    done();
+  });
+
+  it('Validating store information with invalid store tags (missing).', (done) => {
+    data = prepareData(validName,validAddress,validDescription,validOpenTime,validCloseTime,undefined);
+    const validationResult = STORE.validateStoreInfo(data);
+    expect(validationResult.error).to.contain("tags");
     done();
   });
 
@@ -467,5 +509,5 @@ describe('Store Class Tests', () => {
     })
     .catch(err => done(err))
   });
-*/
+
 });

@@ -1,7 +1,7 @@
 //Requiring packages
 const express = require("express");
-const bodyParser = require('body-parser');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const session = require('express-session');
 const bcrypt = require('bcrypt');
 const upload = require('./src/shared/imageUpload');
@@ -19,8 +19,15 @@ const {
 //Setting-up express app
 const app = express();
 require('dotenv').config()
-const server = require('http').Server(app);
-const io = require('socket.io')(server);
+
+
+
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "http://localhost:8100/");
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 
 //Setting-up session and authintication
 app.use(session({
@@ -32,11 +39,8 @@ app.use(session({
 require('./src/models/model');
 
 //Objects
-const product = require('./src/business/Objects').PRODUCT;
 const user = require('./src/business/Objects').USER;
 const garageOwner = require('./src/business/Objects').GARAGEOWNER;
-const contact = require('./src/business/Objects').CONTACT;
-const Chat = require('./src/business/Objects').CHAT;
 const report = require('./src/business/Objects').REPORT;
 
 // validation by thaer
@@ -44,22 +48,23 @@ const limitAndSkipValidation = require('./src/shared/limitAndSkipValidation');
 
 //Setting-up express app
 //Setting-up path for the static files
-app.use(express.static(__dirname + '/public'));
-// app.use('/public', express.static('public'));0
-app.use('./public', express.static('uploads'));
+app.use('/public', express.static('public'));
 //Setting-up req body parser
 app.use(bodyParser.json({ limit: '5mb', extended: true }));
 app.use(bodyParser.urlencoded({
     limit: '5mb',
     extended: true
-}))
+}));
+
+
+
 //Setting-up CORS options
-// const corsOptions = {
-//     origin: 'http://localhost:8100',
-//     methods: "*",
-//     optionsSuccessStatus: 200
-// }
-app.use(cors())
+const corsOptions = {
+    origin: 'http://localhost:8100',
+    methods: "*",
+    optionsSuccessStatus: 200
+}
+app.use(cors(corsOptions));
 
 // Login User 
 app.get('/user/login', (req, res) => {
@@ -69,7 +74,6 @@ app.get('/user/login', (req, res) => {
 });
 
 app.post('/user/login', (req, res, next) => {
-    // console.log(req.body.username, req.body.password);
     // The HTTP 429 Too Many Requests response status code indicates the user has sent too many 
     // requests in a given amount of time ("rate limiting").        
     // A Retry-After header might be included to this 
@@ -95,7 +99,7 @@ app.post('/user/login', (req, res, next) => {
 
             } else {
                 return res.status(400).send({
-                    Error: 'Invalid username or password'
+                    error: 'Invalid username or password'
                 });
             }
 
@@ -104,14 +108,14 @@ app.post('/user/login', (req, res, next) => {
         res.send({
             msg: 'already logged in'
         });
-    }    
+    }
 });
 
 app.delete('/user/logout', userAuthenticated, (req, res) => {
     // console.log(req.session.token)
     // req.headers.authorization.split(' ')[0]
     req.session.token = null;
-    res.send({sucess: true})
+    res.send({ sucess: true })
     // res.redirect('/user/login');
 });
 
@@ -226,7 +230,7 @@ const reportTransporter = nodemailer.createTransport({
 //----------Send garage owner report----------
 const garageOwnerReport = schedule.scheduleJob('0 0 1 * *', () => {
 
-        user.getAllUsersIdOfARole('garageOwner')
+    user.getAllUsersIdOfARole('garageOwner')
         .then(garageOwners => {
             garageOwners.forEach(garageOwnerId => {
                 user.getUserById(garageOwnerId._id)
@@ -317,152 +321,13 @@ const adminReport = schedule.scheduleJob('0 0 1 * *', () => {
 });
 
 //--------------------Chat--------------------\\
-let userForChat = new Set();
 
-app.post('/user/contact/create', userAuthenticated, (req, res) => {
-    let chatBetween = "";
-    const garageOwnerId = req.body.garageOwnerId;
-    const userInfo = req.user;
-    if (userInfo._id > garageOwnerId) {
-        chatBetween = userInfo._id + "-" + garageOwnerId
-    } else {
-        chatBetween = garageOwnerId + "-" + userInfo._id
-    }
-    contact.updateContact({
-        ownerId: userInfo._id,
-        name: req.body.storeName,
-        otherUserId: garageOwnerId
-    }).then(retrivedUserContact => {
-        contact.updateContact({
-            ownerId: garageOwnerId,
-            name: req.body.userName,
-            otherUserId: userInfo._id
-        }).then(retrivedGarageOwnerContact => {
-            if (userInfo._id > garageOwnerId) {
-                userForChat.add(userInfo._id + "-" + garageOwnerId)
-            } else {
-                userForChat.add(garageOwnerId + "-" + userInfo._id)
-            }
-            chat.create({
-                contactBetween: chatBetween
-            }).then(CreatedChat => {
-                res.status(200).send(retrivedGarageOwnerContact);
-            }).catch(err => {
-                res.status(400).send({
-                    err: err
-                });
-            });
-        }).catch(err => {
-            res.status(400).send({
-                err: err
-            });
-        });
-    }).catch(err => {
-        res.status(400).send({
-            err: err
-        });
-    });
-});
+// const server = require('http').Server(app);
+// const io = require('socket.io')(server);
 
-app.get('/user/contact/get', userAuthenticated, (req, res) => {
-    const userInfo = req.user;
-    Contact.getContactByOwnerId(userInfo._id).then(results => {
-        if (results != null) {
-            results.contacts.forEach(Element => {
-                if (Element._id > results.ownerId) {
-                    userForChat.add(Element._id + "-" + results.ownerId)
-                } else {
-                    userForChat.add(results.ownerId + "-" + Element._id)
-                }
-            })
-        }
-        res.status(200).send(results);
-    }).catch(err => {
-        res.status(400).send({
-            err: err
-        });
-    });
-});
 
-app.delete('/user/contact', userAuthenticated, (req, res) => {
-    const userInfo = req.user;
-    contact.deleteOne(
-        userInfo._id
-    ).then(results => {
-        res.status(201).send(results);
-    }).catch(err => {
-        console.log(err);
-        res.status(400).send({
-            err: err
-        });
-    });
-});
 
-app.get('/user/chat/:contactID', userAuthenticated, (req, res) => {
-    let chatBetween = "";
-    const userInfo = req.user;
-    const contactId = req.params.contactID;
-    if (contactId > userInfo._Id) {
-        chatBetween = contactId + "-" + userInfo._Id
-    } else {
-        chatBetween = userInfo._Id + "-" + contactId
-    }
-    chat.getChat(chatBetween).then(results => {
-        res.status(200).send(results);
-    }).catch(err => {
-        if (err) {
-            console.log(err);
-            res.status(400).send({
-                err: err
-            })
-        }
-    });
-});
 
-app.get('/user/chat/hasContactId/:subcontactId', userAuthenticated, (req, res) => {
-    const userInfo = req.user;
-    const subcontactId = req.params.subcontactId;
-    contact.getContactByOwnerIdAndSubContactId(userInfo._id, subcontactId).then(result => {
-        if (result.error) {
-            return res.status(200).send({
-                has: false
-            })
-        } else if (result) {
-            return res.status(200).send({
-                has: true
-            })
-        }
-    }).catch(err => {
-        if (err) {
-            console.log(err)
-            res.status(400).send({
-                err: err
-            })
-        }
-    });
-});
-
-var chatIO = io.of('/user/chat/start')
-    .on('connection', (socket) => {
-        userForChat.forEach(Element => {
-            socket.on(Element, (message) => {
-                chat.pushMessage(Element, message).then(result => {
-                    socket.broadcast.emit(Element, message);
-                }).catch(err => {
-                    if (err) {
-                        console.log(err)
-                        res.status(400).send({
-                            err: err
-                        })
-                    }
-                });
-
-            });
-
-        });
-
-    });
-    
 
 //Load Routes
 const shoppingCartRoute = require('./src/routes/ShoppingCart');
@@ -470,6 +335,7 @@ const orderRoute = require('./src/routes/Order');
 const searchRoute = require('./src/routes/Search');
 const permissionsRoute = require('./src/routes/Permissions');
 const carOwnerRoute = require('./src/routes/CarOwner');
+const chatRoute = require('./src/routes/Chat').router;
 
 // Use Routes
 app.use(shoppingCartRoute);
@@ -477,5 +343,14 @@ app.use(orderRoute);
 app.use(carOwnerRoute);
 app.use(searchRoute);
 app.use(permissionsRoute);
+app.use(chatRoute);
 
+carvaldation = require('./src/business/Car/validate')
+app.get("/test", (req, res) => {
+    let model = req.body.model;
+    let make = req.body.make;
+    let year = req.body.year;
+    let result = carvaldation.validateCarInfo({ model, make, year });
+    res.send(result);
+})
 module.exports = app;

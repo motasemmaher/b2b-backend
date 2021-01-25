@@ -20,7 +20,7 @@ let deleteStoreId = "5fd9af52fdac372044c3aa01";
 
 
 describe('Warehouse Class Tests', () => {    
-
+    
     before((done) => {
       connection.connect()
                 .then(() => done())
@@ -32,16 +32,22 @@ describe('Warehouse Class Tests', () => {
         expect(validationResult).to.be.undefined;
         done();
     });
-/*
+
     it('Validating warehouse information invalid amount (format).', (done) => {
         const validationResult = warehouse.validateWarehouseInfo({amount:"11a1"});
-        expect(validationResult.err).to.contain("amount");
+        expect(validationResult.error).to.contain("amount");
         done();
     });
 
     it('Validating warehouse information invalid amount (length).', (done) => {
         const validationResult = warehouse.validateWarehouseInfo({amount:11111});
-        expect(validationResult.err).to.contain("amount");
+        expect(validationResult.error).to.contain("amount");
+        done();
+    });
+
+    it('Validating warehouse information invalid amount (missing).', (done) => {
+        const validationResult = warehouse.validateWarehouseInfo({amount:undefined});
+        expect(validationResult.error).to.contain("amount");
         done();
     });
 
@@ -180,5 +186,5 @@ describe('Warehouse Class Tests', () => {
         })
         .catch(err => done(err));
     });
-*/
+
 });

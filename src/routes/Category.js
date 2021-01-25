@@ -5,6 +5,8 @@ const {userAuthenticated} = require('../middleware/authentication');
 const category = require('../business/Objects').CATEGORY;
 const store = require('../business/Objects').STORE;
 const menu = require('../business/Objects').MENU;
+const product = require('../business/Objects').PRODUCT;
+const warehouse = require('../business/Objects').WAREHOUSE;
 
 //----------View Categories of a store and View a Category----------
 router.get('/stores/:storeId/categories/:categoryId?',(req,res) => {
@@ -42,9 +44,11 @@ router.get('/stores/:storeId/categories/:categoryId?',(req,res) => {
 router.post('/stores/:storeId/create-category',userAuthenticated,(req,res) => {
     loggedUser = req.user;
     storeId = req.params.storeId;
-
+    
+    if(Object.keys(req.body).length === 0)
+        return res.status(400).send({error:"No data was sent!"});
     if(loggedUser.role !== "garageOwner")
-        res.status(401).send("Unauthorized user")
+        return res.status(401).send({error:"Unauthorized user !"});
     else
     {
         store.exists(storeId)
@@ -58,7 +62,7 @@ router.post('/stores/:storeId/create-category',userAuthenticated,(req,res) => {
             categoryInfo = {...req.body};
             const categoryValidationResult = category.validateCategoryInfo(categoryInfo);
             if(typeof categoryValidationResult !== 'undefined')
-                res.status(404).send(categoryValidationResult.err);
+                res.status(400).send({error:categoryValidationResult.error});
             else
             {
                 //Checking if there is a category with the provided name
@@ -84,7 +88,7 @@ router.post('/stores/:storeId/create-category',userAuthenticated,(req,res) => {
                 }
                 // Else it will a return a response that it already exists
                 else 
-                res.status(404).send("A category with that name already exists");
+                res.status(400).send({error:"A category with that name already exists"});
                 })
                 .catch(err => res.status(500).send({error:"Error getting category Name.   "+err}));
             }
@@ -100,8 +104,10 @@ router.put('/stores/:storeId/update-category/:categoryId',userAuthenticated,(req
     categoryId = req.params.categoryId;
     categoryInfo = {...req.body};
 
+    if(Object.keys(req.body).length === 0)
+        return res.status(400).send({error:"No data was sent!"});
     if(loggedUser.role !== "garageOwner")
-        res.status(401).send("Unauthorized user")
+        return res.status(401).send({error:"Unauthorized user !"});
     else
     {
         store.exists(storeId)
@@ -119,9 +125,9 @@ router.put('/stores/:storeId/update-category/:categoryId',userAuthenticated,(req
                 res.status(404).send({error:"Error! Didn't find a cateory with that id."})
             else
             {
-                const validationResult = category.validateCategoryInfo(categoryInfo);
-                if(typeof validationResult !== 'undefined')
-                    res.status(400).send(validationResult.err);
+                const categoryValidationResult = category.validateCategoryInfo(categoryInfo);
+                if(typeof categoryValidationResult !== 'undefined')
+                    res.status(400).send({error:categoryValidationResult.error});
                 else
                 {
                     //Checking if there is a category with the name that the user provided in the update information
@@ -144,7 +150,7 @@ router.put('/stores/:storeId/update-category/:categoryId',userAuthenticated,(req
                     }
                     // Else it will a return a response that it already exists
                     else    
-                        res.status(400).send("A category with that name already exists.");
+                        res.status(400).send({error:"A category with that name already exists."});
                     })
                     .catch(err => res.status(500).send({error:"Error getting category name.    "+err}))
                 }
@@ -160,7 +166,7 @@ router.put('/stores/:storeId/update-category/:categoryId',userAuthenticated,(req
 router.delete('/stores/:storeId/delete-category/:categoryId',userAuthenticated,(req,res) => {
     loggedUser = req.user;
     if(loggedUser.role !== "garageOwner")
-        res.status(401).send("Unauthorized user")
+        res.status(401).send({error:"Unauthorized user !"});
     else
     {
         storeId = req.params.storeId;
@@ -171,7 +177,7 @@ router.delete('/stores/:storeId/delete-category/:categoryId',userAuthenticated,(
         if(getStoreResult == null)
             res.status(404).send({error:"Error! Didn't find a store with that id."});
         else if(getStoreResult.userId != loggedUser._id)
-            res.status(404).send({error:"Error! The requested store doesn't belong to this garage owner."});
+            res.status(401).send({error:"Error! The requested store doesn't belong to this garage owner."});
         else
         {
             //Checking if the category exists by it's ID
@@ -205,7 +211,7 @@ router.delete('/stores/:storeId/delete-category/:categoryId',userAuthenticated,(
                             })  
                             .catch(err => res.status(500).send({error:"Error removing products of the category.  "+err}))
                         })
-                        .catch(err => res.status(500).send({error:"Error removing products of the category.  "+err}));
+                        .catch(err => res.status(500).send({error:"Error deleting category. "+err}));
                     })
                     .catch(err => res.status(500).send({error:"Error removing category from the menu.  "+err}));
                 })

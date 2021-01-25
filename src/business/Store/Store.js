@@ -7,7 +7,7 @@ module.exports = class Store {
         const validationResult = StoreValidation.validateStoreInfo(storeInfo);
         if (validationResult !== "pass")
             return {
-                err: "Error: " + validationResult
+                error: "Error: " + validationResult
             };
     }
 
@@ -70,6 +70,13 @@ module.exports = class Store {
 
     getStoresByUserId(userId) {
         const promiseResult = StoreModel.findStores({
+            userId: userId
+        });
+        return promiseResult;
+    }
+
+    getStoresIdByUserId(userId) {
+        const promiseResult = StoreModel.findStoresIdAndName({
             userId: userId
         });
         return promiseResult;

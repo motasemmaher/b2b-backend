@@ -101,7 +101,7 @@ module.exports = {
             }, {
                 status: value.status
             }]
-        }).limit(value.limit).skip(value.skip);
+        }).limit(value.limit).skip(value.skip).populate('shoppingCart');
 
         if (result)
             return result;

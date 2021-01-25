@@ -8,7 +8,7 @@ module.exports = class Message
     {
         const validationResult = MessageValidation.validateMessageInfo(message);
         if(validationResult !== "pass")
-            return {err:"Error: "+validationResult};
+            return {error:"Error: "+validationResult};
     }
 
     createMessage(userId,messageBody)

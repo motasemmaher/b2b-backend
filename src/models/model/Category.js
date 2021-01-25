@@ -18,10 +18,10 @@ module.exports =
             };
     },
     createCategory(value) {
-        // tags = value.tags.split(',');
+        tags = value.tags.split(',');
         value = {
             ...value,
-            // tags: tags
+            tags: tags
         };
         const result = CategoryModel.create(value);
         if (result)

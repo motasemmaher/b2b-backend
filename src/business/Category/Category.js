@@ -16,7 +16,7 @@ module.exports = class Category{
     {
         const validationResult = CategoryValidation.validateCategoryInfo(categoryInfo);
         if(validationResult !== "pass")
-            return {err:"Error: "+validationResult};
+            return {error:"Error: "+validationResult};
     }
 
     createCategory(categoryInfo)
@@ -25,12 +25,14 @@ module.exports = class Category{
         return promiseResult;
     }
 
+    /*
     getProductsOfCategory(categoryId,type,limit,skip,nameSort,priceSort)
     {
         const promiseResult = ProductModel.findProductsOfCategory({categoryId,type,skip,limit,nameSort,priceSort});
         return promiseResult;
     }
-
+    */
+   
     updateCategory(categoryInfo)
     {
         const promiseResult = CategoryModel.updateCategory(categoryInfo);

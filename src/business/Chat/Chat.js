@@ -1,4 +1,4 @@
-const ChatModel = require('../../models/model/chat');
+const ChatModel = require('../../models/model/Chat');
 
 module.exports = class Chat {
     createChat(chatInfo) {
@@ -8,7 +8,7 @@ module.exports = class Chat {
 
     getChat(contactBetween) {
         const result = ChatModel.getChat({
-            contactBetween: contactBetween
+            contactBetween
         });
         return result;
     }

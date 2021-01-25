@@ -1,59 +1,274 @@
 process.env.NODE_ENV = 'test';
-const User = require('../src/business/User/User');
 const expect = require('chai').expect;
 const connection = require('../connect');
 const { exists } = require('../src/models/model/User');
+const USER = require('../src/business/Objects').USER;
 
 
-const user = new User();
-
-
-let userId = "5fd866fb6add9a31e0779905";
-let nonExistingUserId = "5fd866fb6add9a31e0770000";
+const existingUserId = "5fd866fb6add9a31e0779905";
+const nonExistingUserId = "5fd866fb6add9a31e0770000";
 
 //Valid user information
-let fullName = "Testing User"; let username = "testinguser1"; let email = "testinguser1@gmail.com";
-let password = "12345678"; let address = "Amman"; let phoneNumber = "0790000000"; let role = "waitingUser";
+const fullName = "Testing User"; const username = "testinguser1"; const email = "testinguser1@gmail.com";
+const password = "12345678"; const address = "Amman"; const phoneNumber = "0790000000"; const role = "waitingUser";
 userInformation = {fullName:fullName,username:username,email:email,password:password,phoneNumber:phoneNumber,address:address,role:role};
 
 //Valid update user information
-let updatedFullName = "Testing User"; let updatedUsername = "testinguser2"; let updatedEmail = "testinguser2@gmail.com";
-let updatedPassword = "12345678"; let updatedAddress = "Amman"; let updatedPhoneNumber = "0790000002"; let updatedRole = "garageOwner";
+const updatedFullName = "Testing User"; const updatedUsername = "testinguser2"; const updatedEmail = "testinguser2@gmail.com";
+const updatedPassword = "12345678"; const updatedAddress = "Amman"; const updatedPhoneNumber = "0790000002"; const updatedRole = "garageOwner";
 updatedUserInformation = {fullName:updatedFullName,username:updatedUsername,email:updatedEmail,password:updatedPassword,phoneNumber:updatedPhoneNumber,address:updatedAddress,role:updatedRole};
 
+//Invalid data for testing
+//Invalid user fullname
+const shortFullName="M";
+const longFullName = new Array(66).join('F');
+const invalidFormatFullname = "FFF@FFF";
+//Invalid user username
+const shortUsername="U";
+const longUsername = new Array(66).join('U');
+const invalidFormatUsername = "UUU@UUU";
+//Invalid user email
+const invalidEmail="invalidEmail";
+//Invalid user password
+const shortPassword = "PPP";
+const longPassword = new Array(66).join('P');
+//Invalid user phone number
+const shortPhoneNumber="07929";
+const longPhoneNumber = "0792924975000";
+const invalidFormatPhoneNumber = "0007929249";
+//Invalid user address
+const longAddress = new Array(10).join('A'); //Produces AAAAAAAAA
+const shortAddress = "Ad";
+const invalidFormatAddress = "Amm@n";
+//Invalid user role
+const invalidRoleFormat = 12345;
+const invalidRoleNonExisting = "anotherUser";
+
+function prepareData (fullName,username,email,password,phoneNumber,address,role)
+{
+    return {fullName,username,email,password,phoneNumber,address,role};
+}
+
 //Testing functions
-function test(result,fullName,username,email,password,phoneNumber,address,role)
+function test(result,fullName,username,email,phoneNumber,address,role,returnPass)
 {
     expect(result).to.contain.property('_id');
     expect(result).to.contain.property('fullName').to.equal(fullName);
     expect(result).to.contain.property('username').to.equal(username);
     expect(result).to.contain.property('email').to.equal(email);
-    expect(result).to.contain.property('password').to.equal(password);
     expect(result).to.contain.property('phoneNumber').to.equal(phoneNumber);
     expect(result).to.contain.property('address').to.equal(address);
     expect(result).to.contain.property('role').to.equal(role);
+    if(returnPass)
+        expect(result).to.contain.property('password');
+}
+
+function testUpdated(userId,fullName,username,email,phoneNumber,address,role,returnPass)
+{
+    const getPromiseResult = USER.getUserById(userId);
+    getPromiseResult.then(getResult => {test(getResult,fullName,username,email,phoneNumber,address,role,returnPass);});
+}
+
+function testDeleted(userId)
+{
+  const getPromiseResult = USER.getUserById(userId);
+  getPromiseResult.then(getResult => {expect(getResult).to.be.null;});
 }
 
 describe('User Class Tests', () => {    
-
+     
     before((done) => {
       connection.connect()
                 .then(() => done())
                 .catch((err) => done(err));
     });
 
+    it("Validating user information without errors.", (done) => {
+        const data = prepareData(fullName,username,email,password,phoneNumber,address,role);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult).to.be.undefined;
+        done();
+    });
+
+    it("Validating user information with invalid fullName (short).", (done) => {
+        const data = prepareData(shortFullName,username,email,password,phoneNumber,address,role);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user fullname !");
+        done();
+    });
+
+    it("Validating user information with invalid fullName (long).", (done) => {
+        const data = prepareData(longFullName,username,email,password,phoneNumber,address,role);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user fullname !");
+        done();
+    });
+
+    it("Validating user information with invalid fullName (format).", (done) => {
+        const data = prepareData(invalidFormatFullname,username,email,password,phoneNumber,address,role);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user fullname !");
+        done();
+    });
+
+    it("Validating user information with invalid fullName (missing).", (done) => {
+        const data = prepareData(undefined,username,email,password,phoneNumber,address,role);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user fullname !");
+        done();
+    });
+
+    it("Validating user information with invalid username (short).", (done) => {
+        const data = prepareData(fullName,shortUsername,email,password,phoneNumber,address,role);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user username !");
+        done();
+    });
+
+    it("Validating user information with invalid username (long).", (done) => {
+        const data = prepareData(fullName,longUsername,email,password,phoneNumber,address,role);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user username !");
+        done();
+    });
+
+    it("Validating user information with invalid username (format).", (done) => {
+        const data = prepareData(fullName,invalidFormatUsername,email,password,phoneNumber,address,role);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user username !");
+        done();
+    });
+
+    it("Validating user information with invalid username (missing).", (done) => {
+        const data = prepareData(fullName,undefined,email,password,phoneNumber,address,role);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user username !");
+        done();
+    });
+
+    it("Validating user information with invalid email.", (done) => {
+        const data = prepareData(fullName,username,invalidEmail,password,phoneNumber,address,role);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user email !");
+        done();
+    });
+
+    it("Validating user information with invalid email (missing).", (done) => {
+        const data = prepareData(fullName,username,undefined,password,phoneNumber,address,role);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user email !");
+        done();
+    });
+
+    it("Validating user information with invalid password (short).", (done) => {
+        const data = prepareData(fullName,username,email,shortPassword,phoneNumber,address,role);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user password !");
+        done();
+    });
+
+    it("Validating user information with invalid password (long).", (done) => {
+        const data = prepareData(fullName,username,email,longPassword,phoneNumber,address,role);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user password !");
+        done();
+    });
+
+    it("Validating user information with invalid password (missing).", (done) => {
+        const data = prepareData(fullName,username,email,undefined,phoneNumber,address,role);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user password !");
+        done();
+    });
+
+    it("Validating user information with invalid phone number (short).", (done) => {
+        const data = prepareData(fullName,username,email,password,shortPhoneNumber,address,role);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user phone number !");
+        done();
+    });
+
+    it("Validating user information with invalid phone number (long).", (done) => {
+        const data = prepareData(fullName,username,email,password,longPhoneNumber,address,role);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user phone number !");
+        done();
+    });
+
+    it("Validating user information with invalid phone number (format).", (done) => {
+        const data = prepareData(fullName,username,email,password,invalidFormatPhoneNumber,address,role);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user phone number !");
+        done();
+    });
+
+    it("Validating user information with invalid phone number (missing).", (done) => {
+        const data = prepareData(fullName,username,email,password,undefined,address,role);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user phone number !");
+        done();
+    });
+
+    it("Validating user information with invalid address (short).", (done) => {
+        const data = prepareData(fullName,username,email,password,phoneNumber,shortAddress,role);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user address !");
+        done();
+    });
+
+    it("Validating user information with invalid address (long).", (done) => {
+        const data = prepareData(fullName,username,email,password,phoneNumber,longAddress,role);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user address !");
+        done();
+    });
+
+    it("Validating user information with invalid address (format).", (done) => {
+        const data = prepareData(fullName,username,email,password,phoneNumber,invalidFormatAddress,role);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user address !");
+        done();
+    });
+
+    it("Validating user information with invalid address (missing).", (done) => {
+        const data = prepareData(fullName,username,email,password,phoneNumber,undefined,role);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user address !");
+        done();
+    });
+
+    it("Validating user information with invalid role (format).", (done) => {
+        const data = prepareData(fullName,username,email,password,phoneNumber,address,invalidRoleFormat);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user role !");
+        done();
+    });
+
+    it("Validating user information with invalid role (non-existing).", (done) => {
+        const data = prepareData(fullName,username,email,password,phoneNumber,address,invalidRoleNonExisting);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user role !");
+        done();
+    });
+
+    it("Validating user information with invalid address (missing).", (done) => {
+        const data = prepareData(fullName,username,email,password,phoneNumber,address,undefined);
+        const validationResult = USER.validateUserInfo(data);
+        expect(validationResult.error).to.contain("Invalid user role !");
+        done();
+    });
+
     it("Checking if the user exists without error (exists)", (done) => {
-        user.exists(userId)
+        USER.exists(existingUserId)
         .then(existsResult => {
             expect(existsResult).to.be.true;
             done();
         })
         .catch(err => done(err));
     });
-/*    
 
     it("Checking if the user exists invalid userId", (done) => {
-        user.exists(nonExistingUserId)
+        USER.exists(nonExistingUserId)
         .then(existsResult => {
             expect(existsResult).to.be.false;
             done();
@@ -62,7 +277,7 @@ describe('User Class Tests', () => {
     });
     
     it("Count by role without error (CarOwner)", (done) => {
-        user.countByRole("carOwner")
+        USER.countByRole("carOwner")
         .then(countResult => {
             expect(countResult).to.equal(2);
             done();
@@ -71,7 +286,7 @@ describe('User Class Tests', () => {
     });
 
     it("Count by role without error (GarageOwner)", (done) => {
-        user.countByRole("garageOwner")
+        USER.countByRole("garageOwner")
         .then(countResult => {
             expect(countResult).to.equal(2);
             done();
@@ -80,7 +295,7 @@ describe('User Class Tests', () => {
     });
 
     it("Count All users without error", (done) => {
-        user.countAll()
+        USER.countAll()
         .then(countResult => {
             expect(countResult).to.equal(4);
             done();
@@ -88,11 +303,65 @@ describe('User Class Tests', () => {
         .catch(err => done(err));
     });
 
+    it("Checking if the username is already taken without errors (taken)", (done) => {
+        USER.checkUsername("carowner1")
+        .then(checkResult => {  
+            expect(checkResult).to.be.true;
+            done();
+        })
+        .catch(err => done(err));
+    });
+
+    it("Checking if the username is already taken without errors (not taken)", (done) => {
+        USER.checkUsername("nonExistingUserName")
+        .then(checkResult => {
+            expect(checkResult).to.be.false;
+            done();
+        })
+        .catch(err => done(err));
+    });
+
+    it("Checking if the email is already taken without errors (taken)", (done) => {
+        USER.checkEmail("carowner1@gmail.com")
+        .then(checkResult => {  
+            expect(checkResult).to.be.true;
+            done();
+        })
+        .catch(err => done(err));
+    });
+
+    it("Checking if the email is already taken without errors (not taken)", (done) => {
+        USER.checkEmail("nonexisting@gmail.com")
+        .then(checkResult => {
+            expect(checkResult).to.be.false;
+            done();
+        })
+        .catch(err => done(err));
+    });
+
+    it("Checking if the phone number is already taken without errors (taken)", (done) => {
+        USER.checkPhone("0792924971")
+        .then(checkResult => {  
+            expect(checkResult).to.be.true;
+            done();
+        })
+        .catch(err => done(err));
+    });
+
+    it("Checking if the phone number is already taken without errors (not taken)", (done) => {
+        USER.checkPhone("0000000000")
+        .then(checkResult => {
+            expect(checkResult).to.be.false;
+            done();
+        })
+        .catch(err => done(err));
+    });
+
     it("Creating user without error", (done) => {
-        user.createUser(userInformation)
+        USER.createUser(userInformation)
         .then(createResult => {
-            test(createResult,fullName,username,email,password,phoneNumber,address,"waitingUser");
-            user.deleteUser(createResult._id)
+            test(createResult,fullName,username,email,phoneNumber,address,"waitingUser",true);
+            USER.deleteUser(createResult._id)
             .then(deleteResult => {
                 done();
             })
@@ -103,7 +372,7 @@ describe('User Class Tests', () => {
 
     it("Creating user with duplicate username", (done) => {
         invalidUserInformation = {...userInformation,username:"carowner1"};
-        user.createUser(invalidUserInformation)
+        USER.createUser(invalidUserInformation)
         .then(createResult => done())
         .catch(err => {
             expect(err.message).to.contain("username_1 dup key");
@@ -113,7 +382,7 @@ describe('User Class Tests', () => {
 
     it("Creating user with duplicate email", (done) => {
         invalidUserInformation = {...userInformation,email:"carowner1@gmail.com"};
-        user.createUser(invalidUserInformation)
+        USER.createUser(invalidUserInformation)
         .then(createResult => done())
         .catch(err => {
             expect(err.message).to.contain("email_1 dup key");
@@ -123,7 +392,7 @@ describe('User Class Tests', () => {
 
     it("Creating user with duplicate phoneNumber", (done) => {
         invalidUserInformation = {...userInformation,phoneNumber:"0792924971"};
-        user.createUser(invalidUserInformation)
+        USER.createUser(invalidUserInformation)
         .then(createResult => done())
         .catch(err => {
             expect(err.message).to.contain("phoneNumber_1 dup key");
@@ -132,18 +401,14 @@ describe('User Class Tests', () => {
     });
 
     it("Updating user without error", (done) => {
-        user.createUser(userInformation)
+        USER.createUser(userInformation)
         .then(createResult => {
-            user.updateUser({_id:createResult._id,...updatedUserInformation})
+            USER.updateUser({_id:createResult._id,...updatedUserInformation})
             .then(updateResult => {
-                user.getUserById(updateResult._id)
-                .then(getResult => {
-                    test(getResult,updatedFullName,updatedUsername,updatedEmail,updatedPassword,updatedPhoneNumber,updatedAddress,updatedRole);
-                    user.deleteUser(getResult._id)
-                    .then(deleteResult => {
-                        done();
-                    })
-                    .catch(err => done(err));
+                testUpdated(updateResult._id,updatedFullName,updatedUsername,updatedEmail,updatedPhoneNumber,updatedAddress,updatedRole,true)
+                USER.deleteUser(updateResult._id)
+                .then(deleteResult => {
+                    done();
                 })
                 .catch(err => done(err));
             })
@@ -151,67 +416,90 @@ describe('User Class Tests', () => {
         })
         .catch(err => done(err));
     });
-*/
-   
 
-
-
-
-    /*
-    it('Validating warehouse information without errors.', (done) => {
-        const validationResult = warehouse.validateWarehouseInfo({amount:1111});
-        expect(validationResult).to.be.undefined;
-        done();
+    it("Updating user with duplicate username", (done) => {
+        USER.createUser(userInformation)
+        .then(createResult => {
+            updatedUserInformation = {...updatedUserInformation,username:"carowner1"};
+            USER.updateUser({_id:createResult._id,...updatedUserInformation})
+            .then(updateResult => {
+                done();
+            })
+            .catch(err => {
+                expect(err.message).to.contain("username_1 dup key");
+                USER.deleteUser(createResult._id)
+                .then(deleteResult => {
+                    done();
+                })
+                .catch(err => done(err));
+            });
+        })
+        .catch(err => done(err));
     });
 
-    it('Validating warehouse information invalid amount (format).', (done) => {
-        const validationResult = warehouse.validateWarehouseInfo({amount:"11a1"});
-        expect(validationResult.err).to.contain("amount");
-        done();
-    });
-
-    it('Validating warehouse information invalid amount (length).', (done) => {
-        const validationResult = warehouse.validateWarehouseInfo({amount:11111});
-        expect(validationResult.err).to.contain("amount");
-        done();
-    });
-
-    it('Creating warehouse without errors.', (done) => {
-      warehouse.createWarehouse()
-      .then(warehouseResult => {
-        expect(warehouseResult).to.contain.property('_id');
-        warehouse.deleteWarehouse(warehouseResult._id)
-        .then(deleteResult => {
+    it("Getting user by id without errors.", (done) => {
+        USER.getUserById(existingUserId)
+        .then(getResult => {
+            test(getResult,"CarOwner","carowner1","carowner1@gmail.com","0792924971","Amman","carOwner",false);
             done();
         })
         .catch(err => done(err));
-      })
-      .catch(err => done(err));
     });
 
-    it('Deleting warehouse without errors.', (done) => {
-        warehouse.createWarehouse()
-        .then(warehouseResult => {
-          warehouse.deleteWarehouse(warehouseResult._id)
-          .then(deleteResult => {
-              expect(deleteResult._id.toString()).to.equal(warehouseResult._id.toString());
-              done();
-          })
-          .catch(err => done(err));
+    it("Getting user by id with non-existing id.", (done) => {
+        USER.getUserById(nonExistingUserId)
+        .then(getResult => {
+            expect(getResult).to.be.null;
+            done();
         })
         .catch(err => done(err));
-      });
+    });
 
-    it('Linking warehouse without errors.', (done) => {
-    warehouse.createWarehouse()
-    .then(warehouseResult => {
-        warehouse.linkWarehouse({_id:warehouseResult._id,storeId:storeId})
-        .then(linkingResult => {
-            warehouse.getWarehouse(linkingResult._id)
-            .then(getResult => {
-                expect(getResult.storeId.toString()).to.equal(storeId);
-                warehouse.deleteWarehouse(warehouseResult._id)
+    it("Getting all users ids of a role without errors. (carOwner)", (done) => {
+        USER.getAllUsersIdOfARole("carOwner")
+        .then(getResult => {
+            expect(getResult.length).to.equal(2);
+            done();
+        })
+        .catch(err => done(err));
+    });
+
+    it("Getting all users ids of a role without errors. (waitingUser)", (done) => {
+        USER.getAllUsersIdOfARole("waitingUser")
+        .then(getResult => {
+            expect(getResult.length).to.equal(2);
+            done();
+        })
+        .catch(err => done(err));
+    });
+
+    it("Getting all users ids of a role without errors. (garageOwner)", (done) => {
+        USER.getAllUsersIdOfARole("garageOwner")
+        .then(getResult => {
+            expect(getResult.length).to.equal(2);
+            done();
+        })
+        .catch(err => done(err));
+    });
+
+    it("Getting all users ids of a role without errors. (invalidRole)", (done) => {
+        USER.getAllUsersIdOfARole("invalidRole")
+        .then(getResult => {
+            expect(getResult.length).to.equal(0);
+            done();
+        })
+        .catch(err => done(err));
+    });
+
+    it("Accepting waiting user without error", (done) => {
+        USER.createUser(userInformation)
+        .then(createResult => {
+            USER.acceptWaitingUser(createResult._id)
+            .then(acceptResult => {
+                testUpdated(acceptResult._id,fullName,username,email,phoneNumber,address,"garageOwner",true);
+                USER.deleteUser(acceptResult._id._id)
                 .then(deleteResult => {
+                    testDeleted(deleteResult._id);
                     done();
                 })
                 .catch(err => done(err));
@@ -219,36 +507,14 @@ describe('User Class Tests', () => {
             .catch(err => done(err));
         })
         .catch(err => done(err));
-    })
-    .catch(err => done(err));
     });
-    
-    it('Adding product to warehouse without errors.', (done) => {
-        warehouse.addProduct(storeId,addAndRemoveProductId,categoryId,30)
-        .then(addResult => {
-            warehouse.getWarehouse(warehouseId)
-            .then(getResult => {
-                length = getResult.storage.length;
-                expect(length).to.equal(7);
-                expect(getResult.storage[length-1].productId.toString()).to.equal(addAndRemoveProductId);
-                expect(getResult.storeId.toString()).to.equal(storeId);
-                expect(getResult.storage[length-1].categoryId.toString()).to.equal(categoryId);
-                expect(getResult.storage[length-1].amount).to.equal(30);
-                done();
-            })
-            .catch(err => done(err));
-        })
-        .catch(err => done(err));
-        
-    });
-    
-    it('Removing product from warehouse without errors.', (done) => {
-        warehouse.removeProductFromWarehouse(storeId,addAndRemoveProductId)
-        .then(removeResult => {
-            warehouse.getWarehouse(warehouseId)
-            .then(getResult => {
-                length = getResult.storage.length;
-                expect(length).to.equal(6);
+
+    it("Deleting user without error", (done) => {
+        USER.createUser(userInformation)
+        .then(createResult => {
+            USER.deleteUser(createResult._id)
+            .then(deleteResult => {
+                testDeleted(deleteResult._id);
                 done();
             })
             .catch(err => done(err));
@@ -256,47 +522,4 @@ describe('User Class Tests', () => {
         .catch(err => done(err));
     });
 
-    it('Removing all products of the warehouse without errors.', (done) => {
-        
-        warehouse.addProduct(otherStoreId,addAndRemoveProductId,otherCategoryId,30)
-        .then(addResult1 => {
-        warehouse.addProduct(otherStoreId,addAndRemoveProductId,otherCategoryId,30)
-            .then(addResult2 => {
-            warehouse.removeProductsFromWarehouse(otherStoreId,otherCategoryId)
-                .then(removeResult => {
-                warehouse.getWarehouse(addResult2._id)
-                    .then(getResult => {
-                        expect(getResult.storage.length).to.equal(6);
-                        done();
-                    })
-                    .catch(err => done(err));
-                })
-                .catch(err => done(err));
-            })
-            .catch(err => done(err));
-        })
-        .catch(err => done(err));
-    })
-    
-    it('Deleting warehouse by storeId without errors.', (done) => {
-        warehouse.createWarehouse()
-        .then(createResult => {
-            warehouse.linkWarehouse({_id:createResult._id,storeId:deleteStoreId})
-            .then(linkingResult => {
-                warehouse.deleteWarehouseByStoreId(deleteStoreId)
-                .then(deletingResult => {
-                    warehouse.getWarehouse(createResult._id)
-                    .then(getResult => {
-                        expect(getResult).to.be.null;
-                        done();
-                    })
-                    .catch(err => done(err));
-                })
-                .catch(err => done(err));
-            })
-            .catch(err => done(err));
-        })
-        .catch(err => done(err));
-    });
-*/
 });

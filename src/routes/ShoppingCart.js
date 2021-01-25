@@ -148,7 +148,7 @@ router.post('/shopping-cart/add-cart/:storeId/:productId', userAuthenticated, (r
                             }
                         }).catch(err => {
                             return res.status(404).send({
-                                err: 'WAREHOUSE_IS_NOT_FOUND'
+                                error: 'WAREHOUSE_IS_NOT_FOUND'
                             });
                         });
                     }).catch(err => {

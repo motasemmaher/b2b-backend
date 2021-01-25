@@ -21,7 +21,7 @@ function test(result,owner,data)
 }
 
 describe('Message Class Tests', () => {    
-
+     
     before((done) => {
       connection.connect()
                 .then(() => done())
@@ -33,10 +33,16 @@ describe('Message Class Tests', () => {
         expect(validationResult).to.be.undefined;
         done();
     });
-/*
+
     it('Validating message information with invalid data.', (done) => {
         const validationResult = message.validateMessageInfo({data:invalidData});
-        expect(validationResult.err).to.contain("data");
+        expect(validationResult.error).to.contain("data");
+        done();
+    });
+
+    it('Validating message information with invalid data (missing).', (done) => {
+        const validationResult = message.validateMessageInfo({data:undefined});
+        expect(validationResult.error).to.contain("data");
         done();
     });
 
@@ -85,5 +91,5 @@ describe('Message Class Tests', () => {
         })
         .catch(err => done(err));
     });
-  */
+  
 }); 

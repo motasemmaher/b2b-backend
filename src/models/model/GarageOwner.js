@@ -204,6 +204,15 @@ module.exports = {
                 error: "Error with the removeOrder in GarageOwners"
             };
     }
+    ,
+    trustGarageOwner(value)
+    {
+        const result = GarageOwnerModel.findOneAndUpdate({_id:value._id},{isTrusted:true},{ "useFindAndModify": false });
+        if (result)
+            return result;
+        else
+            return {error: "Error with trusting garageOwner"};
+    }
     /*
     ,
     acceptWaitingUser(value)

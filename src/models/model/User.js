@@ -14,6 +14,39 @@ module.exports = {
                 error: "Error with the getting User"
             };
     },
+    checkUsername(value)
+    {
+        const result = UserModel.exists({username: value.username},{id:1});
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error with the getting User"
+            };
+    }
+    ,
+    checkPhone(value)
+    {
+        const result = UserModel.exists({phoneNumber: value.phone},{id:1});
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error with the getting User"
+            };
+    }
+    ,
+    checkEmail(value)
+    {
+        const result = UserModel.exists({email: value.email},{id:1});
+        if (result)
+            return result;
+        else
+            return {
+                error: "Error with the getting User"
+            };
+    }
+    ,
 
     countByRole(value) {
         const count = UserModel.countDocuments({
@@ -77,6 +110,9 @@ module.exports = {
     findUserById(value) {
         const result = UserModel.findById({
             _id: value.userId
+        },
+        {
+            password:0
         });
         if (result)
             return result;
@@ -88,7 +124,7 @@ module.exports = {
 
     getUser(value) {
         const result = UserModel.findById({
-            _id: value._id
+            _id: value
         });
         if (result)
             return result;

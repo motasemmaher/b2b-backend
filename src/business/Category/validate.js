@@ -4,10 +4,10 @@ module.exports = {
     
    validateCategoryInfo(category)
    {
-      if(!validator.matches(category.name,/(^[A-Z a-z\s\d-_']{2,64}$)/))
+      if(category.name === undefined || !validator.matches(category.name,/(^[\p{L}\s\d'_-]{2,64}$)/ugi))
          return "Invalid category name !";
-      // if(!validator.matches(category.tags,/(^[A-Z a-z\s\d-,']{2,256}$)/))
-      //    return "Invalid category tags !"   
+      if(category.tags === undefined || !validator.matches(category.tags,/(^[\p{L}\s\d',-]{2,256}$)/ugi))
+         return "Invalid category tags !"   
 
        return "pass";
    }

@@ -1,0 +1,173 @@
+"Unauthorized user !"
+"Didn't find a car with that id."
+"Invalid car make !"
+"Invalid car model !"
+"Invalid car year !"    
+"Error! Didn't find a car with that id."
+"The requested car doesn't belong to this carowner."
+"Error! Didn't find a store with thats id."
+"Error! Didn't find a category with that id."
+"Error! Didn't find a store with that id."
+"Error! The requested store doesn't belong to this garage owner."
+"Invalid category name !"
+"Invalid category tags !"
+"Error! Didn't find a cateory with that id."
+"A category with that name already exists."
+"Error! Didn't find a complaint with that id."
+"Error, the user isn't allowed to view the complaints."
+"Error! Didn't find a user with that is."
+"Invalid message data !"
+"Error! Didn't find store with that id."
+"Error! Didn't find offer with that id."
+"The requested product type is invalid !"
+"Error! Didn't find a product with that id."   
+"Error! Didn't find a produt with that id."
+"Error! Didn't find a user with that id."
+"Invalid product name !"
+"Invalid product description !"
+"Invalid product price !"
+"Invalid category tags !"
+"Invalid product type !"
+"Invalid warehouse's product amount !"
+"Invalid store name !"
+"Invalid store address !"
+"Invalid store description"
+"Invalid store open time !"
+"Invalid store close time !"
+"Invalid store tags !"
+"Invalid user fullname !"
+"Invalid username !"
+"Invalid email !"
+"Invalid phone number !"
+"Invalid password !"
+"Invalid user address !"
+"Invalid user role !"
+-------------------------------------------------------------------
+"UNAUTHORIZED_USER"
+"DIDN\'T_FIND_A_CAR_WITH_THAT_ID"
+"INVALID_CAR_MAKE"
+"INVALID_CAR_MODEL"
+"INVALID_CAR_YEAR"
+"ERROR_DIDN\'T_FIND_A_CAR_WITH_THAT_ID"
+"THE_REQUESTED_CAR_DOESN\'T_BELONG_TO_THIS_CAROWNER"
+"ERROR_DIDN\'T_FIND_A_STORE_WITH_THATS_ID"
+"ERROR_DIDN\'T_FIND_A_CATEGORY_WITH_THAT_ID"
+"ERROR_DIDN\'T_FIND_A_STORE_WITH_THAT_ID"
+"ERROR_THE_REQUESTED_STORE_DOESN\'T_BELONG_TO_THIS_GARAGE_OWNER"
+"INVALID_CATEGORY_NAME"
+"INVALID_CATEGORY_TAGS"
+"ERROR_DIDN\'T_FIND_A_CATEORY_WITH_THAT_ID"
+"A_CATEGORY_WITH_THAT_NAME_ALREADY_EXISTS"
+"ERROR_DIDN\'T_FIND_A_COMPLAINT_WITH_THAT_ID"
+"ERROR_THE_USER_ISN\'T_ALLOWED_TO_VIEW_THE_COMPLAINTS"
+"ERROR_DIDN\'T_FIND_A_USER_WITH_THAT_IS"
+"INVALID_MESSAGE_DATA"
+"ERROR_DIDN\'T_FIND_STORE_WITH_THAT_ID"
+"ERROR_DIDN\'T_FIND_OFFER_WITH_THAT_ID"
+"THE_REQUESTED_PRODUCT_TYPE_IS_INVALID"
+"ERROR_DIDN\'T_FIND_A_PRODUCT_WITH_THAT_ID"
+"ERROR_DIDN\'T_FIND_A_PRODUT_WITH_THAT_ID"
+"ERROR_DIDN\'T_FIND_A_USER_WITH_THAT_ID"
+"INVALID_PRODUCT_NAME"
+"INVALID_PRODUCT_DESCRIPTION"
+"INVALID_PRODUCT_PRICE"
+"INVALID_CATEGORY_TAGS"
+"INVALID_PRODUCT_TYPE"
+"INVALID_WAREHOUSE\'S_PRODUCT_AMOUNT"
+"INVALID_STORE_NAME"
+"INVALID_STORE_ADDRESS"
+"INVALID_STORE_DESCRIPTION"
+"INVALID_STORE_OPEN_TIME"
+"INVALID_STORE_CLOSE_TIME"
+"INVALID_STORE_TAGS"
+"INVALID_USER_FULLNAME"
+"INVALID_USERNAME"
+"INVALID_EMAIL"
+"INVALID_PHONE_NUMBER"
+"INVALID_PASSWORD"
+"INVALID_USER_ADDRESS"
+"INVALID_USER_ROLE"
+--------------------------------------------------------------
+"UNAUTHORIZED_USER":"Unauthorized user !",
+"DIDN'T_FIND_A_CAR_WITH_THAT_ID":"Didn't find a car with that id.",
+"INVALID_CAR_MAKE":"Invalid car make !",
+"INVALID_CAR_MODEL":"Invalid car model !",
+"INVALID_CAR_YEAR":"Invalid car year !",
+"ERROR_DIDN'T_FIND_A_CAR_WITH_THAT_ID":"Error! Didn't find a car with that id.",
+"THE_REQUESTED_CAR_DOESN'T_BELONG_TO_THIS_CAROWNER":"The requested car doesn't belong to this carowner.",
+"ERROR_DIDN'T_FIND_A_CATEGORY_WITH_THAT_ID":"Error! Didn't find a category with that id.",
+"ERROR_DIDN'T_FIND_A_STORE_WITH_THAT_ID":"Error! Didn't find a store with that id.",
+"ERROR_THE_REQUESTED_STORE_DOESN'T_BELONG_TO_THIS_GARAGE_OWNER":"Error! The requested store doesn't belong to this garage owner.",
+"INVALID_CATEGORY_NAME":"Invalid category name !",
+"INVALID_CATEGORY_TAGS":"Invalid category tags !",
+"ERROR_DIDN'T_FIND_A_CATEGORY_WITH_THAT_ID":"Error! Didn't find a category with that id.",
+"A_CATEGORY_WITH_THAT_NAME_ALREADY_EXISTS":"A category with that name already exists.",
+"ERROR_DIDN'T_FIND_A_COMPLAINT_WITH_THAT_ID":"Error! Didn't find a complaint with that id.",
+"ERROR_THE_USER_ISN'T_ALLOWED_TO_VIEW_THE_COMPLAINTS":"Error, the user isn't allowed to view the complaints.",
+"INVALID_MESSAGE_DATA":"Invalid message data !",
+"ERROR_DIDN'T_FIND_STORE_WITH_THAT_ID":"Error! Didn't find store with that id.",
+"ERROR_DIDN'T_FIND_OFFER_WITH_THAT_ID":"Error! Didn't find offer with that id.",
+"THE_REQUESTED_PRODUCT_TYPE_IS_INVALID":"The requested product type is invalid !",
+"ERROR_DIDN'T_FIND_A_PRODUCT_WITH_THAT_ID":"Error! Didn't find a product with that id.",
+"ERROR_DIDN'T_FIND_A_USER_WITH_THAT_ID":"Error! Didn't find a user with that id.",
+"INVALID_PRODUCT_NAME":"Invalid product name !",
+"INVALID_PRODUCT_DESCRIPTION":"Invalid product description !",
+"INVALID_PRODUCT_PRICE":"Invalid product price !",
+"INVALID_CATEGORY_TAGS":"Invalid category tags !",
+"INVALID_PRODUCT_TYPE":"Invalid product type !",
+"INVALID_WAREHOUSE'S_PRODUCT_AMOUNT":"Invalid warehouse's product amount !",
+"INVALID_STORE_NAME":"Invalid store name !",
+"INVALID_STORE_ADDRESS":"Invalid store address !",
+"INVALID_STORE_DESCRIPTION":"Invalid store description",
+"INVALID_STORE_OPEN_TIME":"Invalid store open time !",
+"INVALID_STORE_CLOSE_TIME":"Invalid store close time !",
+"INVALID_STORE_TAGS":"Invalid store tags !",
+"INVALID_USER_FULLNAME":"Invalid user fullname !",
+"INVALID_USERNAME":"Invalid username !",
+"INVALID_EMAIL":"Invalid email !",
+"INVALID_PHONE_NUMBER":"Invalid phone number !",
+"INVALID_PASSWORD":"Invalid password !",
+"INVALID_USER_ADDRESS":"Invalid user address !",
+"INVALID_USER_ROLE":"Invalid user role !"
+---------------------------------------------------------------------------------------------------------------------
+"UNAUTHORIZED_USER":"! مستخدم غير مصرح له",
+"DIDN'T_FIND_A_CAR_WITH_THAT_ID":"! لم أجد سيارة بهذا المعرف",
+"INVALID_CAR_MAKE":"! صنع سيارة غير صالحة",
+"INVALID_CAR_MODEL":"! طراز السيارة غير صالح",
+"INVALID_CAR_YEAR":"! سنة السيارة غير صالحة",
+"ERROR_DIDN'T_FIND_A_CAR_WITH_THAT_ID":"خطأ! لم يتم العثور على سيارة بهذا المعرف",
+"THE_REQUESTED_CAR_DOESN'T_BELONG_TO_THIS_CAROWNER":"السيارة المطلوبة لا تنتمي إلى صاحب السيارة هذا",
+"ERROR_DIDN'T_FIND_A_STORE_WITH_THATS_ID":"خطأ! لم يتم العثور على متجر بهذا المعرف",
+"ERROR_DIDN'T_FIND_A_CATEGORY_WITH_THAT_ID":"خطأ! لم يتم العثور على فئة بهذا المعرف",
+"ERROR_THE_REQUESTED_STORE_DOESN'T_BELONG_TO_THIS_GARAGE_OWNER":"خطأ! المتجر المطلوب لا ينتمي إلى مالك المرآب هذا",
+"INVALID_CATEGORY_NAME":"! اسم فئة غير صالح",
+"INVALID_CATEGORY_TAGS":"! علامات فئة غير صالحة",
+"ERROR_DIDN'T_FIND_A_CATEGORY_WITH_THAT_ID":"خطأ! لم يتم العثور على كتالوج مع هذا المعرف",
+"A_CATEGORY_WITH_THAT_NAME_ALREADY_EXISTS":"توجد فئة بهذا الاسم بالفعل",
+"ERROR_DIDN'T_FIND_A_COMPLAINT_WITH_THAT_ID":"خطأ! لم يتم العثور على شكوى بهذا المعرف",
+"ERROR_THE_USER_ISN'T_ALLOWED_TO_VIEW_THE_COMPLAINTS":"خطأ ، لا يُسمح للمستخدم بمشاهدة الشكاوى",
+"INVALID_MESSAGE_DATA":"! بيانات رسالة غير صالحة",
+"ERROR_DIDN'T_FIND_STORE_WITH_THAT_ID":"خطأ! لم يتم العثور على متجر بهذا المعرف",
+"ERROR_DIDN'T_FIND_OFFER_WITH_THAT_ID":"خطأ! لم يتم العثور على عرض بهذا المعرف",
+"THE_REQUESTED_PRODUCT_TYPE_IS_INVALID":"! نوع المنتج المطلوب غير صالح",
+"ERROR_DIDN'T_FIND_A_PRODUCT_WITH_THAT_ID":"خطأ! لم يتم العثور على منتج بهذا المعرف",
+"ERROR_DIDN'T_FIND_A_USER_WITH_THAT_ID":"خطأ! لم يتم العثور على مستخدم بهذا المعرف",
+"INVALID_PRODUCT_NAME":"! اسم المنتج غير صالح",
+"INVALID_PRODUCT_DESCRIPTION":"! وصف المنتج غير صالح",
+"INVALID_PRODUCT_PRICE":"! سعر المنتج غير صالح",
+"INVALID_CATEGORY_TAGS":"! علامات فئة غير صالحة",
+"INVALID_PRODUCT_TYPE":"! نوع المنتج غير صالح",
+"INVALID_WAREHOUSE'S_PRODUCT_AMOUNT":"! كمية منتج المستودع غير صالحة",
+"INVALID_STORE_NAME":"! اسم المتجر غير صالح",
+"INVALID_STORE_ADDRESS":"! عنوان المتجر غير صالح",
+"INVALID_STORE_DESCRIPTION":"! وصف المتجر غير صالح",
+"INVALID_STORE_OPEN_TIME":"! وقت فتح المتجر غير صالح",
+"INVALID_STORE_CLOSE_TIME":"! وقت إغلاق المتجر غير صالح",
+"INVALID_STORE_TAGS":"! علامات المتجر غير صالحة",
+"INVALID_USER_FULLNAME":"! الاسم الكامل للمستخدم غير صالح",
+"INVALID_USERNAME":"! اسم المستخدم غير صالح",
+"INVALID_EMAIL":"! بريد إلكتروني خاطئ",
+"INVALID_PHONE_NUMBER":"! رقم الهاتف غير صحيح",
+"INVALID_PASSWORD":"! رمز مرور خاطئ!",
+"INVALID_USER_ADDRESS":"! عنوان المستخدم غير صالح",
+"INVALID_USER_ROLE":"! دور المستخدم غير صالح"

@@ -24,6 +24,10 @@ let testingStoreId = "5fd9af52fdac372044c3aa01";
 let invalidNameShort = "c";
 let invalidNameLong = new Array(66).join('c');
 let invalidNameFormat = "category.1"
+//Invalid category tags
+const invalidTagsLong = new Array(258).join('T');
+const invalidTagsShort = "T";
+const invalidTagsFormat = "invalidTag@format";
 
 //Testing functions
 function test(result,name,storeId,tags)
@@ -53,7 +57,7 @@ function testDeleted(categoryId)
 }
 
 describe('Category Class Tests', () => {    
-
+  
   before((done) => {
     connection.connect()
               .then(() => done())
@@ -65,22 +69,52 @@ describe('Category Class Tests', () => {
     expect(validationResult).to.be.undefined;
     done();
   });
-/*
+
   it('Validating category information invalid name (short).', (done) => {
     const validationResult = category.validateCategoryInfo({name:invalidNameShort,tags:tags});
-    expect(validationResult.err).to.contain("name");
+    expect(validationResult.error).to.contain("name");
     done();
   });
 
   it('Validating category information invalid name (long).', (done) => {
     const validationResult = category.validateCategoryInfo({name:invalidNameLong,tags:tags});
-    expect(validationResult.err).to.contain("name");
+    expect(validationResult.error).to.contain("name");
     done();
   });
 
   it('Validating category information invalid name (format).', (done) => {
     const validationResult = category.validateCategoryInfo({name:invalidNameFormat,tags:tags});
-    expect(validationResult.err).to.contain("name");
+    expect(validationResult.error).to.contain("name");
+    done();
+  });
+
+  it('Validating category information invalid name (missing).', (done) => {
+    const validationResult = category.validateCategoryInfo({name:undefined,tags:tags});
+    expect(validationResult.error).to.contain("name");
+    done();
+  });
+
+  it('Validating category information with invalid category tags (long).', (done) => {
+    const validationResult = category.validateCategoryInfo({name:validName,tags:invalidTagsLong});
+    expect(validationResult.error).to.contain("tags");
+    done();
+  });
+
+  it('Validating category information with invalid category tags (short).', (done) => {
+    const validationResult = category.validateCategoryInfo({name:validName,tags:invalidTagsShort});
+    expect(validationResult.error).to.contain("tags");
+    done();
+  });
+
+  it('Validating category information with invalid category tags (format).', (done) => {
+    const validationResult = category.validateCategoryInfo({name:validName,tags:invalidTagsFormat});
+    expect(validationResult.error).to.contain("tags");
+    done();
+  });
+
+  it('Validating category information with invalid category tags (missing).', (done) => {
+    const validationResult = category.validateCategoryInfo({name:validName,tags:undefined});
+    expect(validationResult.error).to.contain("tags");
     done();
   });
 
@@ -144,7 +178,10 @@ describe('Category Class Tests', () => {
         })
     .catch(err => done(err));
   });
-  
+
+
+  //--------------------------------------------------------------------------------------
+  /*
   it('Getting products of a category without errors.', (done) => {
     category.getProductsOfCategory(existingCategoryId)
     .then(productsResult => {
@@ -162,7 +199,9 @@ describe('Category Class Tests', () => {
     })
     .catch(err => done(err));
   });
-
+  */
+ //--------------------------------------------------------------------------------------
+ 
   it('Adding product to category without errors.', (done) => {
     category.addProduct(existingCategoryId,testingProductId)
     .then(addResult => {
@@ -235,5 +274,5 @@ describe('Category Class Tests', () => {
     })
     .catch(err => done(err));
   });
-*/
+
 });

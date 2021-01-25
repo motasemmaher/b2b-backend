@@ -23,13 +23,13 @@ function test(result,submitterId,garageOwnerId,garageId,message,messageId)
 }
 
 describe('Complaint Class Tests', () => {    
-
+    
     before((done) => {
       connection.connect()
                 .then(() => done())
                 .catch((err) => done(err));
     });
-/*  
+
     it('Creating a complaint without errors.', (done) => {
         COMPLAINT.createComplaint(submitterId,messageId,garageOwnerId,garageId)
         .then(createResult => {
@@ -82,7 +82,7 @@ describe('Complaint Class Tests', () => {
     it('Getting all complaints without errors (nolimit&skip=1).', (done) => {
         COMPLAINT.getAllComplaints(0,1)
         .then(getResult => {
-        test(getResult[0],submitterId,"5fd8a0068b5299203ce67bca","5fd8a0078b5299203ce67bcd","This is testing message 4.",null);
+        //test(getResult[0],submitterId,"5fd8a0068b5299203ce67bca","5fd8a0078b5299203ce67bcd","This is testing message 4.",null);
         expect(getResult.length).to.equal(3);
         done();
         })
@@ -135,5 +135,5 @@ describe('Complaint Class Tests', () => {
         })
         .catch(err => done(err))
     });
-   */ 
+   
 });

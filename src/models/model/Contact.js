@@ -20,9 +20,9 @@ module.exports = {
         const result = ContactModel.findOneAndUpdate({
             ownerId: value.ownerId
         }, {
-            $push: {
+            $addToSet: {
                 contacts: {
-                    name: value.Name,
+                    name: value.name,
                     _id: value.otherUserId
                 }
             }
@@ -85,7 +85,7 @@ module.exports = {
             }, {
                 contacts: {
                     $elemMatch: {
-                        _id: value.subcontactId
+                        _id: value.subContactId
                     }
                 }
             }]
