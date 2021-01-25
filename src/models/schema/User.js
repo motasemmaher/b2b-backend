@@ -55,6 +55,11 @@ const User = new schema({
         enum: ["admin", "garageOwner", "carOwner", "waitingUser"]
     },
 
+    logged: {
+        type: Boolean,
+        default: true
+    }
+
 });
 
 
