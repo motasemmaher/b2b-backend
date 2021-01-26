@@ -6,6 +6,7 @@ const {
 
 const subscription = require('../business/Objects').SUBSCRIPTION;
 
+// if userid and endpoint exists it will return true otherwise will return false
 router.get('/subscription/:endpoint', userAuthenticated, async (req, res) => {
     const userInfo = req.user;
     const endpoint = req.body.endpoint;
