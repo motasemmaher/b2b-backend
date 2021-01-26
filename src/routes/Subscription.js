@@ -6,6 +6,17 @@ const {
 
 const subscription = require('../business/Objects').SUBSCRIPTION;
 
+// if userid and endpoint exists it will return true otherwise will return false
+router.get('/subscription/:endpoint', userAuthenticated, async (req, res) => {
+    const userInfo = req.user;
+    const endpoint = req.body.endpoint;
+    const result = await subscription.getSubscriptionByUserIdAndEndpoint(userInfo.id, endpoint);
+    if (result) {
+        return res.send(true);
+    }
+    return res.send(false);
+});
+
 router.post('/subscription', userAuthenticated, (req, res) => {
     const userInfo = req.user;
     const endpoint = req.body.endpoint;
@@ -22,5 +33,7 @@ router.post('/subscription', userAuthenticated, (req, res) => {
         }
     });
 
-    res.status(201).send({msg: 'Subscription created'});
+    res.status(201).send({
+        msg: 'Subscription created'
+    });
 });

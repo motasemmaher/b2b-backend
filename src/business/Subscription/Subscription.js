@@ -16,6 +16,14 @@ module.exports = class Subscription {
         return result;
     }
 
+    getSubscriptionByUserIdAndEndpoint(userId, endpoint) {
+        const result = SubscriptionModel.getSubscriptionByUserIdAndEndpoint({
+            userId: userId,
+            endpoint: endpoint
+        });
+        return result;
+    }
+
     deleteSubscriptionByUserId(userId) {
         const result = SubscriptionModel.deleteSubscriptionByUserId({
             userId: userId

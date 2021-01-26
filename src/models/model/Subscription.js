@@ -12,7 +12,22 @@ module.exports = {
     getSubscriptionByUserId(value) {
         const result = SubscriptionModel.findOne({
             userId: value.userId
-        }, {userId: 0});
+        }, {
+            userId: 0
+        });
+        return result;
+    },
+
+    getSubscriptionByUserIdAndEndpoint(value) {
+        const result = SubscriptionModel.findOne({
+            $and: [{
+                userId: value.userId
+            }, {
+                endpoint: value.endpoint
+            }]
+        }, {
+            userId: 0
+        });
         return result;
     },
 
