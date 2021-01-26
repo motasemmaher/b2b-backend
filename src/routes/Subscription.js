@@ -9,7 +9,7 @@ const subscription = require('../business/Objects').SUBSCRIPTION;
 router.get('/subscription/:endpoint', userAuthenticated, async (req, res) => {
     const userInfo = req.user;
     const endpoint = req.body.endpoint;
-    const result = await subscription.getSubscriptionByUserIdAndEndpoint(userInfo.id);
+    const result = await subscription.getSubscriptionByUserIdAndEndpoint(userInfo.id, endpoint);
     if (result) {
         return res.send(true);
     }
