@@ -58,7 +58,7 @@ const User = new schema({
 
     logged: {
         type: Boolean,
-        default: true
+        default: false
     }
 
 });

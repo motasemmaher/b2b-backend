@@ -13,7 +13,7 @@ const carOwner = require('../business/Objects').CAROWNER;
 const cartItem = require('../business/Objects').CARTITEM;
 const order = require('../business/Objects').ORDER;
 const offer = require('../business/Objects').OFFER;
-
+const subscription = require('../business/Objects').SUBSCRIPTION;
 
 // validation by thaer
 const orderInformationValidator = require('../business/Order/orderInformation');
@@ -277,6 +277,10 @@ router.post('/shopping-cart/checkout', userAuthenticated, (req, res) => {
         });
     }
 
+    const payload = JSON.stringify({
+        title: 'Push notifications with Service Workers',
+    });    
+        
     const status = 'pending';
     let errors = [];
     if (userInfo.role === 'carOwner') {
@@ -314,7 +318,12 @@ router.post('/shopping-cart/checkout', userAuthenticated, (req, res) => {
                                                                                 .then(async addedOrderToStore => {
                                                                                     if (index === owner.shoppingCart.Items.length - 1) {
                                                                                         await carOwner.clearShoppingcart(owner._id).then(clearedShoppingCart => {
-                                                                                            res.send(addedOrderToStore);
+                                                                                            subscription.getSubscriptionByUserId(userInfo._id).then(subscriptionInfo => {
+                                                                                                webPush.sendNotification(subscriptionInfo, payload).catch(error => console.error(error));
+                                                                                                res.send(addedOrderToStore);
+                                                                                            }).catch(err => {
+                                                                                                res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
+                                                                                            });                                                                                                                                                                                    
                                                                                         });
                                                                                     }
                                                                                 }).catch(err => {
@@ -371,7 +380,12 @@ router.post('/shopping-cart/checkout', userAuthenticated, (req, res) => {
                                                                         .then(async addedOrderToStore => {
                                                                             if (index === owner.shoppingCart.Items.length - 1) {
                                                                                 await carOwner.clearShoppingcart(owner._id).then(clearedShoppingCart => {
-                                                                                    res.send(addedOrderToStore);
+                                                                                    subscription.getSubscriptionByUserId(userInfo._id).then(subscriptionInfo => {
+                                                                                        webPush.sendNotification(subscriptionInfo, payload).catch(error => console.error(error));
+                                                                                        res.send(addedOrderToStore);
+                                                                                    }).catch(err => {
+                                                                                        res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
+                                                                                    }); 
                                                                                 });
                                                                             }
                                                                         }).catch(err => {

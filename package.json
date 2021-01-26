@@ -36,7 +36,8 @@
     "rate-limiter-flexible": "^2.1.13",
     "socket.io": "^2.3.0",
     "supertest": "^6.0.0",
-    "validator": "^13.1.17"
+    "validator": "^13.1.17",
+    "web-push": "^3.4.4"
   },
   "devDependencies": {
     "nyc": "^15.1.0"
