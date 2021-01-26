@@ -18,7 +18,7 @@ const Contact = require('./Contact/Contact');
 const Chat = require('./Chat/Chat');
 const Report = require('./Report/Report');
 const Permissions = require('./Permissions/Permissions');
-
+const Subscription = require('./Subscription/Subscription');
 //Objects
 const USER = new User();
 const GARAGEOWNER = new GarageOwner();
@@ -39,5 +39,6 @@ const CONTACT = new Contact();
 const CHAT = new Chat();
 const REPORT = new Report();
 const PERMISSIONS = new Permissions();
+const SUBSCRIPTION = new Subscription();
 
-module.exports = {USER,GARAGEOWNER, CHAT,CAROWNER,STORE,WAREHOUSE,MENU,CATEGORY,PRODUCT,COMPLAINT,MESSAGE,OFFER,CAR,SHOPPINGCART, CARTITEM, ORDER, PERMISSIONS, REPORT, CONTACT};
+module.exports = {USER,GARAGEOWNER, CHAT,CAROWNER,STORE,WAREHOUSE,MENU,CATEGORY,PRODUCT,COMPLAINT,MESSAGE,OFFER,CAR,SHOPPINGCART, CARTITEM, ORDER, PERMISSIONS, REPORT, CONTACT, SUBSCRIPTION};

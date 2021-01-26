@@ -4,7 +4,7 @@ const Permissions = require('./src/business/Permissions/Permissions');
 const permissions = new Permissions();
 const PORT = 3000;
 const chat = require('./src/business/Objects').CHAT;
-
+const { placeOrder } = require('./src/routes/ShoppingCart');
 let http = require('http');
 let server = http.Server(app);
 
@@ -36,7 +36,7 @@ io.on('connection', (socket) => {
 connection.connect()
     .then(() => {
         server.listen(PORT, () => {
-           
+
             Promise.all([
                 permissions.createPermissions('carOwner'),
                 permissions.createPermissions('garageOwner'),
