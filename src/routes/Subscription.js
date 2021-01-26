@@ -6,6 +6,16 @@ const {
 
 const subscription = require('../business/Objects').SUBSCRIPTION;
 
+router.get('/subscription/:endpoint', userAuthenticated, async (req, res) => {
+    const userInfo = req.user;
+    const endpoint = req.body.endpoint;
+    const result = await subscription.getSubscriptionByUserIdAndEndpoint(userInfo.id);
+    if (result) {
+        return res.send(true);
+    }
+    return res.send(false);
+});
+
 router.post('/subscription', userAuthenticated, (req, res) => {
     const userInfo = req.user;
     const endpoint = req.body.endpoint;
@@ -22,5 +32,7 @@ router.post('/subscription', userAuthenticated, (req, res) => {
         }
     });
 
-    res.status(201).send({msg: 'Subscription created'});
+    res.status(201).send({
+        msg: 'Subscription created'
+    });
 });
