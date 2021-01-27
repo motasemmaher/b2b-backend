@@ -170,7 +170,8 @@ app.use(productRoute);
 
 //Store CORS
 app.options('/stores/:storeId?'); //View Stores and View a Store
-app.options('/stores/nearby'); //View nearby stores (same address)
+app.options('/view-stores/nearby'); //View nearby stores (same address)
+app.options('/view-stores/location'); //View nearby stores (same location)
 app.options('/user/:userId/manage-garage-owner/stores'); //View garageOwner's Stores
 app.options('/user/:userId/manage-garage-owner/add-store'); //Add Store
 app.options('/user/:userId/manage-garage-owner/update-store/:storeId'); //Update Store
@@ -516,12 +517,11 @@ const shoppingCartRoute = require('./src/routes/ShoppingCart');
 const orderRoute = require('./src/routes/Order');
 const searchRoute = require('./src/routes/Search');
 const permissionsRoute = require('./src/routes/Permissions');
-const carOwnerRoute = require('./src/routes/CarOwner');
+
 
 // Use Routes
 app.use(shoppingCartRoute);
 app.use(orderRoute);
-app.use(carOwnerRoute);
 app.use(searchRoute);
 app.use(permissionsRoute);
 

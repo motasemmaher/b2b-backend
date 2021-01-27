@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const upload = require('../shared/imageUpload');
 const imageToBase64 = require('image-to-base64');
+const uploadImage = require('../shared/uploadImage');
+const randomId = require('../shared/generateRandomId');
 const { userAuthenticated } = require('../middleware/authentication');
 const limitAndSkipValidation = require('../shared/limitAndSkipValidation');
 
@@ -287,11 +289,14 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
                                 else if (typeof warehouseValidationResult !== 'undefined')
                                     return res.status(400).send({ error: warehouseValidationResult.error });
                                 else {
+                                    const randomIdValue = randomId.generateId();
+                                    const path = `public/images/${randomIdValue}.png`;
                                     garageOwner.getGarageOwnerByUserId(loggedUser._id)
                                         .then(garageOwnerResult => {
-                                            if (garageOwnerResult != null && garageOwnerResult.isTrusted)
-                                                productInfo = { ...productInfo, tags: req.body.generalType + tags };
-
+                                            if (garageOwnerResult != null && garageOwnerResult.isTrusted){
+                                                tags = req.body.generalType+","+ productInfo.tags;
+                                                productInfo = { ...productInfo,tags:tags,image:path};
+                                            }
                                             product.createProduct(productInfo)
                                                 .then(productResult => {
                                                     //Adding a ref of the product to the category
@@ -300,7 +305,11 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
                                                             //Adding the product and its quantity to the warehouse
                                                             warehouse.addProduct(storeId, productResult._id, categoryId, req.body.amount)
                                                                 .then(warehouseResult => {
-                                                                    return res.status(200).send(productResult);
+                                                                    uploadImage.upload(path,req.body.image)
+                                                                    //.then(() => {
+                                                                        return res.status(200).send(productResult);
+                                                                    //})
+                                                                    //.catch(err => {return res.status(500).send({ error: "Error uploading image. " + err })});
                                                                 })
                                                                 .catch(err => {return res.status(500).send({ error: "Error updating warehouse. " + err })});
                                                         })
@@ -364,7 +373,10 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId', us
                                                     .then(categoryFindByNameResult => {
                                                         updatedProductInfo = { _id: productId, ...productInfo, categoryId: categoryFindByNameResult._id } // , image: req.file.path,
                                                         if (garageOwnerResult.isTrusted)
-                                                            updatedProductInfo = { ...updatedProductInfo, tags: req.body.generalType + tags };
+                                                        {
+                                                            tags = req.body.generalType+","+ updatedProductInfo.tags;
+                                                            updatedProductInfo = { ...updatedProductInfo, tags:tags };
+                                                        }
                                                         
                                                         product.updateProduct(updatedProductInfo)
                                                             .then(productResult => {

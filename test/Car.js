@@ -133,6 +133,12 @@ describe('Car Class Tests', () => {
     done();
   });
 
+  it('Validating car information invalid year (negative).', (done) => {
+    const validationResult = car.validateCarInfo({make:make,model:model,year:-1});
+    expect(validationResult.error).to.contain("year");
+    done();
+  });
+
   it('Validating car information invalid year (missing).', (done) => {
     const validationResult = car.validateCarInfo({make:make,model:model,year:undefined});
     expect(validationResult.error).to.contain("year");

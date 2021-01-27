@@ -18,7 +18,11 @@ module.exports = {
             return "Invalid store close time !";
         if(store.tags === undefined || !validator.matches(store.tags,/(^[\p{L}\s\d',-]{2,256}$)/ugi))
             return "Invalid store tags !";
-        
+        if(store.lat === undefined || !validator.matches(store.lat+"",/(^(\d+).(\d+)$)/))
+            return "Invalid store latitude !";            
+        if(store.long === undefined || !validator.matches(store.long+"",/(^(\d+).(\d+)$)/))
+            return "Invalid store longitude !";
+            
         return "pass";
     }
 }

@@ -90,6 +90,12 @@ module.exports = class Store {
         return promiseResult;
     }
     
+    getStoresByLocation(lat,long,limit,skip)
+    {
+        const promiseResult = StoreModel.findStoresByLocation({lat,long,limit,skip});
+        return promiseResult;
+    }
+
     deleteStoreByUserId(userId)
     {
         const promiseResult = StoreModel.deleteStoreByUserId({userId:userId});

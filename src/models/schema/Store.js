@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const GarageOwner = require('./GarageOwner');
 const Menu = require('./Menu');
 const Warehouse = require('./Warehouse');
+const Geolocation = require('./Geolocation');
 
 const schema = mongoose.Schema;
 
@@ -58,16 +59,17 @@ const Store = new schema({
         minLength: 7,
         maxlength: 8
     },
-
+    /*
     location: {
         type:String,
         //required:true
     },
-    /*location: {
-        long: {type:String,required: true,trim: true},
-        lat: {type:String,required: true,trim: strue},
-    },
     */
+    location: {
+        type: Geolocation,
+        required: true
+    }
+    ,
     //menu: Menu,
     menu: {
         type: schema.Types.ObjectId,
@@ -91,6 +93,6 @@ const Store = new schema({
     },
 
 });
-
+Store.index({location:"2dsphere"});
 module.exports = Store;
 //module.exports = mongoose.model('Store', StoreSchema);

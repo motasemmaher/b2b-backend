@@ -100,7 +100,6 @@ describe('Product Class Tests', () => {
     it('Validating product information without errors.', (done) => {
         data = prepareData(validName,validType,validPrice,validDescription,validTags,null,null,validGeneralType,null);
         const validationResult = PRODUCT.validateProductInfo(data);
-        console.log(validationResult)
         expect(validationResult).to.be.undefined;
         done();
       });

@@ -2,7 +2,7 @@
 "Didn't find a car with that id."
 "Invalid car make !"
 "Invalid car model !"
-"Invalid car year !"    
+"Invalid car year !"
 "Error! Didn't find a car with that id."
 "The requested car doesn't belong to this carowner."
 "Error! Didn't find a store with thats id."
@@ -171,3 +171,60 @@
 "INVALID_PASSWORD":"! رمز مرور خاطئ!",
 "INVALID_USER_ADDRESS":"! عنوان المستخدم غير صالح",
 "INVALID_USER_ROLE":"! دور المستخدم غير صالح"
+----------------------------------------------------------------------------------------------
+//Product
+//Attributes
+-name:String
+-storeId:String
+-price:Number
+-image:String
+-categoryId:Category
+-productType:String
+-description:String
+-offer: Offer
+-isInStock:type:Boolean
+-tags:String[]
+//Methods
++exists(productId):Product
++countAll(type):Int
++countByStore(storeId,type):Int
++countByCategory(categoryId,type):Int
++countByOffers():Int
++countByOffersOfStore(storeId):Int
++validateProductInfo(productInfo):String
++createProduct(productInfo):Product
++updateProduct(updatedProduct):Product
++deleteProduct(productId):Product
++deleteProductsOfCategory(categoryId):Product[]
++getProductById(productId):Product[]
++getProductsOfCategory(categoryId,type,limit,skip,nameSort,priceSort):Product[]
++deleteProductsOfCategoriesId(categoriesIds):Product[]
++addOffer(productId, offer):Product[]
++removeOffer(offerId):Product
++getProductsWithOffers(limit, skip):Product[]
++getProductsWithOffersOfStore(storeId, limit, skip):Product[]
++getAllProducts(type,limit,skip,nameSort,priceSort):Product[]
++getProductsOfStore(storeId,type,limit,skip,nameSort,priceSort):Product[]
++expiredOffers():Product[]
++searchProducts(searchText, limit, skip):Product[]
++findProductAndItsOffer(ProductId):Product[]
+---------------------------------------------------------------------------------------------------
+//Warehouse
+//Attributes
+-storeId:Store
+-storage:Object[]
+//Methods
++Warehouse():ctor
++validateWarehouseInfo(warehouseInfo):String
++createWarehouse():Warehouse
++deleteWarehouse(warehouseId):Warehouse
++linkWarehouse(info):Warehouse
++addProduct(storeId,productId,categoryId,amount):Warehouse
++removeProductsFromWarehouse(storeId,categoryId):Warehouse
++removeProductFromWarehouse(storeId,productId):Warehouse
++deleteWarehouseByStoreId(storeIds):Warehouse
++getWarehouse(warehouseId):Warehouse
++getProductFromWarehouse(warehouseId, productId):Warehouse
++decreaseAmaountOfProduct(warehouseId, productId, quantity):Warehouse
++increaseAmaountOfProduct(warehouseId, productId, quantity):Warehouse
+---------------------------------------------------------------------------------------------------

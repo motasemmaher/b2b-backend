@@ -4,7 +4,6 @@ module.exports = {
     
    validateProductInfo(product)
    {
-       console.log("General type inside validation: "+product.generalType)
        if(product.name === undefined || !validator.matches(product.name,/(^[\p{L}\s\d'-]{4,64}$)/ugi))
               return "Invalid product name !";
        if(product.description === undefined || !validator.matches(product.description,/(^[\p{L}\s\d',\.-]{8,254}$)/ugi))  
