@@ -1,9 +1,8 @@
 process.env.NODE_ENV = 'test';
-const Message = require('../src/business/Message/Message');
 const expect = require('chai').expect;
 const connection = require('../connect');
+const message = require('../src/business/Objects').MESSAGE;
 
-const message = new Message();
 
 //Valid data
 let owner = "5fd866fb6add9a31e0779905";

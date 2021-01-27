@@ -5,8 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "mocha --recursive --timeout 100000 --exit",
-    "start": "nodemon server.js",
-    "test-coverage": "nyc --reporter=text --reporter=lcov mocha --exit"
+    "test-coverage": "nyc --reporter=text --reporter=lcov mocha --exit",
+    "start":"nodemon server.js"
   },
   "author": "",
   "license": "ISC",

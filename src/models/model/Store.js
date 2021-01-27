@@ -37,7 +37,8 @@ module.exports = {
         tags = value.tags.split(',');
         value = {
             ...value,
-            tags: tags
+            tags: tags,
+            location: {type:"Point",coordinates:[value.lat,value.long]}
         };
         const result = StoreModel.create(value);
 
@@ -55,7 +56,8 @@ module.exports = {
             tags = value.tags.split(',');
             value = {
                 ...value,
-                tags: tags
+                tags: tags,
+                location: {type:"Point",coordinates:[value.lat,value.long]}
             };
         }
         const result = StoreModel.findByIdAndUpdate({
@@ -137,7 +139,20 @@ module.exports = {
         else 
             return {error: "Error with the finding same address Stores"};
     },
+    findStoresByLocation(value)
+    {
+        const result = StoreModel.find({location:{
+            $near :
+            { $geometry: { type: "Point",  coordinates: [value.lat,value.long] } }
+        }}).select('name , address , image , openTime , closeTime').skip(value.skip).limit(value.limit)//.pretty();
+        
+        if (result) 
+            return result;
+        else 
+            return {error: "Error with the finding nearby stores by location"};
 
+    }
+    ,
     deleteStoreByUserId(value)
     {
         const result = StoreModel.deleteMany({userId: value.userId});

@@ -14,7 +14,7 @@ module.exports = {
             return "Invalid user phone number !";
         if(user.password === undefined || !validator.matches(user.password,/(^.{8,64}$)/))
             return "Invalid user password !";
-        if(user.address === undefined || !validator.matches(user.address,/(^[\p{L}'-]{4,8}$)/ugi))
+        if(user.address === undefined || !validator.matches(user.address,/(^[\p{L}'-]{4,9}$)/ugi))
             return "Invalid user address !";
         if(user.role === undefined || !["admin", "garageOwner", "carOwner", "waitingUser"].includes(user.role))  
             return "Invalid user role !";
