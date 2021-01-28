@@ -235,16 +235,17 @@ router.put('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
         });
     if (userInfo.role === 'garageOwner') {
         garageOwner.getGarageOwnerByUserId(userInfo._id).then(gaOwner => {
-            order.getOrder(orderId).then(retrivedOrder => {
+            order.getOrder(orderId).then(retrivedOrder => {                
                 if (retrivedOrder.status === "pending") {
                     if ((date.getTime() - retrivedOrder.date.getTime()) >= 3600000) {
-                        if (status === 'delivered' || status === 'cancel') {
+                        if (status === 'delivered' || status === 'cancel') {                            
                             store.updateOrderStatus(storeId, orderId, status)
-                                .then(updatedOrderStatus => {
+                                .then(updatedOrderStatus => {                                    
                                     shoppingCart.getShoppingCart(updatedOrderStatus.shoppingCart).populate('Items').then(retrivedSoppingCart => {
-                                        store.getStore(storeId).then(retrivedStore => {
+                                        store.getStore(storeId).then(retrivedStore => {                                            
                                             retrivedSoppingCart.Items.forEach((item, index) => {
-                                                if (status === 'delivered') {
+                                                if (status === 'delivered') { 
+                                                    console.log(gaOwner);                                                   
                                                     // warehouse.decreaseAmaountOfProduct(retrivedStore.warehouse, item.product, item.quantity).then(updatedWarehouse => {
                                                     if (index === retrivedSoppingCart.Items.length - 1) {
                                                         report.addOrder(gaOwner.reportId, orderId).then(updatedReport => {
@@ -258,11 +259,11 @@ router.put('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
                                                     // }).catch(err => {
                                                     //     res.status(400).send('There is no available quantity in this store');
                                                     // });
-                                                } else if (status === 'cancel') {
-                                                    warehouse.increaseAmaountOfProduct(retrivedStore.warehouse, item.product, item.quantity).then(updatedWarehouse => {
-                                                        product.getProductById(item.product).then(retrivedProduct => {
-                                                            retrivedProduct[0].isInStock = true;
-                                                            product.updateProduct(retrivedProduct[0]).then(updatedProduct => {
+                                                } else if (status === 'cancel') {                                                    
+                                                    warehouse.increaseAmaountOfProduct(retrivedStore.warehouse, item.product, item.quantity).then(updatedWarehouse => {                                                        
+                                                        product.getProductById(item.product).then(retrivedProduct => {                                                            
+                                                            retrivedProduct.isInStock = true;                                                            
+                                                            product.updateProductStock(retrivedProduct).then(updatedProduct => {
                                                                     if (index === retrivedSoppingCart.Items.length - 1) {
                                                                         report.addCancelOrder(gaOwner.reportId, orderId).then(updatedReport => {
                                                                             return res.status(200).send(updatedOrderStatus);

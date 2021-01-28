@@ -3,7 +3,7 @@ const router = express.Router();
 const {
     userAuthenticated
 } = require('../middleware/authentication');
-
+const webPush = require('web-push');
 //Requiring classes
 const product = require('../business/Objects').PRODUCT;
 const warehouse = require('../business/Objects').WAREHOUSE;
@@ -19,6 +19,11 @@ const subscription = require('../business/Objects').SUBSCRIPTION;
 const orderInformationValidator = require('../business/Order/orderInformation');
 const cartItemInformationValidator = require('../business/CartItem/cartItemInformation');
 const limitAndSkipValidation = require('../shared/limitAndSkipValidation');
+
+const publicVapidKey = process.env.PUBLIC_VAPID_KEY;
+const privateVapidKey = process.env.PRIVATE_VAPID_KEY;
+
+webPush.setVapidDetails('mailto:bocibiw276@eamarian.com', publicVapidKey, privateVapidKey);
 
 //---------get shoppingcart---------------\\
 router.get('/shopping-cart', userAuthenticated, (req, res) => {

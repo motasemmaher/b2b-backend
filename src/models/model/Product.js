@@ -56,7 +56,7 @@ module.exports =
     updateProduct(value)
     {
         tags = value.tags.split(',');
-        value = {...value,tags:tags};
+        value = {...value,tags:tags};        
         const result = ProductModel.findOneAndUpdate(
                 {_id:value._id},
                 value, 
@@ -398,5 +398,18 @@ module.exports =
         type = setProductType(value.type);
         const count = ProductModel.countDocuments({productType:{$in:type}});
         return count;
-    }
+    },
+
+    updateProductStock(value)
+    {        
+        const result = ProductModel.findOneAndUpdate(
+                {_id:value._id},
+                value, 
+                {"useFindAndModify":false}
+                );
+        if(result)
+            return result;
+        else
+            return {error:"Error with the update Product"};
+    }    
 }
