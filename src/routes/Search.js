@@ -14,18 +14,17 @@ function escapeRegex(text) {
 
 //---------------------search in (stores or products)---------------------\\
 router.get('/search', (req, res) => {
-    let skip = req.query.skip;
-    let limit = req.query.limit;
+    let skip = req.query.skip || '0';
+    let limit = req.query.limit || '/* 30 */';
     const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);
 
     skip = limitAndSkipValues.skip;
     limit = limitAndSkipValues.limit;
     const search = req.query.search;
-    const fliter = req.query.fliter;
-
+    const filter = req.query.filter;
     if (search) {
         const regex = new RegExp(escapeRegex(search), 'gi');
-        if (fliter === 'stores') {
+        if (filter === 'stores') {
             store.searchStores(regex, limit, skip).then(storesSearchResult => {
                 // if (storesSearchResult.length <= 0) {
                 //     return res.status(404).send({
@@ -38,7 +37,7 @@ router.get('/search', (req, res) => {
             }).catch(err => {
                 res.status(404).send({error: "ERROR_IN_SEARCH"});
             });
-        } else if (fliter === 'products') {
+        } else if (filter === 'products') {
             product.searchProducts(regex, limit, skip).then(productsSearchResult => {
                 // if (productsSearchResult.length <= 0) {
                 //     return res.status(404).send({

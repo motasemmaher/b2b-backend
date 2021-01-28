@@ -217,7 +217,6 @@ const complaintRoute = require('./src/routes/Complaint');
 app.use(complaintRoute);
 
 
-
 //--------------------------------------Report--------------------------------------
 const reportTransporter = nodemailer.createTransport({
     service: 'gmail',
@@ -320,12 +319,25 @@ const adminReport = schedule.scheduleJob('0 0 1 * *', () => {
         }));
 });
 
+const http = require("http")
+
+
+const startTrinModelForSearchByImage = schedule.scheduleJob('0 0 1 * *', () => {
+    let url = new URL("http://localhost:8000/start-training")
+    http
+        .request(
+            url,
+            res => {
+               console.log('Model Was Trained')
+            }
+        )
+        .end()
+});
+
 //--------------------Chat--------------------\\
 
 // const server = require('http').Server(app);
 // const io = require('socket.io')(server);
-
-
 
 
 
