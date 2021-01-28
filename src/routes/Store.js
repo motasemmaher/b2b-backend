@@ -4,6 +4,7 @@ const upload = require('../shared/imageUpload');
 const imageToBase64 = require('image-to-base64');
 const { userAuthenticated } = require('../middleware/authentication');
 const limitAndSkipValidation = require('../shared/limitAndSkipValidation');
+const latAndLongValidation = require('../shared/latAndLongValidation');
 
 const store = require('../business/Objects').STORE;
 const category = require('../business/Objects').CATEGORY;
@@ -11,6 +12,7 @@ const product = require('../business/Objects').PRODUCT;
 const garageOwner = require('../business/Objects').GARAGEOWNER;
 const menu = require('../business/Objects').MENU;
 const warehouse = require('../business/Objects').WAREHOUSE;
+
 
 //----------View Stores and View a store----------
 router.get('/stores/:storeId?', (req, res) => {
@@ -65,7 +67,7 @@ router.get('/stores/:storeId?', (req, res) => {
     }
 });
 //----------View nearby stores----------
-router.get('/stores/nearby', (req, res) => {
+router.get('/view-stores/nearby', (req, res) => {
     const loggedUser = req.user;
     let skip = req.query.skip;
     let limit = req.query.limit;
@@ -73,7 +75,7 @@ router.get('/stores/nearby', (req, res) => {
     skip = limitAndSkipValues.skip;
     limit = limitAndSkipValues.limit;
 
-    store.getSameAddressStores(loggedUser.role, limit, skip)
+    store.getSameAddressStores(loggedUser.address, limit, skip)
         .then(storesResult => {
             store.countBySameAddress()
                 .then(countResult => {
@@ -98,21 +100,49 @@ router.get('/stores/nearby', (req, res) => {
         })
         .catch(err => res.status(500).send({ error: "Error getting all nearby stores. " + err }));
 });
-//----------View Garage Owner's storesId----------
-router.get('/user/manage-garage-owner/stores/storesId', userAuthenticated, (req, res) => {
-    const loggedUser = req.user;
-    
-    if (loggedUser.role !== "garageOwner")
-    res.status(401).send({ error: "Unauthorized user !" });
-    else {
-        store.getStoresIdByUserId(loggedUser._id)
-        .then(storesResult => {
-            res.status(200).send({ storesId: storesResult });
-        })
-        .catch(err => res.status(500).send({ error: "Error with getting stores of the garageowner. " + err }));
-    }
-});
+//----------View nearby stores by location----------
+router.get('/view-stores/location', userAuthenticated,(req, res) => {
+    loggedUser = req.user;
+    if(loggedUser.role !== "carOwner")
+        return res.status(401).send({error:"Unauthorized user !"});
 
+    let skip = req.query.skip;
+    let limit = req.query.limit;
+    const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);
+    skip = limitAndSkipValues.skip;
+    limit = limitAndSkipValues.limit;
+
+    lat = req.query.lat;
+    long = req.query.long;
+    const latAndLongValidationResult = latAndLongValidation.validatingLatAndLong(lat,long);
+    if(latAndLongValidationResult !== "pass")
+        return res.status(400).send(latAndLongValidationResult);
+
+    store.getStoresByLocation(lat,long, limit, skip)
+        .then(storesResult => {
+            store.countAll()
+                .then(countResult => {
+                    storesArray = storesResult;
+                    if (storesArray.length == 0)
+                        return res.status(200).send({ count: 0, stores: [] });
+                    // storesArray.forEach((storeResult,index,storesArray) => {
+                    // imageToBase64(storeResult.image)
+                    // .then(base64Image => {
+                    // storeResult.image = base64Image;       
+                    // if(index  === storesArray.length - 1)
+                    return res.status(200).send({ count: countResult, stores: storesArray });
+                    // })
+                    // .catch(err => {
+                    //     console.log({error:"Error converting image.    "+err})
+                    //     if (!res.headersSent)
+                    //         res.status(200).send({count:countResult,stores:storesArray});
+                    // });  
+                    // }) //End of foreach
+                })
+                .catch(err => res.status(500).send({ error: "Error with getting count of all stores.  " + err }));
+        })
+        .catch(err => res.status(500).send({ error: "Error getting stores by location. " + err }));
+});
 //----------View Garage Owner's stores----------
 router.get('/user/manage-garage-owner/stores', userAuthenticated, (req, res) => {
     const loggedUser = req.user;
@@ -152,7 +182,7 @@ router.get('/user/manage-garage-owner/stores', userAuthenticated, (req, res) => 
     }
 });
 //----------Add Store----------
-router.post('/user/manage-garage-owner/add-store', userAuthenticated, (req, res) => { // upload.single('image'),
+router.post('/user/manage-garage-owner/add-store', userAuthenticated, upload.single('image'),(req, res) => { // upload.single('image'),
     const loggedUser = req.user;
 
     if(Object.keys(req.body).length === 0)

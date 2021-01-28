@@ -23,11 +23,11 @@ router.get('/view-complaints/:complaintId?',userAuthenticated,(req,res) => {
         complaint.getComplaint(req.params.complaintId)
         .then(complaintResult => {
         if(complaintResult == null)
-            res.status(404).send({error:"Error! Didn't find a complaint with that id."});
+            return res.status(404).send({error:"Error! Didn't find a complaint with that id."});
         else
-            res.status(200).send(complaintResult);
+            return res.status(200).send(complaintResult);
         })
-        .catch(err => res.status(500).send({error:"Error getting the complaint. "+err}));
+        .catch(err => {return res.status(500).send({error:"Error getting the complaint. "+err})});
     }
     else if(loggedUser.role === 'admin')
     {
@@ -35,11 +35,11 @@ router.get('/view-complaints/:complaintId?',userAuthenticated,(req,res) => {
         .then(complaintResult => {
             complaint.countAllComplaints()
             .then(countResult => {
-            res.status(200).send({count:countResult,complaints:complaintResult});
+            return res.status(200).send({count:countResult,complaints:complaintResult});
             })
-            .catch(err => res.status(500).send({error:"Error getting the count of all complaints. "+err}));
+            .catch(err => {return res.status(500).send({error:"Error getting the count of all complaints. "+err})});
         })
-        .catch(err => res.status(500).send({error:"Error getting all complaints. "+err}));
+        .catch(err => {return res.status(500).send({error:"Error getting all complaints. "+err})});
     }
     else if(loggedUser.role === 'garageOwner')
     {
@@ -47,14 +47,14 @@ router.get('/view-complaints/:complaintId?',userAuthenticated,(req,res) => {
         .then(complaintResult => {
         complaint.countByGarageOwner(loggedUser._id)
         .then(countResult => {
-        res.status(200).send({count:countResult,complaints:complaintResult});
+        return res.status(200).send({count:countResult,complaints:complaintResult});
         })
-        .catch(err => res.status(500).send({error:"Error getting the count of garageOwner's complaints. "+err}));
+        .catch(err => {return res.status(500).send({error:"Error getting the count of garageOwner's complaints. "+err})});
         })
-        .catch(err => res.status(500).send({error:"Error getting the garageOwner's complaints. "+err}));
+        .catch(err => {return res.status(500).send({error:"Error getting the garageOwner's complaints. "+err})});
     }
     else
-        res.status(401).send({error:"Error, the user isn't allowed to view the complaints."});
+        return res.status(401).send({error:"Error, the user isn't allowed to view the complaints."});
 });
 //----------Create Complaint----------
 router.post('/stores/:storeId/create-complaint',userAuthenticated,(req,res) => {
@@ -65,45 +65,35 @@ router.post('/stores/:storeId/create-complaint',userAuthenticated,(req,res) => {
         return res.status(400).send({error:"No data was sent!"});
     if(loggedUser.role !== "carOwner")
         return res.status(401).send({error:"Unauthorized user !"});
-    else
-    {
-        store.exists(storeId)
-        .then(storeResult => {
-        if(storeResult == null)
-            res.status(404).send({error:"Error! Didn't find a store with that id."});
-        else
-        {
-            user.exists(loggedUser._id)
-            .then(getUserResult => {
-                if(getUserResult == null)
-                    res.status(404).send({error:"Error! Didn't find a user with that is."})
-                else
-                {
-                    messageBody = req.body.message;
-                    const messageValidationResult = message.validateMessageInfo({data:messageBody});
-                    if(typeof messageValidationResult !== 'undefined')
-                        res.status(400).send({error:messageValidationResult.error});
-                    else
-                    {
-                        message.createMessage(loggedUser._id,messageBody)
-                        .then(messageResult => {
-                            complaint.createComplaint(loggedUser._id,messageResult,storeResult.userId,storeId)
-                            .then(complaintResult => {
-                                res.status(200).send(complaintResult);
-                            //res.redirect('/store/'+req.params.id);
-                            })
-                        .catch(err => res.status(500).send({error:"Error creating the complaint. "+err}));
-                        })
-                        .catch(err => res.status(500).send({error:"Error creating the message. "+err}));
-                    }
-                }
-            })
-            .catch(err => res.status(500).send({error:"Error getting the user. "+err}));    
-        }
-        })
-        .catch(err => res.status(500).send({error:"Error getting the store. "+err}));
-    }
-});
 
+    store.exists(storeId)
+    .then(storeResult => {
+    if(storeResult == null)
+        return res.status(404).send({error:"Error! Didn't find a store with that id."});
+    
+    user.exists(loggedUser._id)
+        .then(getUserResult => {
+        if(getUserResult == null)
+            return res.status(404).send({error:"Error! Didn't find a user with that is."})
+        
+        messageBody = req.body.message;
+        const messageValidationResult = message.validateMessageInfo({data:messageBody});
+        if(typeof messageValidationResult !== 'undefined')
+            return res.status(400).send({error:messageValidationResult.error});
+       
+        message.createMessage(loggedUser._id,messageBody)
+            .then(messageResult => {
+            complaint.createComplaint(loggedUser._id,messageResult,storeResult.userId,storeId)
+                .then(complaintResult => {
+                return res.status(200).send(complaintResult);
+                })
+                .catch(err => {return res.status(500).send({error:"Error creating the complaint. "+err})});
+            })
+            .catch(err => {return res.status(500).send({error:"Error creating the message. "+err})});
+        })
+        .catch(err => {return res.status(500).send({error:"Error getting the user. "+err})});    
+    })
+    .catch(err => {return res.status(500).send({error:"Error getting the store. "+err})});
+});
 
 module.exports = router;

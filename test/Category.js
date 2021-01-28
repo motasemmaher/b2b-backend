@@ -1,9 +1,7 @@
 process.env.NODE_ENV = 'test';
-const Category = require('../src/business/Category/Category');
 const expect = require('chai').expect;
 const connection = require('../connect');
-
-const category = new Category();
+const category = require('../src/business/Objects').CATEGORY;
 
 //Valid car data
 let validName = "C1";

@@ -34,64 +34,11 @@ router.get('/store/:storeId/orders', userAuthenticated, (req, res) => {
                     if (status === 'pending' || status === 'cancel' || status === 'delivered') {
                         order.getOrdersByStoreIdAndStatus(storeId, status, limit, skip).populate('shoppingCart')
                             .then(orders => {
-                                if (orders.length > 0) {
-                                    orders.forEach((orderInfo, orderIndex) => {
-                                        orderInfo.shoppingCart.Items.forEach((cartItemId, cartIndex) => {
-                                            cartItem.getCartItem(cartItemId).populate('product').then(cartInfo => {
-                                                carOwner.getCarOwner(orderInfo.carOwnerId).populate('user').then(carOwnerInfo => {
-                                                    populateAllProducts.push({
-                                                        order: {
-                                                            _id: orderInfo._id,
-                                                            date: orderInfo.date,
-                                                            deliveryAddress: orderInfo.deliveryAddress,
-                                                            phoneNumber: orderInfo.phoneNumber,
-                                                            status: orderInfo.status,
-                                                            storeId: orderInfo.storeId,
-                                                            totalBill: orderInfo.shoppingCart.totalBill,
-                                                            quantity: cartInfo.quantity,
-                                                            carOwner: {
-                                                                fullName: carOwnerInfo.user.fullName,
-                                                                username: carOwnerInfo.user.username,
-                                                                email: carOwnerInfo.user.email
-                                                            },
-                                                            product: {
-                                                                _id: cartInfo.product._id,
-                                                                name: cartInfo.product.name,
-                                                                price: cartInfo.product.price,
-                                                                image: cartInfo.product.image,
-                                                                productType: cartInfo.product.productType,
-                                                            }
-                                                        }
-                                                    });
-                                                    if (orderIndex === orders.length - 1) {
-                                                        return res.send(populateAllProducts);
-                                                    }
-                                                });
-                                            });
-                                        });
-                                    });
-                                    // Promise.all(populateAllProducts).then(done => {
-                                    // });
-                                } else {
-                                    return res.status(404).send({
-                                        error: `Error_THERE_IS_NO_ORDERS_IN_THIS_STATUS_IN_YOUR_STORES`
-                                    });
-                                }
-                            });
-                    } else {
-                        return res.status(400).send({
-                            error: 'ERROR_STATUS_IS_WRONG_IT_MUST_BE_PENDING_OR_CANCEL_OR_DELIVERED'
-                        });
-                    }
-                } else {
-                    order.getOrdersByStoreId(storeId, limit, skip)
-                        .then(orders => {
-                            orders.forEach((orderInfo, orderIndex) => {
-                                orderInfo.shoppingCart.Items.forEach((cartItemId, cartIndex) => {
-                                    cartItem.getCartItem(cartItemId).populate('product').then(cartInfo => {
-                                        carOwner.getCarOwner(orderInfo.carOwnerId).populate('user').then(carOwnerInfo => {
-                                            populateAllProducts.push({
-                                                order: {
+                                orders.forEach((orderInfo, orderIndex) => {
+                                    orderInfo.shoppingCart.Items.forEach((cartItemId, cartIndex) => {
+                                        cartItem.getCartItem(cartItemId).populate('product').then(cartInfo => {
+                                            carOwner.getCarOwner(orderInfo.carOwnerId).populate('user').then(carOwnerInfo => {
+                                                populateAllProducts.push({
                                                     _id: orderInfo._id,
                                                     date: orderInfo.date,
                                                     deliveryAddress: orderInfo.deliveryAddress,
@@ -112,10 +59,56 @@ router.get('/store/:storeId/orders', userAuthenticated, (req, res) => {
                                                         image: cartInfo.product.image,
                                                         productType: cartInfo.product.productType,
                                                     }
+                                                });
+                                                if (orderIndex === orders.length - 1) {
+                                                    return res.send({ order: populateAllProducts });
+                                                }
+                                            });
+                                        });
+                                    });
+                                });
+                                // Promise.all(populateAllProducts).then(done => {
+                                // });
+                                if (orders.length === 0) {
+                                    return res.send({ order: [] });
+                                }
+                            });
+                    } else {
+                        return res.status(400).send({
+                            error: 'ERROR_STATUS_IS_WRONG_IT_MUST_BE_PENDING_OR_CANCEL_OR_DELIVERED'
+                        });
+                    }
+                } else {
+                    order.getOrdersByStoreId(storeId, limit, skip).populate('shoppingCart')
+                        .then(orders => {
+                            orders.forEach((orderInfo, orderIndex) => {
+                                orderInfo.shoppingCart.Items.forEach((cartItemId, cartIndex) => {
+                                    cartItem.getCartItem(cartItemId).populate('product').then(cartInfo => {
+                                        carOwner.getCarOwner(orderInfo.carOwnerId).populate('user').then(carOwnerInfo => {
+                                            populateAllProducts.push({
+                                                _id: orderInfo._id,
+                                                date: orderInfo.date,
+                                                deliveryAddress: orderInfo.deliveryAddress,
+                                                phoneNumber: orderInfo.phoneNumber,
+                                                status: orderInfo.status,
+                                                storeId: orderInfo.storeId,
+                                                totalBill: orderInfo.shoppingCart.totalBill,
+                                                quantity: cartInfo.quantity,
+                                                carOwner: {
+                                                    fullName: carOwnerInfo.user.fullName,
+                                                    username: carOwnerInfo.user.username,
+                                                    email: carOwnerInfo.user.email
+                                                },
+                                                product: {
+                                                    _id: cartInfo.product._id,
+                                                    name: cartInfo.product.name,
+                                                    price: cartInfo.product.price,
+                                                    image: cartInfo.product.image,
+                                                    productType: cartInfo.product.productType,
                                                 }
                                             });
                                             if (orderIndex === orders.length - 1) {
-                                                return res.send(populateAllProducts);
+                                                return res.send({ order: populateAllProducts });
                                             }
                                         });
                                     });
@@ -272,8 +265,9 @@ router.put('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
                                                                                 error: 'INTERNAL_SERVER_ERROR'
                                                                             });
                                                                         });
-                                                                    }
-                                                                })
+                                                                    // });
+                                                                }
+                                                            })
                                                                 .catch(err => {
                                                                     return res.status(500).send({
                                                                         error: 'INTERNAL_SERVER_ERRORt'
@@ -338,48 +332,48 @@ router.delete('/store/:storeId/order/:orderId', userAuthenticated, (req, res) =>
 
     if (userInfo.role === 'garageOwner') {
         garageOwner.getGarageOwnerByUserId(userInfo._id).then(owner => {
-                garageOwner.removeOrder(owner._id, storeId, orderId).then(updateGarageOwner => {
-                    order.getOrder(orderId).then(orderInfo => {
-                        carOwner.removeOrder(orderInfo.carOwnerId, orderId).then(updateCarOwner => {
-                                order.deleteOrder(orderId).then(deletedOrder => {
-                                        shoppingCart.deleteShoppingCart(deletedOrder.shoppingCart).then(deletedShoppingCart => {
-                                            cartItem.deleteAllCartItemsAssociatedWithShoppingCartId(deletedOrder.shoppingCart).then(deletedCartItem => {
-                                                res.status(200).send({
-                                                    msg: "successfully deleted order"
-                                                });
-                                            }).catch(err => {
-                                                res.status(500).send({
-                                                    error: 'INTERNAL_SERVER_ERROR'
-                                                });
-                                            });
-                                        }).catch(err => {
-                                            res.status(500).send({
-                                                error: 'INTERNAL_SERVER_ERROR'
-                                            });
-                                        });
-                                    })
-                                    .catch(err => {
-                                        res.status(500).send({
-                                            error: 'INTERNAL_SERVER_ERROR'
-                                        });
+            garageOwner.removeOrder(owner._id, storeId, orderId).then(updateGarageOwner => {
+                order.getOrder(orderId).then(orderInfo => {
+                    carOwner.removeOrder(orderInfo.carOwnerId, orderId).then(updateCarOwner => {
+                        order.deleteOrder(orderId).then(deletedOrder => {
+                            shoppingCart.deleteShoppingCart(deletedOrder.shoppingCart).then(deletedShoppingCart => {
+                                cartItem.deleteAllCartItemsAssociatedWithShoppingCartId(deletedOrder.shoppingCart).then(deletedCartItem => {
+                                    res.status(200).send({
+                                        msg: "successfully deleted order"
                                     });
-                            })
+                                }).catch(err => {
+                                    res.status(500).send({
+                                        error: 'INTERNAL_SERVER_ERROR'
+                                    });
+                                });
+                            }).catch(err => {
+                                res.status(500).send({
+                                    error: 'INTERNAL_SERVER_ERROR'
+                                });
+                            });
+                        })
                             .catch(err => {
                                 res.status(500).send({
                                     error: 'INTERNAL_SERVER_ERROR'
                                 });
                             });
-                    }).catch(err => {
-                        res.status(500).send({
-                            error: 'INTERNAL_SERVER_ERROR'
+                    })
+                        .catch(err => {
+                            res.status(500).send({
+                                error: 'INTERNAL_SERVER_ERROR'
+                            });
                         });
-                    });
                 }).catch(err => {
                     res.status(500).send({
                         error: 'INTERNAL_SERVER_ERROR'
                     });
                 });
-            })
+            }).catch(err => {
+                res.status(500).send({
+                    error: 'INTERNAL_SERVER_ERROR'
+                });
+            });
+        })
             .catch(err => {
                 res.status(500).send({
                     error: 'INTERNAL_SERVER_ERROR'
