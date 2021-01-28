@@ -47,7 +47,7 @@ const User = new schema({
         require: true,
         trim: true,
         minlength: 4,
-        maxlength: 8
+        maxlength: 9
     },
 
     role: {

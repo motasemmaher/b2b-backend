@@ -12,7 +12,7 @@ module.exports = {
 
         if(car.year !== undefined)
         {
-            if(validator.matches(car.year,/(^[\d']{4}$)/))
+            if(validator.matches(""+car.year,/(^[\d']{4}$)/))
             {
                 if(parseInt(car.year) < 1885 || parseInt(car.year) > new Date(). getFullYear()+1)
                 return "Invalid car year !";

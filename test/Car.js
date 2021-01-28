@@ -1,9 +1,8 @@
 process.env.NODE_ENV = 'test';
-const Car = require('../src/business/Car/Car');
 const expect = require('chai').expect;
 const connection = require('../connect');
+const car = require('../src/business/Objects').CAR;
 
-const car = new Car();
 
 let existingCarId = "5fd866fc6add9a31e0779906";
 
@@ -130,6 +129,12 @@ describe('Car Class Tests', () => {
 
   it('Validating car information invalid year (format).', (done) => {
     const validationResult = car.validateCarInfo({make:make,model:model,year:invalidFormatYear});
+    expect(validationResult.error).to.contain("year");
+    done();
+  });
+
+  it('Validating car information invalid year (negative).', (done) => {
+    const validationResult = car.validateCarInfo({make:make,model:model,year:-1});
     expect(validationResult.error).to.contain("year");
     done();
   });

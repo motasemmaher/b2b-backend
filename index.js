@@ -176,7 +176,8 @@ app.use(productRoute);
 
 //Store CORS
 app.options('/stores/:storeId?'); //View Stores and View a Store
-app.options('/stores/nearby'); //View nearby stores (same address)
+app.options('/view-stores/nearby'); //View nearby stores (same address)
+app.options('/view-stores/location'); //View nearby stores (same location)
 app.options('/user/:userId/manage-garage-owner/stores'); //View garageOwner's Stores
 app.options('/user/:userId/manage-garage-owner/add-store'); //Add Store
 app.options('/user/:userId/manage-garage-owner/update-store/:storeId'); //Update Store
@@ -225,11 +226,9 @@ const reportTransporter = nodemailer.createTransport({
         pass: 'b2bgp2020'
     }
 });
-
 //----------Send garage owner report----------
 const garageOwnerReport = schedule.scheduleJob('0 0 1 * *', () => {
-
-    user.getAllUsersIdOfARole('garageOwner')
+        user.getAllUsersIdOfARole('garageOwner')
         .then(garageOwners => {
             garageOwners.forEach(garageOwnerId => {
                 user.getUserById(garageOwnerId._id)
@@ -243,80 +242,60 @@ const garageOwnerReport = schedule.scheduleJob('0 0 1 * *', () => {
                                     subject: `Month:${new Date().getMonth() + 1}/${new Date().getFullYear()} Report`,
                                     text: `Hello ${garOwner.fullName}, this is the report for the current month.\n${reportForGarageOwner}\nBest wishes, B2B team`,
                                 };
-                                reportTransporter.sendMail(mailOptions, function (error, info) {
-                                    if (error)
-                                        console.log(error);
+                                reportTransporter.sendMail(mailOptions, function (err, info) {
+                                    if (err)
+                                        console.log({error:"Email wasn't sent !    "+err});
                                     else {
                                         report.clearReport(retrivedReport._id).then(clearedReport => {
-                                            console.log('Email sent: ' + info.response);
+                                            console.log({success:'Email sent: ' + info.response});
                                         });
                                     }
                                 });
                             });
                         });
                     })
-                    .catch(err => console.log("Error in generating report -Geeting garage owner by id- ! " + err));
+                    .catch(err => console.log({error:"Error in generating report -Geeting garage owner by id- ! " + err}));
             })
         })
-        .catch(err => console.log("Error in generating report -Geting garage owners- ! " + err));
+        .catch(err => console.log({error:"Error in generating report -Geting garage owners- ! " + err}));
 });
-
 //----------Send admin report----------
 const adminReport = schedule.scheduleJob('0 0 1 * *', () => {
-
     user.getAllUsersIdOfARole('garageOwner')
         .then(garageOwners => {
             user.getAllUsersIdOfARole('carOwner')
-                .then(carOwners => {
-                    user.getAllUsersIdOfARole('waitingUser')
-                        .then(waitingUsers => {
-                            reportForAdmin = `#of Garage Owners: ${garageOwners.length}\n#of Car Owners: ${carOwners.length}\n#of Waiting Users: ${waitingUsers.length}\n`;
-                            user.getAllUsersIdOfARole('admin')
-                                .then(admins => {
-                                    admins.forEach(adminId => {
-                                        user.getUserById(adminId._id)
-                                            .then(admin => {
-                                                fs.writeFile("./public/admin-report.txt", reportForAdmin, (err) => {
-                                                    if (err)
-                                                        return console.log(err);
-                                                });
-                                                var mailOptions = {
-                                                    from: 'b2b.report.generator@gmail.com',
-                                                    to: admin.email,
-                                                    subject: `Admin,Month:${new Date().getMonth() + 1}/${new Date().getFullYear()} Report`,
-                                                    text: `Hello ${admin.fullName},this is the report for the current month.\nBest wishes, B2B team`,
-                                                    attachments: [{
-                                                        filename: `admin-report#${new Date().getMonth() + 1}/${new Date().getFullYear()}.txt`,
-                                                        path: './public/admin-report.txt'
-                                                    }]
-                                                };
-                                                reportTransporter.sendMail(mailOptions, function (error, info) {
-                                                    if (error)
-                                                        console.log(error);
-                                                    else
-                                                        console.log('Email sent: ' + info.response);
-                                                });
-                                            })
-                                            .catch(err => res.send({
-                                                error: "Error getting the admin by id. " + err
-                                            }));
-                                    }); //End of for each
+            .then(carOwners => {
+                user.getAllUsersIdOfARole('waitingUser')
+                .then(waitingUsers => {
+                reportForAdmin = `#of Garage Owners: ${garageOwners.length}\n#of Car Owners: ${carOwners.length}\n#of Waiting Users: ${waitingUsers.length}\n`;
+                user.getAllUsersIdOfARole('admin')
+                    .then(admins => {
+                        admins.forEach(adminId => {
+                            user.getUserById(adminId._id)
+                                .then(admin => {
+                                    var mailOptions = {
+                                        from: 'b2b.report.generator@gmail.com',
+                                        to: admin.email,
+                                        subject: `Admin,Month:${new Date().getMonth() + 1}/${new Date().getFullYear()} Report`,
+                                        text: `Hello ${admin.fullName},this is the report for the current month.\n${reportForAdmin}\nBest wishes, B2B team`,
+                                    };
+                                    reportTransporter.sendMail(mailOptions, function (err, info) {
+                                        if (err)
+                                            console.log({error:"Email wasn't sent !    "+err});
+                                        else
+                                            console.log({success:'Email sent: ' + info.response});
+                                    });
                                 })
-                                .catch(err => res.send({
-                                    error: "Error getting all the admins owners. " + err
-                                }));
-                        })
-                        .catch(err => res.send({
-                            error: "Error getting all the waiting users. " + err
-                        }));
+                                .catch(err => console.log({error: "Error getting the admin by id. " + err}));
+                        }); //End of for each
+                    })
+                    .catch(err => console.log({error: "Error getting all the admins owners. " + err}));
                 })
-                .catch(err => res.send({
-                    error: "Error getting all the car owners. " + err
-                }));
+                .catch(err => console.log({error: "Error getting all the waiting users. " + err}));
+            })
+            .catch(err => console.log({error: "Error getting all the car owners. " + err}));
         })
-        .catch(err => res.send({
-            error: "Error getting all the garage owners. " + err
-        }));
+        .catch(err => console.log({error: "Error getting all the garage owners. " + err}));
 });
 
 const http = require("http")
@@ -346,13 +325,10 @@ const shoppingCartRoute = require('./src/routes/ShoppingCart');
 const orderRoute = require('./src/routes/Order');
 const searchRoute = require('./src/routes/Search');
 const permissionsRoute = require('./src/routes/Permissions');
-const carOwnerRoute = require('./src/routes/CarOwner');
-const chatRoute = require('./src/routes/Chat').router;
 
 // Use Routes
 app.use(shoppingCartRoute);
 app.use(orderRoute);
-app.use(carOwnerRoute);
 app.use(searchRoute);
 app.use(permissionsRoute);
 app.use(chatRoute);
