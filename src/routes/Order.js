@@ -214,7 +214,6 @@ router.get('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
 
 //----------------processing order (accept order by garage owner or cancel the order)----------------\\
 router.put('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
-
     const userInfo = req.user;
     const status = req.body.status;
     const orderId = req.params.orderId;
@@ -237,14 +236,15 @@ router.put('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
                                     shoppingCart.getShoppingCart(updatedOrderStatus.shoppingCart).populate('Items').then(retrivedSoppingCart => {
                                         store.getStore(storeId).then(retrivedStore => {                                            
                                             retrivedSoppingCart.Items.forEach((item, index) => {
+                                                console.log(retrivedSoppingCart)
                                                 if (status === 'delivered') { 
                                                     console.log(gaOwner);                                                   
                                                     // warehouse.decreaseAmaountOfProduct(retrivedStore.warehouse, item.product, item.quantity).then(updatedWarehouse => {
                                                     if (index === retrivedSoppingCart.Items.length - 1) {
                                                         report.addOrder(gaOwner.reportId, orderId).then(updatedReport => {
-                                                            res.status(200).send(updatedOrderStatus);
+                                                            return res.status(200).send(updatedOrderStatus);
                                                         }).catch(err => {
-                                                            res.status(500).send({
+                                                            return res.status(500).send({
                                                                 error: 'INTERNAL_SERVER_ERROR'
                                                             });
                                                         });
@@ -286,39 +286,39 @@ router.put('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
                                                 }
                                             })
                                         }).catch(err => {
-                                            res.status(404).send({
+                                            return res.status(404).send({
                                                 error: 'ERROR_STORE_DOES_NOT_EXIST'
                                             });
                                         });
                                     }).catch(err => {
-                                        res.status(404).send({
+                                        return res.status(404).send({
                                             error: 'ERROR_SHOPPINGCART_DOES_NOT_EXIST'
                                         });
                                     });
                                 }).catch(err => {
-                                    res.status(404).send({
+                                    return res.status(404).send({
                                         error: 'ERROR_STORE_OR_ORDER_DOES_NOT_EXIST'
                                     });
                                 });
                         }
                     } else {
-                        res.send({
+                        return res.status(400).send({
                             error: 'ERROR_THE_USER_HAS_1_HOUR_TO_UPDATE_THE_ORDER_YOU_NEED_TO_WAIT_ONE_HOUR_TO_HAVE_THE_ABILITY_TO_UPDATE_THE_ORDER_STATUS'
                         });
                     }
                 } else {
-                    res.send({
+                    return res.status(400).send({
                         error: 'ERROR_THE_ORDER_IS_ALREADY_PROCESSED'
                     });
                 }
             }).catch(err => {
-                res.status(404).send({
+                return res.status(404).send({
                     error: 'ERROR_ORDER_ID_IS_NOT_FOUND'
                 });
             });
         });
     } else {
-        res.status(401).send({
+        return res.status(401).send({
             error: 'UNAUTHORIZED_USER'
         });
     }

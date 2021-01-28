@@ -181,6 +181,20 @@ router.get('/user/manage-garage-owner/stores', userAuthenticated, (req, res) => 
             .catch(err => res.status(500).send({ error: "Error with getting stores of the garageowner. " + err }));
     }
 });
+
+router.get('/user/manage-garage-owner/stores/storesId', userAuthenticated, (req, res) => {
+    const loggedUser = req.user;
+
+    if (loggedUser.role !== "garageOwner")
+        res.status(401).send({ error: "Unauthorized user !" });
+    else {
+        store.getStoresIdByUserId(loggedUser._id)
+            .then(storesResult => {
+                return res.status(200).send({ count: 0, storesId: storesResult });
+            })
+            .catch(err => res.status(500).send({ error: "Error with getting stores of the garageowner. " + err }));
+    }
+});
 //----------Add Store----------
 router.post('/user/manage-garage-owner/add-store', userAuthenticated, upload.single('image'),(req, res) => { // upload.single('image'),
     const loggedUser = req.user;
