@@ -140,9 +140,11 @@ module.exports =
     },
     
     async increaseAmaountOfProduct(value) {
-        let result = null;
+        let result = null;        
+        // console.log(value)
         await WarehouseModel.findOne({_id: value._id}, {storage: {$elemMatch: {productId: value.productId}}})
         .then(warehouse => {                        
+            // console.log(warehouse)
                 warehouse.storage[0].amount += value.quantity;
                 result = warehouse.save();
         });

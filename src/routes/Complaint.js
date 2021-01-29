@@ -68,12 +68,12 @@ router.post('/stores/:storeId/create-complaint',userAuthenticated,(req,res) => {
 
     store.exists(storeId)
     .then(storeResult => {
-    if(storeResult == null)
+    if(!storeResult)
         return res.status(404).send({error:"Error! Didn't find a store with that id."});
     
     user.exists(loggedUser._id)
         .then(getUserResult => {
-        if(getUserResult == null)
+        if(!getUserResult)
             return res.status(404).send({error:"Error! Didn't find a user with that is."})
         
         messageBody = req.body.message;

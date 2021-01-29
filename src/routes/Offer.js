@@ -52,7 +52,7 @@ router.get('/stores/:storeId/offers',(req,res) => {
 
     store.exists(storeId)
     .then(getStoreResult => {
-    if(getStoreResult == null)
+    if(!getStoreResult)
         return res.status(404).send({error:"Error! Didn't find a store with thats id."});
     else
     {
@@ -96,7 +96,7 @@ router.post('/stores/:storeId/offers/add-offer',userAuthenticated,(req,res) => {
     
     store.exists(storeId)
     .then(getStoreResult => {
-    if(getStoreResult == null)
+    if(!getStoreResult)
         return res.status(404).send({error:"Error! Didn't find store with that id."});
     else if(getStoreResult.userId != loggedUser._id)
         return res.status(401).send({error:"Error! The requested store doesn't belong to this garage owner."});
@@ -199,14 +199,14 @@ router.delete('/stores/:storeId/offers/delete-offer/:offerId',userAuthenticated,
     {
         store.exists(storeId)
         .then(getStoreResult => {
-        if(getStoreResult == null)
+        if(!getStoreResult)
             return res.status(404).send({error:"Error! Didn't find store with that id."});
         else if(getStoreResult.userId != loggedUser._id)
             return res.status(401).send({error:"Error! The requested store doesn't belong to this garage owner."});
         
         offer.exists(offerId)
         .then(getOfferResult => {
-        if(getOfferResult == null)
+        if(!getOfferResult)
             return res.status(404).send({error:"Error! Didn't find offer with that id."});
         else
         {

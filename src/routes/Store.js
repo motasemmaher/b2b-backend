@@ -183,6 +183,20 @@ router.get('/user/manage-garage-owner/stores', userAuthenticated, (req, res) => 
             .catch(err => res.status(500).send({ error: "Error with getting stores of the garageowner. " + err }));
     }
 });
+
+router.get('/user/manage-garage-owner/stores/storesId', userAuthenticated, (req, res) => {
+    const loggedUser = req.user;
+
+    if (loggedUser.role !== "garageOwner")
+        res.status(401).send({ error: "Unauthorized user !" });
+    else {
+        store.getStoresIdByUserId(loggedUser._id)
+            .then(storesResult => {
+                return res.status(200).send({ count: 0, storesId: storesResult });
+            })
+            .catch(err => res.status(500).send({ error: "Error with getting stores of the garageowner. " + err }));
+    }
+});
 //----------Add Store----------
 router.post('/user/manage-garage-owner/add-store', userAuthenticated, upload.single('image'),(req, res) => { // upload.single('image'),
     const loggedUser = req.user;
@@ -259,7 +273,7 @@ router.put('/user/manage-garage-owner/update-store/:storeId', userAuthenticated,
     else {
         store.exists(storeId)
             .then(getStoreResult => {
-                if (getStoreResult == null)
+                if (!getStoreResult)
                     res.status(404).send({ error: "Error! Didn't find store with that id." });
                 else if (getStoreResult.userId != loggedUser._id)
                     res.status(401).send({ error: "Error! The requested store doesn't belong to this garage owner." });
@@ -300,7 +314,7 @@ router.delete('/user/manage-garage-owner/delete-store/:storeId', userAuthenticat
     else {
         store.exists(storeId)
             .then(getStoreResult => {
-                if (getStoreResult == null)
+                if (!getStoreResult)
                     res.status(404).send({ error: "Error! Didn't find store with that id." });
                 else if (getStoreResult.userId != loggedUser._id)
                     res.status(401).send({ error: "Error! The requested store doesn't belong to this garage owner." });

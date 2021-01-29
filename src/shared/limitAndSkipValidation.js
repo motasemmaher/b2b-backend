@@ -2,7 +2,6 @@ const validator = require('validator');
 
 module.exports = {
     validateLimitAndSkip(limit, skip) {
-        console.log("limit: "+limit+" skip: "+skip)
         if((limit === null && skip === null) || (limit === undefined && skip === undefined))
             return "default both";
         if (limit === undefined || limit === null || !validator.matches(limit, /^\d+$/))
@@ -15,7 +14,6 @@ module.exports = {
     limitAndSkipValues(limit, skip) 
     {    
         const validationResult = this.validateLimitAndSkip(limit, skip);   
-        console.log(validationResult)
         if(validationResult === "default both")
             return {limit: 30, skip: 0}                            
         else if(validationResult === "default limit") 

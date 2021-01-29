@@ -86,7 +86,7 @@ router.get('/admin/view-users/:userId', userAuthenticated, (req, res) => {
         else {
             user.exists(req.params.userId)
             .then(existResult => {
-            if(existResult == null)
+            if(!existResult)
                 return res.status(404).send({error:"Error! Didn't find a user with that id."});
             else
             {
@@ -136,7 +136,7 @@ router.put('/admin/waiting-users/accept/:userId', userAuthenticated, (req, res) 
         userId = req.params.userId;
         user.exists(userId)
         .then(getUserResult => {
-            if(getUserResult == null)
+            if(!getUserResult)
                 return res.status(404).send({error:"Error! Didn't find a user with that id."});
             else
             {
@@ -179,7 +179,7 @@ router.delete('/admin/waiting-users/reject/:userId', userAuthenticated, (req, re
         userId = req.params.userId;
         user.exists(userId)
         .then(getUserResult => {
-            if(getUserResult == null)
+            if(!getUserResult)
                 return res.status(404).send({error:"Error! Didn't find a user with that id."});
             else
             {
@@ -237,7 +237,7 @@ router.delete('/admin/view-users/delete/:userId', userAuthenticated, (req, res) 
         userId = req.params.userId;
         user.exists(req.params.userId)
         .then(getUserResult => {
-        if(getUserResult == null)
+        if(!getUserResult)
             return res.status(404).send({error:"Error! Didn't find a user with that id."});
         else
         {
@@ -309,7 +309,7 @@ router.put('/admin/view-users/trust/:userId', userAuthenticated, (req, res) => {
         userId = req.params.userId;
         user.exists(userId)
         .then(getUserResult => {
-            if(getUserResult == null)
+            if(!getUserResult)
                 return res.status(404).send({error:"Error! Didn't find a user with that id."});
             else
             {
@@ -342,7 +342,7 @@ router.put('/user/manage-user-info', userAuthenticated, (req, res) => {
 
     user.exists(userId)
     .then(getUserResult => {
-    if(getUserResult == null)
+    if(!getUserResult)
         return res.status(404).send({error:"Error! Didn't find a user with that id."})
     else
     {

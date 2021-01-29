@@ -48,7 +48,7 @@ router.put('/permissions/autoAdding', (req, res) => {
         'viewProduct', 'updateProduct', 'deleteProduct', 'viewCategory', 'updateCategory', 'deleteCategory',
         'chat', 'manageOffers', 'viewComplaints'
     ];
-    const arrPermissionAdmin = ['addUser', 'removeUser', 'viewUsers', 'viewComplaints'];
+    const arrPermissionAdmin = ['addUser', 'removeUser', 'viewUsers', 'viewComplaints', 'login'];
 
     arrPermissionCarOwner.forEach((item, index) => {
         prom.push(permissions.addPermission('carOwner', item));

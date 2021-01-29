@@ -117,7 +117,7 @@ router.get('/stores/:storeId/products/:productId?', (req, res) => {
     storeId = req.params.storeId;
     store.exists(storeId)
         .then(getStoreResult => {
-            if (getStoreResult == null)
+            if (!getStoreResult)
                 returnres.status(404).send({ error: "Error! Didn't find a store with thats id." });
             else {
                 if (req.params.productId == null) {
@@ -268,7 +268,7 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
     else {
         store.exists(storeId)
             .then(getStoreResult => {
-                if (getStoreResult == null)
+                if (!getStoreResult)
                     return res.status(404).send({ error: "Error! Didn't find a store with that id." });
                 else if (getStoreResult.userId != loggedUser._id)
                     return res.status(401).send({ error: "Error! The requested store doesn't belong to this garage owner." });
@@ -276,7 +276,7 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
                     //Checking if the category exists by it's ID
                     category.exists(categoryId)
                         .then(getCategoryResult => {
-                            if (getCategoryResult == null)
+                            if (!getCategoryResult)
                                 return res.status(404).send({ error: "Error! Didn't find a category with that id." })
                             else {
                                 //Creating product
@@ -341,7 +341,7 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId', us
     else {
         store.exists(storeId)
             .then(getStoreResult => {
-                if (getStoreResult == null)
+                if (!getStoreResult)
                     return res.status(404).send({ error: "Error! Didn't find a store with that id." });
                 else if (getStoreResult.userId != loggedUser._id)
                     return res.status(401).send({ error: "Error! The requested store doesn't belong to this garage owner." });
@@ -349,12 +349,12 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId', us
                     //Checking if the category exists by it's ID
                     category.exists(categoryId)
                         .then(getCategoryResult => {
-                            if (getCategoryResult == null)
+                            if (!getCategoryResult)
                                 return res.status(404).send({ error: "Error! Didn't find a category with that id." })
                             else {
                                 product.exists(productId)
                                     .then(getProductResult => {
-                                        if (getProductResult == null)
+                                        if (!getProductResult)
                                             return res.status(404).send({ error: "Error! Didn't find a product with that id." })
                                         else {
                                             const randomIdValue = randomId.generateId();
@@ -450,7 +450,7 @@ router.delete('/stores/:storeId/category/:categoryId/delete-product/:productId',
     else {
         store.exists(storeId)
             .then(getStoreResult => {
-                if (getStoreResult == null)
+                if (!getStoreResult)
                     return res.status(404).send({ error: "Error! Didn't find a store with that id." });
                 else if (getStoreResult.userId != loggedUser._id)
                     return res.status(401).send({ error: "Error! The requested store doesn't belong to this garage owner." });
@@ -458,12 +458,12 @@ router.delete('/stores/:storeId/category/:categoryId/delete-product/:productId',
                     //Checking if the category exists by it's ID
                     category.exists(categoryId)
                         .then(getCategoryResult => {
-                            if (getCategoryResult == null)
+                            if (!getCategoryResult)
                                 return res.status(404).send({ error: "Error! Didn't find a category with that id." })
                             else {
                                 product.exists(productId)
                                     .then(getProductResult => {
-                                        if (getProductResult == null)
+                                        if (!getProductResult)
                                             return res.status(404).send({ error: "Error! Didn't find a produt with that id." })
                                         else {
                                             //Deleting product

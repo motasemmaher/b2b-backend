@@ -176,4 +176,10 @@ module.exports = class Product {
         });
         return result;
     }
+
+     updateProductStock(updatedProductStock)
+    {        
+        const result = ProductModel.updateProductStock(updatedProductStock);                
+        return result;
+    } 
 }
