@@ -1,7 +1,7 @@
 const OrderModel = require('../../models/model/Order');
 
 module.exports = class Order {
-    constructor(Order) {}
+    constructor() {}
 
     createOrder(OrderInfo) {
         const promiseResult = OrderModel.createOrder(OrderInfo);

@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const upload = require('../shared/imageUpload');
 const imageToBase64 = require('image-to-base64');
+const uploadImage = require('../shared/uploadImage');
+const randomId = require('../shared/generateRandomId');
 const { userAuthenticated } = require('../middleware/authentication');
 const limitAndSkipValidation = require('../shared/limitAndSkipValidation');
 const latAndLongValidation = require('../shared/latAndLongValidation');
@@ -196,6 +198,9 @@ router.post('/user/manage-garage-owner/add-store', userAuthenticated, upload.sin
         if (typeof storeValidationResult !== 'undefined')
             res.status(400).send({ error: storeValidationResult.error });
         else {
+            const randomIdValue = randomId.generateId();
+            const path = `public/images/${randomIdValue}.png`;
+            storeInfo = {...storeInfo,image:path};
             menu.createMenu()
                 .then(menuResult => {
                     warehouse.createWarehouse()
@@ -208,6 +213,7 @@ router.post('/user/manage-garage-owner/add-store', userAuthenticated, upload.sin
                                         .then(garageOwnerResult => {
                                             garageOwner.addStoreToList(garageOwnerResult._id, storeResult)
                                                 .then(addingResult => {
+                                                    uploadImage.upload(path,req.body.image);
                                                     res.status(200).send(addingResult);
                                                 })
                                                 .catch(err => {
@@ -258,8 +264,10 @@ router.put('/user/manage-garage-owner/update-store/:storeId', userAuthenticated,
                 else if (getStoreResult.userId != loggedUser._id)
                     res.status(401).send({ error: "Error! The requested store doesn't belong to this garage owner." });
                 else {
+                    const randomIdValue = randomId.generateId();
+                    const path = `public/images/${randomIdValue}.png`;
                     const body = req.body;
-                    const storeInfo = { _id: storeId, ...body }; // , image: req.file.path
+                    const storeInfo = { _id: storeId, ...body ,image:path}; // , image: req.file.path
 
                     const storeValidationResult = store.validateStoreInfo(storeInfo);
 
@@ -270,6 +278,7 @@ router.put('/user/manage-garage-owner/update-store/:storeId', userAuthenticated,
                             .then(storeResult => {
                                 store.getStoreById(storeResult._id)
                                     .then(updatedStore => {
+                                        uploadImage.upload(path,req.body.image);
                                         res.status(200).send(updatedStore);
                                     })
                                     .catch(error => res.status(500).send({ error: "Error with getting Store: " + error }));

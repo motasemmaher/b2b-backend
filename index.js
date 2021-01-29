@@ -313,6 +313,7 @@ const shoppingCartRoute = require('./src/routes/ShoppingCart');
 const orderRoute = require('./src/routes/Order');
 const searchRoute = require('./src/routes/Search');
 const permissionsRoute = require('./src/routes/Permissions');
+const chatRoute = require('./src/routes/Chat').router;
 
 // Use Routes
 app.use(shoppingCartRoute);
@@ -321,12 +322,5 @@ app.use(searchRoute);
 app.use(permissionsRoute);
 app.use(chatRoute);
 
-carvaldation = require('./src/business/Car/validate')
-app.get("/test", (req, res) => {
-    let model = req.body.model;
-    let make = req.body.make;
-    let year = req.body.year;
-    let result = carvaldation.validateCarInfo({ model, make, year });
-    res.send(result);
-})
+
 module.exports = app;
