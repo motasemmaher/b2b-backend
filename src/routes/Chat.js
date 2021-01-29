@@ -88,19 +88,17 @@ router.post('/user/contact', userAuthenticated, (req, res) => {
     } else {
         contactBetween = garageOwnerId + "-" + userInfo._id
     }
-    console.log(userInfo._id, garageOwnerId);
+    
     contact.updateContact({
         ownerId: userInfo._id,
         name: stoteName,
         otherUserId: garageOwnerId
     }).then(retrivedUserContact => {
-        console.log(retrivedUserContact)
         contact.updateContact({
             ownerId: garageOwnerId,
             name: userInfo.username,
             otherUserId: userInfo._id
         }).then(retrivedGarageOwnerContact => {
-            console.log(retrivedGarageOwnerContact)
             chat.createChat({
                 contactBetween
             }).then(CreatedChat => {

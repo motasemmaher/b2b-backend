@@ -41,7 +41,6 @@ router.post('/auth/garage-owner/create',upload.single('image'),(req, res) => {
         
         user.checkUsername(userInfo.username)
         .then(usernameCheckResult => {
-            // console.log(userInfo.username, usernameCheckResult)
         if(usernameCheckResult != false)
             return res.status(400).send({error:"Error! The username you entered is already in use by another user."});
         else
@@ -144,7 +143,6 @@ router.post('/auth/car-owner/create', (req,res) => {
 
         user.checkUsername(userInfo.username)
         .then(usernameCheckResult => {
-            // console.log(userInfo.username, usernameCheckResult)
         if(usernameCheckResult != false)
             return res.status(400).send({error:"Error! The username you entered is already in use by another user."});
         else
