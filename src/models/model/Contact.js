@@ -27,7 +27,7 @@ module.exports = {
                 }
             }
         }, {
-            "useFindAndModify": false
+            new: true
         });
 
         if (result) {

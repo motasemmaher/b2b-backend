@@ -13,7 +13,7 @@ const warehouse = require('../business/Objects').WAREHOUSE;
 const menu = require('../business/Objects').MENU;
 const car = require('../business/Objects').CAR;
 const shoppingCart = require('../business/Objects').SHOPPINGCART;
-
+const contact = require('../business/Objects').CONTACT;
 //----------Hashing password----------
 function hashPassword(password) {
     const hash = bcrypt.hashSync(password, 10);
@@ -41,19 +41,20 @@ router.post('/auth/garage-owner/create',upload.single('image'),(req, res) => {
         
         user.checkUsername(userInfo.username)
         .then(usernameCheckResult => {
-        if(usernameCheckResult != null)
+            // console.log(userInfo.username, usernameCheckResult)
+        if(usernameCheckResult != false)
             return res.status(400).send({error:"Error! The username you entered is already in use by another user."});
         else
         {
             user.checkEmail(userInfo.email)
             .then(emailCheckResult => {
-            if(emailCheckResult != null)
+            if(emailCheckResult != false)
                 return res.status(400).send({error:"Error! The email you entered is already in use by another user."});
             else
             {
                 user.checkPhone(userInfo.phoneNumber)
                 .then(phoneNumberCheckResult => {
-                if(phoneNumberCheckResult != null)
+                if(phoneNumberCheckResult != false)
                     return res.status(400).send({error:"Error! The phone number you entered is already in use by another user."});
                 else
                 {
@@ -67,9 +68,17 @@ router.post('/auth/garage-owner/create',upload.single('image'),(req, res) => {
                                 .then(storeResult => {
                                 garageOwner.createGarageOwner({user:userResult,stores:[storeResult]})
                                     .then(garageOwnerResult => {
-                                    warehouse.linkWarehouse({_id:warehouseResult._id,storeId:storeResult._id});
-                                    menu.linkMenu({_id:menuResult._id,storeId:storeResult._id});
-                                    return res.status(200).send({created:true,message:"SUCCESSFULLY_CREATED_GARAGEOWNER_(WAITING_USER)"});
+                                        contact.createContact({ownerId: userResult._id}).then(createdContact => {
+                                            warehouse.linkWarehouse({_id:warehouseResult._id,storeId:storeResult._id});
+                                            menu.linkMenu({_id:menuResult._id,storeId:storeResult._id});
+                                            return res.status(200).send({created:true,message:"SUCCESSFULLY_CREATED_GARAGEOWNER_(WAITING_USER)"});
+                                        }).catch(err => {
+                                            user.deleteUser(userResult._id);
+                                            menu.deleteMenu(menuResult._id);
+                                            warehouse.deleteWarehouse(warehouseResult._id);
+                                            store.deleteStore(storeResult._id);
+                                            return res.status(500).send({error:"Error with creating GarageOwner: "+err});
+                                        });
                                     })
                                     .catch(err => {
                                     user.deleteUser(userResult._id);
@@ -135,19 +144,20 @@ router.post('/auth/car-owner/create', (req,res) => {
 
         user.checkUsername(userInfo.username)
         .then(usernameCheckResult => {
-        if(usernameCheckResult != null)
+            // console.log(userInfo.username, usernameCheckResult)
+        if(usernameCheckResult != false)
             return res.status(400).send({error:"Error! The username you entered is already in use by another user."});
         else
         {
             user.checkEmail(userInfo.email)
             .then(emailCheckResult => {
-            if(emailCheckResult != null)
+            if(emailCheckResult != false)
                 return res.status(400).send({error:"Error! The email you entered is already in use by another user."});
             else
             {
                 user.checkPhone(userInfo.phoneNumber)
                 .then(phoneNumberCheckResult => {
-                if(phoneNumberCheckResult != null)
+                if(phoneNumberCheckResult != false)
                     return res.status(400).send({error:"Error! The phone number you entered is already in use by another user."});
                 else
                 {
@@ -159,7 +169,14 @@ router.post('/auth/car-owner/create', (req,res) => {
                             .then(shoppingCartResult => {
                             carOwner.createCarOwner({user:userResult,cars:[carResult],shoppingCart:shoppingCartResult._id}) 
                                 .then(carOwnerResult => {
-                                return res.status(200).send({created:true,message:"SUCCESSFULLY_CREATED_CAROWNER"});
+                                    contact.createContact({ownerId: userResult._id}).then(createdContact => {
+                                        return res.status(200).send({created:true,message:"SUCCESSFULLY_CREATED_CAROWNER"});
+                                    }).catch(err => {
+                                        user.deleteUser(userResult._id);
+                                        car.deleteCar(carResult._id);
+                                        shoppingCart.deleteShoppingCart(shoppingCartResult._id);
+                                        return res.status(500).send({error:"Error with creating CarOwner: "+err});
+                                    });
                                 })
                                 .catch(err =>{
                                 user.deleteUser(userResult._id);
