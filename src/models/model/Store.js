@@ -334,13 +334,6 @@ module.exports = {
                         description: value.searchText
                     }
                 ]
-            }, {
-                storeName: 1,
-                address: 1,
-                description: 1,
-                opentime: 1,
-                closetime: 1,
-                location: 1,
             })
             .limit(value.limit)
             .skip(value.skip);

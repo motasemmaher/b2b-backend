@@ -104,6 +104,7 @@ router.post('/stores/:storeId/offers/add-offer',userAuthenticated,(req,res) => {
     let errors = {};
     productOffers = req.body.productOffers;
     productOffers.forEach((productOffer,index,productOffers) => {
+        console.log(productOffer)
         product.getProductById(productOffer['productId'])
         .then(productResult => {
             newPrice = productResult.price - (productResult.price*(productOffer['discountRate']/100));
@@ -137,7 +138,7 @@ router.post('/stores/:storeId/offers/add-offer',userAuthenticated,(req,res) => {
             }
         })
         .catch(err => {
-            errors[productResult._id] = "Errors with getting product. "+err;
+            errors[productOffer.id] = "Errors with getting product. "+err;
         });
     });//End of foreach    
     })

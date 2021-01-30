@@ -348,12 +348,6 @@ module.exports =
                 tags: { $in: value.searchText },
             }
             ]
-        }, {
-            name: 1,
-            price: 1,
-            image: 1,
-            productType: 1,
-            description: 1
         })
             .limit(value.limit)
             .skip(value.skip);

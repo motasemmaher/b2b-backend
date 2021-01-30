@@ -21,44 +21,22 @@ router.get('/search', (req, res) => {
     skip = limitAndSkipValues.skip;
     limit = limitAndSkipValues.limit;
     const search = req.query.search;
-    const filter = req.query.filter;
     if (search) {
         const regex = new RegExp(escapeRegex(search), 'gi');
-        if (filter === 'stores') {
-            store.searchStores(regex, limit, skip).then(storesSearchResult => {
-                // if (storesSearchResult.length <= 0) {
-                //     return res.status(404).send({
-                //         error: 'There is no result'
-                //     });
-                // }
-                return res.send({
-                    storesSearchResult
-                });
-            }).catch(err => {
-                res.status(404).send({error: "ERROR_IN_SEARCH"});
-            });
-        } else if (filter === 'products') {
+        store.searchStores(regex, limit, skip).then(storesSearchResult => {
             product.searchProducts(regex, limit, skip).then(productsSearchResult => {
-                // if (productsSearchResult.length <= 0) {
-                //     return res.status(404).send({
-                //         error: 'There is no result'
-                //     });
-                // }
                 return res.send({
-                    productsSearchResult
+                    productsSearchResult, storesSearchResult
                 });
             }).catch(err => {
-                res.status(404).send({error: "ERROR_IN_SEARCH"});
+                return res.status(404).send({ error: "ERROR_IN_SEARCH" });
             });
-        } else {
-            return res.status(400).send({
-                error: 'ERROR_YOU_MUST_SPECIFY_WHERE_YOU_WANT_TO_SEARCH_IN_STORES_OR_PRODUCTS'
-            });
-        }
-
+        }).catch(err => {
+            return res.status(404).send({ error: "ERROR_IN_SEARCH" });
+        });
     } else {
-        res.status(404).send({
-            error: 'ERROR_THERE_IS_NO_RESULT'
+        return res.status(400).send({
+            error: 'ERROR_YOU_MUST_SPECIFY_WHERE_YOU_WANT_TO_SEARCH_IN_STORES_OR_PRODUCTS'
         });
     }
 });

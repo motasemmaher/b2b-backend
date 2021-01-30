@@ -60,7 +60,7 @@ app.use(bodyParser.urlencoded({
 
 //Setting-up CORS options
 const corsOptions = {
-    origin: 'http://localhost:8100',
+    origin: ['http://localhost:8100', 'http://localhost:8101'],
     methods: "*",
     optionsSuccessStatus: 200
 }
@@ -226,9 +226,73 @@ const reportTransporter = nodemailer.createTransport({
         pass: 'b2bgp2020'
     }
 });
+
+
+
+const OneSignal = require('onesignal-node');
+const client = new OneSignal.Client('96c26840-bc81-400a-b25c-63cba4a21b7a', 'N2U4Y2VmYmUtMmJhYS00MWI5LTk2YTQtOWI5ZDg2Zjc0MWZm');
+start = async () => {
+    const responseD = await client.viewDevice('edd73d40-ffa5-4994-80a2-59dc3263ee14');
+    console.log(responseD.body);
+
+    const response = await client.viewDevices({ limit: 200, offset: 0 });
+    console.log(response.body);
+
+    const notification = {
+        contents: {
+            'tr': 'Yeni bildirim',
+            'en': 'New notification',
+        },
+        // included_segments: ['Subscribed Users'],
+        include_player_ids: ['edd73d40-ffa5-4994-80a2-59dc3263ee14'],
+        filters: [
+            { field: 'tag', key: 'level', relation: '>', value: 10 }
+        ]
+    };
+
+    // using async/await
+    try {
+        const response = await client.createNotification(notification);
+        console.log(response.body.id);
+    } catch (e) {
+        if (e instanceof OneSignal.HTTPError) {
+            // When status code of HTTP response is not 2xx, HTTPError is thrown.
+            console.log(e.statusCode);
+            console.log(e.body);
+        }
+    }
+
+    // or you can use promise style:
+    client.createNotification(notification)
+        .then(response => console.log(response))
+        .catch(e => { });
+
+}
+start()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //----------Send garage owner report----------
 const garageOwnerReport = schedule.scheduleJob('0 0 1 * *', () => {
-        user.getAllUsersIdOfARole('garageOwner')
+    user.getAllUsersIdOfARole('garageOwner')
         .then(garageOwners => {
             garageOwners.forEach(garageOwnerId => {
                 user.getUserById(garageOwnerId._id)
@@ -244,58 +308,58 @@ const garageOwnerReport = schedule.scheduleJob('0 0 1 * *', () => {
                                 };
                                 reportTransporter.sendMail(mailOptions, function (err, info) {
                                     if (err)
-                                        console.log({error:"Email wasn't sent !    "+err});
+                                        console.log({ error: "Email wasn't sent !    " + err });
                                     else {
                                         report.clearReport(retrivedReport._id).then(clearedReport => {
-                                            console.log({success:'Email sent: ' + info.response});
+                                            console.log({ success: 'Email sent: ' + info.response });
                                         });
                                     }
                                 });
                             });
                         });
                     })
-                    .catch(err => console.log({error:"Error in generating report -Geeting garage owner by id- ! " + err}));
+                    .catch(err => console.log({ error: "Error in generating report -Geeting garage owner by id- ! " + err }));
             })
         })
-        .catch(err => console.log({error:"Error in generating report -Geting garage owners- ! " + err}));
+        .catch(err => console.log({ error: "Error in generating report -Geting garage owners- ! " + err }));
 });
 //----------Send admin report----------
 const adminReport = schedule.scheduleJob('0 0 1 * *', () => {
     user.getAllUsersIdOfARole('garageOwner')
         .then(garageOwners => {
             user.getAllUsersIdOfARole('carOwner')
-            .then(carOwners => {
-                user.getAllUsersIdOfARole('waitingUser')
-                .then(waitingUsers => {
-                reportForAdmin = `#of Garage Owners: ${garageOwners.length}\n#of Car Owners: ${carOwners.length}\n#of Waiting Users: ${waitingUsers.length}\n`;
-                user.getAllUsersIdOfARole('admin')
-                    .then(admins => {
-                        admins.forEach(adminId => {
-                            user.getUserById(adminId._id)
-                                .then(admin => {
-                                    var mailOptions = {
-                                        from: 'b2b.report.generator@gmail.com',
-                                        to: admin.email,
-                                        subject: `Admin,Month:${new Date().getMonth() + 1}/${new Date().getFullYear()} Report`,
-                                        text: `Hello ${admin.fullName},this is the report for the current month.\n${reportForAdmin}\nBest wishes, B2B team`,
-                                    };
-                                    reportTransporter.sendMail(mailOptions, function (err, info) {
-                                        if (err)
-                                            console.log({error:"Email wasn't sent !    "+err});
-                                        else
-                                            console.log({success:'Email sent: ' + info.response});
-                                    });
+                .then(carOwners => {
+                    user.getAllUsersIdOfARole('waitingUser')
+                        .then(waitingUsers => {
+                            reportForAdmin = `#of Garage Owners: ${garageOwners.length}\n#of Car Owners: ${carOwners.length}\n#of Waiting Users: ${waitingUsers.length}\n`;
+                            user.getAllUsersIdOfARole('admin')
+                                .then(admins => {
+                                    admins.forEach(adminId => {
+                                        user.getUserById(adminId._id)
+                                            .then(admin => {
+                                                var mailOptions = {
+                                                    from: 'b2b.report.generator@gmail.com',
+                                                    to: admin.email,
+                                                    subject: `Admin,Month:${new Date().getMonth() + 1}/${new Date().getFullYear()} Report`,
+                                                    text: `Hello ${admin.fullName},this is the report for the current month.\n${reportForAdmin}\nBest wishes, B2B team`,
+                                                };
+                                                reportTransporter.sendMail(mailOptions, function (err, info) {
+                                                    if (err)
+                                                        console.log({ error: "Email wasn't sent !    " + err });
+                                                    else
+                                                        console.log({ success: 'Email sent: ' + info.response });
+                                                });
+                                            })
+                                            .catch(err => console.log({ error: "Error getting the admin by id. " + err }));
+                                    }); //End of for each
                                 })
-                                .catch(err => console.log({error: "Error getting the admin by id. " + err}));
-                        }); //End of for each
-                    })
-                    .catch(err => console.log({error: "Error getting all the admins owners. " + err}));
+                                .catch(err => console.log({ error: "Error getting all the admins owners. " + err }));
+                        })
+                        .catch(err => console.log({ error: "Error getting all the waiting users. " + err }));
                 })
-                .catch(err => console.log({error: "Error getting all the waiting users. " + err}));
-            })
-            .catch(err => console.log({error: "Error getting all the car owners. " + err}));
+                .catch(err => console.log({ error: "Error getting all the car owners. " + err }));
         })
-        .catch(err => console.log({error: "Error getting all the garage owners. " + err}));
+        .catch(err => console.log({ error: "Error getting all the garage owners. " + err }));
 });
 
 const http = require("http")
@@ -307,7 +371,7 @@ const startTrinModelForSearchByImage = schedule.scheduleJob('0 0 1 * *', () => {
         .request(
             url,
             res => {
-               console.log('Model Was Trained')
+                console.log('Model Was Trained')
             }
         )
         .end()

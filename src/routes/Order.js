@@ -249,9 +249,6 @@ router.put('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
                                                             });
                                                         });
                                                     }
-                                                    // }).catch(err => {
-                                                    //     res.status(400).send('There is no available quantity in this store');
-                                                    // });
                                                 } else if (status === 'cancel') {                                                    
                                                     warehouse.increaseAmaountOfProduct(retrivedStore.warehouse, item.product, item.quantity).then(updatedWarehouse => {                                                        
                                                         product.getProductById(item.product).then(retrivedProduct => {                                                            

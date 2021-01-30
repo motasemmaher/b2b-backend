@@ -106,8 +106,8 @@ router.get('/view-stores/location', userAuthenticated,(req, res) => {
     if(loggedUser.role !== "carOwner")
         return res.status(401).send({error:"Unauthorized user !"});
 
-    let skip = req.query.skip;
-    let limit = req.query.limit;
+    let skip = req.query.skip || '0';
+    let limit = req.query.limit || '5';
     const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);
     skip = limitAndSkipValues.skip;
     limit = limitAndSkipValues.limit;
