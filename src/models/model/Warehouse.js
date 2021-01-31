@@ -129,6 +129,7 @@ module.exports =
                 
                 warehouse.storage[0].amount -= value.quantity;
                 result = warehouse.save();
+                console.log(result);
             }
         });
         // console.log(value);
@@ -147,6 +148,7 @@ module.exports =
             // console.log(warehouse)
                 warehouse.storage[0].amount += value.quantity;
                 result = warehouse.save();
+                console.log(result);
         });
         
         if(result)

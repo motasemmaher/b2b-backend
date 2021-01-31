@@ -128,8 +128,8 @@ router.get('/admin/view-users/:userId', userAuthenticated, (req, res) => {
 //----------Accepting waiting user----------
 router.put('/admin/waiting-users/accept/:userId', userAuthenticated, (req, res) => {
     loggedUser = req.user;
-    if (Object.keys(req.body).length === 0)
-        return res.status(400).send({ error: "No data was sent!" });
+    // if (Object.keys(req.body).length === 0)
+    //     return res.status(400).send({ error: "No data was sent!" });
     if (loggedUser.role !== "admin")
         return res.status(401).send({ error: "Unauthorized user !" });
     else {

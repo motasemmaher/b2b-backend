@@ -66,7 +66,7 @@ module.exports = class GarageOwner {
     createGarageOwner(GarageOwnerInfo) {
         const result = GarageOwnerModel.createGarageOwner(GarageOwnerInfo);
         return result;
-    }
+    } 
 
     updateGarageOwner(GarageOwnerId) {
         const result = GarageOwnerModel.updateGarageOwner(GarageOwnerId);

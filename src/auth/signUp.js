@@ -14,6 +14,7 @@ const menu = require('../business/Objects').MENU;
 const car = require('../business/Objects').CAR;
 const shoppingCart = require('../business/Objects').SHOPPINGCART;
 const contact = require('../business/Objects').CONTACT;
+const report = require('../business/Objects').REPORT;
 //----------Hashing password----------
 function hashPassword(password) {
     const hash = bcrypt.hashSync(password, 10);
@@ -65,27 +66,34 @@ router.post('/auth/garage-owner/create',upload.single('image'),(req, res) => {
                             .then(warehouseResult =>{
                             store.createStore({...storeInfo,userId:userResult._id,menu:menuResult,warehouse:warehouseResult})//,image:req.file.path
                                 .then(storeResult => {
-                                garageOwner.createGarageOwner({user:userResult,stores:[storeResult]})
-                                    .then(garageOwnerResult => {
-                                        contact.createContact({ownerId: userResult._id}).then(createdContact => {
-                                            warehouse.linkWarehouse({_id:warehouseResult._id,storeId:storeResult._id});
-                                            menu.linkMenu({_id:menuResult._id,storeId:storeResult._id});
-                                            return res.status(200).send({created:true,message:"SUCCESSFULLY_CREATED_GARAGEOWNER_(WAITING_USER)"});
-                                        }).catch(err => {
-                                            user.deleteUser(userResult._id);
-                                            menu.deleteMenu(menuResult._id);
-                                            warehouse.deleteWarehouse(warehouseResult._id);
-                                            store.deleteStore(storeResult._id);
-                                            return res.status(500).send({error:"Error with creating GarageOwner: "+err});
+                                    report.createReport({}).then(reportInfo => {
+                                        garageOwner.createGarageOwner({user:userResult,stores:[storeResult], reportId: reportInfo._id})
+                                        .then(garageOwnerResult => {
+                                            contact.createContact({ownerId: userResult._id}).then(createdContact => {
+                                                warehouse.linkWarehouse({_id:warehouseResult._id,storeId:storeResult._id});
+                                                menu.linkMenu({_id:menuResult._id,storeId:storeResult._id});
+                                                return res.status(200).send({created:true,message:"SUCCESSFULLY_CREATED_GARAGEOWNER_(WAITING_USER)"});
+                                            }).catch(err => {
+                                                user.deleteUser(userResult._id);
+                                                menu.deleteMenu(menuResult._id);
+                                                warehouse.deleteWarehouse(warehouseResult._id);
+                                                store.deleteStore(storeResult._id);
+                                                return res.status(500).send({error:"Error with creating GarageOwner: "+err});
+                                            });
+                                        })
+                                        .catch(err => {
+                                        user.deleteUser(userResult._id);
+                                        menu.deleteMenu(menuResult._id);
+                                        warehouse.deleteWarehouse(warehouseResult._id);
+                                        store.deleteStore(storeResult._id);
+                                        return res.status(500).send({error:"Error with creating GarageOwner: "+err});
                                         });
-                                    })
-                                    .catch(err => {
-                                    user.deleteUser(userResult._id);
-                                    menu.deleteMenu(menuResult._id);
-                                    warehouse.deleteWarehouse(warehouseResult._id);
-                                    store.deleteStore(storeResult._id);
-                                    return res.status(500).send({error:"Error with creating GarageOwner: "+err});
-                                    });
+                                    }).catch(err => {
+                                        user.deleteUser(userResult._id);
+                                        menu.deleteMenu(menuResult._id);
+                                        warehouse.deleteWarehouse(warehouseResult._id);
+                                        return res.status(500).send({error:"Error with creating report: "+err});
+                                    });                                
                                 })    
                                 .catch(err =>{
                                 user.deleteUser(userResult._id);
