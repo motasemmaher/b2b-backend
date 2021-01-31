@@ -1,7 +1,8 @@
+//Requiring the validation package
 const validator = require('validator');
-
+//Exporting the validation method
 module.exports = {
-
+    //A method to validate the user information
     validateUserInfo(user)
     {
         if(user.fullName === undefined || !validator.matches(user.fullName,/(^[\p{L}\s]{3,64}$)/ugi))

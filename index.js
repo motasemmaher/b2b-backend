@@ -38,11 +38,6 @@ app.use(session({
 
 require('./src/models/model');
 
-//Objects
-const user = require('./src/business/Objects').USER;
-const garageOwner = require('./src/business/Objects').GARAGEOWNER;
-const report = require('./src/business/Objects').REPORT;
-
 // validation by thaer
 const limitAndSkipValidation = require('./src/shared/limitAndSkipValidation');
 
@@ -118,6 +113,29 @@ app.delete('/user/logout', userAuthenticated, (req, res) => {
     res.send({ sucess: true })
     // res.redirect('/user/login');
 });
+
+
+
+//Requring the scheduled jobs
+//Starting the generate report services
+const generatingReports = require('./src/scheduled Jobs/generatingReports');
+generatingReports.generateGarageOwnerReport();
+generatingReports.generatingAdminReport();
+//Starting the clean-up expired offers service
+const removeExpiredOffers = require('./src/scheduled Jobs/removingExpiredOffers');
+removeExpiredOffers.removeExpiredOffers();
+//Starting the training service
+const modelTrain = require('./src/scheduled Jobs/trainingModel');
+modelTrain.train();
+
+
+
+
+
+
+
+
+
 
 
 
@@ -218,100 +236,9 @@ const complaintRoute = require('./src/routes/Complaint');
 app.use(complaintRoute);
 
 
-//--------------------------------------Report--------------------------------------
-const reportTransporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: 'b2b.report.generator@gmail.com',
-        pass: 'b2bgp2020'
-    }
-});
-//----------Send garage owner report----------
-const garageOwnerReport = schedule.scheduleJob('0 0 1 * *', () => {
-        user.getAllUsersIdOfARole('garageOwner')
-        .then(garageOwners => {
-            garageOwners.forEach(garageOwnerId => {
-                user.getUserById(garageOwnerId._id)
-                    .then(garOwner => {
-                        garageOwner.getGarageOwnerByUserId(garageOwnerId._id).then(retrivedgarageOwner => {
-                            report.getReport(retrivedgarageOwner.reportId).then(retrivedReport => {
-                                reportForGarageOwner = `Total Income this month ${retrivedReport.totalIncome}\nNumber of delivered orders ${retrivedReport.listOfSoldItems.length}\nNumber of cancel orders ${retrivedReport.listOfCancelItems.length}`;
-                                var mailOptions = {
-                                    from: 'b2b.report.generator@gmail.com',
-                                    to: garOwner.email,
-                                    subject: `Month:${new Date().getMonth() + 1}/${new Date().getFullYear()} Report`,
-                                    text: `Hello ${garOwner.fullName}, this is the report for the current month.\n${reportForGarageOwner}\nBest wishes, B2B team`,
-                                };
-                                reportTransporter.sendMail(mailOptions, function (err, info) {
-                                    if (err)
-                                        console.log({error:"Email wasn't sent !    "+err});
-                                    else {
-                                        report.clearReport(retrivedReport._id).then(clearedReport => {
-                                            console.log({success:'Email sent: ' + info.response});
-                                        });
-                                    }
-                                });
-                            });
-                        });
-                    })
-                    .catch(err => console.log({error:"Error in generating report -Geeting garage owner by id- ! " + err}));
-            })
-        })
-        .catch(err => console.log({error:"Error in generating report -Geting garage owners- ! " + err}));
-});
-//----------Send admin report----------
-const adminReport = schedule.scheduleJob('0 0 1 * *', () => {
-    user.getAllUsersIdOfARole('garageOwner')
-        .then(garageOwners => {
-            user.getAllUsersIdOfARole('carOwner')
-            .then(carOwners => {
-                user.getAllUsersIdOfARole('waitingUser')
-                .then(waitingUsers => {
-                reportForAdmin = `#of Garage Owners: ${garageOwners.length}\n#of Car Owners: ${carOwners.length}\n#of Waiting Users: ${waitingUsers.length}\n`;
-                user.getAllUsersIdOfARole('admin')
-                    .then(admins => {
-                        admins.forEach(adminId => {
-                            user.getUserById(adminId._id)
-                                .then(admin => {
-                                    var mailOptions = {
-                                        from: 'b2b.report.generator@gmail.com',
-                                        to: admin.email,
-                                        subject: `Admin,Month:${new Date().getMonth() + 1}/${new Date().getFullYear()} Report`,
-                                        text: `Hello ${admin.fullName},this is the report for the current month.\n${reportForAdmin}\nBest wishes, B2B team`,
-                                    };
-                                    reportTransporter.sendMail(mailOptions, function (err, info) {
-                                        if (err)
-                                            console.log({error:"Email wasn't sent !    "+err});
-                                        else
-                                            console.log({success:'Email sent: ' + info.response});
-                                    });
-                                })
-                                .catch(err => console.log({error: "Error getting the admin by id. " + err}));
-                        }); //End of for each
-                    })
-                    .catch(err => console.log({error: "Error getting all the admins owners. " + err}));
-                })
-                .catch(err => console.log({error: "Error getting all the waiting users. " + err}));
-            })
-            .catch(err => console.log({error: "Error getting all the car owners. " + err}));
-        })
-        .catch(err => console.log({error: "Error getting all the garage owners. " + err}));
-});
-
-const http = require("http")
 
 
-const startTrinModelForSearchByImage = schedule.scheduleJob('0 0 1 * *', () => {
-    let url = new URL("http://localhost:8000/start-training")
-    http
-        .request(
-            url,
-            res => {
-               console.log('Model Was Trained')
-            }
-        )
-        .end()
-});
+
 
 //--------------------Chat--------------------\\
 

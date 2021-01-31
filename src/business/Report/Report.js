@@ -1,3 +1,4 @@
+//Requiring the necessary files and models
 const ReportModel = require('../../models/model/Report');
 
 module.exports = class Report{

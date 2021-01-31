@@ -40,5 +40,5 @@ const CHAT = new Chat();
 const REPORT = new Report();
 const PERMISSIONS = new Permissions();
 const SUBSCRIPTION = new Subscription();
-
+//Exporting the objects to be used in other parts of the project
 module.exports = {USER,GARAGEOWNER, CHAT,CAROWNER,STORE,WAREHOUSE,MENU,CATEGORY,PRODUCT,COMPLAINT,MESSAGE,OFFER,CAR,SHOPPINGCART, CARTITEM, ORDER, PERMISSIONS, REPORT, CONTACT, SUBSCRIPTION};

@@ -1,7 +1,10 @@
+//Requiring the validation package
 const validator = require('validator');
 
 //----------Checking lat and long password----------
+//Exporting the validation method
 module.exports = {
+    //A method to validate the values of the latitude and longitude
     validatingLatAndLong(lat,long)
     {
         if(lat === undefined || !validator.matches(lat+"",/(^(\d+).(\d+)$)/))

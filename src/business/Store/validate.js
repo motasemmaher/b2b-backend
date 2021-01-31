@@ -1,8 +1,9 @@
+//Requiring the validation package
 const validator = require('validator');
-
+//Exporting the validation method
 module.exports = {
-    
-   validateStoreInfo(store)
+    //A method to validate the store information
+    validateStoreInfo(store)
     {
         if(store === undefined)
         return "No data were entered ! !";
