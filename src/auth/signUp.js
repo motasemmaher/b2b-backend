@@ -42,19 +42,19 @@ router.post('/auth/garage-owner/create',upload.single('image'),(req, res) => {
         
         user.checkUsername(userInfo.username)
         .then(usernameCheckResult => {
-        if(usernameCheckResult != false)
+        if(usernameCheckResult)
             return res.status(400).send({error:"Error! The username you entered is already in use by another user."});
         else
         {
             user.checkEmail(userInfo.email)
             .then(emailCheckResult => {
-            if(emailCheckResult != false)
+            if(emailCheckResult)
                 return res.status(400).send({error:"Error! The email you entered is already in use by another user."});
             else
             {
                 user.checkPhone(userInfo.phoneNumber)
                 .then(phoneNumberCheckResult => {
-                if(phoneNumberCheckResult != false)
+                if(phoneNumberCheckResult)
                     return res.status(400).send({error:"Error! The phone number you entered is already in use by another user."});
                 else
                 {
@@ -151,19 +151,19 @@ router.post('/auth/car-owner/create', (req,res) => {
 
         user.checkUsername(userInfo.username)
         .then(usernameCheckResult => {
-        if(usernameCheckResult != false)
+        if(usernameCheckResult)
             return res.status(400).send({error:"Error! The username you entered is already in use by another user."});
         else
         {
             user.checkEmail(userInfo.email)
             .then(emailCheckResult => {
-            if(emailCheckResult != false)
+            if(emailCheckResult)
                 return res.status(400).send({error:"Error! The email you entered is already in use by another user."});
             else
             {
                 user.checkPhone(userInfo.phoneNumber)
                 .then(phoneNumberCheckResult => {
-                if(phoneNumberCheckResult != false)
+                if(phoneNumberCheckResult)
                     return res.status(400).send({error:"Error! The phone number you entered is already in use by another user."});
                 else
                 {
@@ -181,7 +181,7 @@ router.post('/auth/car-owner/create', (req,res) => {
                                         user.deleteUser(userResult._id);
                                         car.deleteCar(carResult._id);
                                         shoppingCart.deleteShoppingCart(shoppingCartResult._id);
-                                        return res.status(500).send({error:"Error with creating CarOwner: "+err});
+                                        return res.status(500).send({error:"Error with creating Contact: "+err});
                                     });
                                 })
                                 .catch(err =>{

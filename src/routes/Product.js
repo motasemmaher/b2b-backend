@@ -117,7 +117,7 @@ router.get('/stores/:storeId/products/:productId?', (req, res) => {
     storeId = req.params.storeId;
     store.exists(storeId)
         .then(getStoreResult => {
-            if (getStoreResult == null)
+            if (!getStoreResult)
                 returnres.status(404).send({ error: "Error! Didn't find a store with thats id." });
             else {
                 if (req.params.productId == null) {
@@ -268,7 +268,7 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
     else {
         store.exists(storeId)
             .then(getStoreResult => {
-                if (getStoreResult == null)
+                if (!getStoreResult)
                     return res.status(404).send({ error: "Error! Didn't find a store with that id." });
                 else if (getStoreResult.userId != loggedUser._id)
                     return res.status(401).send({ error: "Error! The requested store doesn't belong to this garage owner." });
@@ -276,7 +276,7 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
                     //Checking if the category exists by it's ID
                     category.exists(categoryId)
                         .then(getCategoryResult => {
-                            if (getCategoryResult == null)
+                            if (!getCategoryResult)
                                 return res.status(404).send({ error: "Error! Didn't find a category with that id." })
                             else {
                                 //Creating product
@@ -293,10 +293,14 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
                                     const path = `public/images/${randomIdValue}.png`;
                                     garageOwner.getGarageOwnerByUserId(loggedUser._id)
                                         .then(garageOwnerResult => {
-                                            if (garageOwnerResult != null && garageOwnerResult.isTrusted){
+                                            if (garageOwnerResult != null)
+                                                return res.status(400).send("Didn't find a garageOwner with that userId !");
+                                            if(garageOwnerResult.isTrusted)
+                                            {
                                                 tags = req.body.generalType+","+ productInfo.tags;
-                                                productInfo = { ...productInfo,tags:tags,image:path};
+                                                productInfo = { ...productInfo,tags:tags};
                                             }
+                                            productInfo = { ...productInfo,image:path};
                                             product.createProduct(productInfo)
                                                 .then(productResult => {
                                                     //Adding a ref of the product to the category
@@ -305,11 +309,8 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
                                                             //Adding the product and its quantity to the warehouse
                                                             warehouse.addProduct(storeId, productResult._id, categoryId, req.body.amount)
                                                                 .then(warehouseResult => {
-                                                                    uploadImage.upload(path,req.body.image)
-                                                                    //.then(() => {
-                                                                        return res.status(200).send(productResult);
-                                                                    //})
-                                                                    //.catch(err => {return res.status(500).send({ error: "Error uploading image. " + err })});
+                                                                    uploadImage.upload(path,req.body.image);
+                                                                    return res.status(200).send(productResult);
                                                                 })
                                                                 .catch(err => {return res.status(500).send({ error: "Error updating warehouse. " + err })});
                                                         })
@@ -340,7 +341,7 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId', us
     else {
         store.exists(storeId)
             .then(getStoreResult => {
-                if (getStoreResult == null)
+                if (!getStoreResult)
                     return res.status(404).send({ error: "Error! Didn't find a store with that id." });
                 else if (getStoreResult.userId != loggedUser._id)
                     return res.status(401).send({ error: "Error! The requested store doesn't belong to this garage owner." });
@@ -348,14 +349,16 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId', us
                     //Checking if the category exists by it's ID
                     category.exists(categoryId)
                         .then(getCategoryResult => {
-                            if (getCategoryResult == null)
+                            if (!getCategoryResult)
                                 return res.status(404).send({ error: "Error! Didn't find a category with that id." })
                             else {
                                 product.exists(productId)
                                     .then(getProductResult => {
-                                        if (getProductResult == null)
+                                        if (!getProductResult)
                                             return res.status(404).send({ error: "Error! Didn't find a product with that id." })
                                         else {
+                                            const randomIdValue = randomId.generateId();
+                                            const path = `public/images/${randomIdValue}.png`;
                                             productInfo = { ...req.body }; //  image: req.file.path
                                             if (req.body.amount === 0)
                                                 productInfo = { ...productInfo, isInStock: false };
@@ -371,13 +374,12 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId', us
                                                 //Updating product
                                                 category.findCategoryById(categoryId)
                                                     .then(categoryFindByNameResult => {
-                                                        updatedProductInfo = { _id: productId, ...productInfo, categoryId: categoryFindByNameResult._id } // , image: req.file.path,
+                                                        updatedProductInfo = { _id: productId, ...productInfo, categoryId: categoryFindByNameResult._id,image:path } // , image: req.file.path,
                                                         if (garageOwnerResult.isTrusted)
                                                         {
                                                             tags = req.body.generalType+","+ updatedProductInfo.tags;
-                                                            updatedProductInfo = { ...updatedProductInfo, tags:tags };
+                                                            updatedProductInfo = { ...updatedProductInfo, tags:tags};
                                                         }
-                                                        
                                                         product.updateProduct(updatedProductInfo)
                                                             .then(productResult => {
                                                                 if (categoryFindByNameResult._id != categoryId) {
@@ -391,6 +393,7 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId', us
                                                                                                 .then(addProductToWarehouseResult => {
                                                                                                     product.getProductById(productId)
                                                                                                         .then(productFindResult => {
+                                                                                                            uploadImage.upload(path,req.body.image)
                                                                                                             return res.status(200).send(productFindResult);
                                                                                                         })
                                                                                                         .catch(err => {return res.status(500).send({ error: "Error finding updated product.  " + err })});
@@ -447,7 +450,7 @@ router.delete('/stores/:storeId/category/:categoryId/delete-product/:productId',
     else {
         store.exists(storeId)
             .then(getStoreResult => {
-                if (getStoreResult == null)
+                if (!getStoreResult)
                     return res.status(404).send({ error: "Error! Didn't find a store with that id." });
                 else if (getStoreResult.userId != loggedUser._id)
                     return res.status(401).send({ error: "Error! The requested store doesn't belong to this garage owner." });
@@ -455,12 +458,12 @@ router.delete('/stores/:storeId/category/:categoryId/delete-product/:productId',
                     //Checking if the category exists by it's ID
                     category.exists(categoryId)
                         .then(getCategoryResult => {
-                            if (getCategoryResult == null)
+                            if (!getCategoryResult)
                                 return res.status(404).send({ error: "Error! Didn't find a category with that id." })
                             else {
                                 product.exists(productId)
                                     .then(getProductResult => {
-                                        if (getProductResult == null)
+                                        if (!getProductResult)
                                             return res.status(404).send({ error: "Error! Didn't find a produt with that id." })
                                         else {
                                             //Deleting product

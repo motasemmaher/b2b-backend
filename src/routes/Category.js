@@ -14,7 +14,7 @@ router.get('/stores/:storeId/categories/:categoryId?',(req,res) => {
     
     store.exists(storeId)
     .then(storeResult => {
-    if(storeResult == null)
+    if(!storeResult)
         return res.status(404).send({error:"Error! Didn't find a store with thats id."});
 
     if(req.params.categoryId == null)
@@ -50,7 +50,7 @@ router.post('/stores/:storeId/create-category',userAuthenticated,(req,res) => {
     
     store.exists(storeId)
     .then(getStoreResult => {
-    if(getStoreResult == null)
+    if(!getStoreResult)
         return res.status(404).send({error:"Error! Didn't find a store with that id."})
     else if(getStoreResult.userId != loggedUser._id)
         return res.status(401).send({error:"Error! The requested store doesn't belong to this garage owner."});
@@ -105,7 +105,7 @@ router.put('/stores/:storeId/update-category/:categoryId',userAuthenticated,(req
     
     store.exists(storeId)
     .then(getStoreResult => {
-    if(getStoreResult == null)
+    if(!getStoreResult)
         return res.status(404).send({error:"Error! Didn't find a store with that id."});
     else if(getStoreResult.userId != loggedUser._id)
         return res.status(401).send({error:"Error! The requested store doesn't belong to this garage owner."});
@@ -114,7 +114,7 @@ router.put('/stores/:storeId/update-category/:categoryId',userAuthenticated,(req
         //Checking if the category exists by it's ID
         category.exists(categoryId)
         .then(getCategoryResult => {
-        if(getCategoryResult == null)
+        if(!getCategoryResult)
             return res.status(404).send({error:"Error! Didn't find a cateory with that id."})
         
         const categoryValidationResult = category.validateCategoryInfo(categoryInfo);
@@ -163,7 +163,7 @@ router.delete('/stores/:storeId/delete-category/:categoryId',userAuthenticated,(
     categoryId = req.params.categoryId;
     store.exists(storeId)
     .then(getStoreResult => {
-    if(getStoreResult == null)
+    if(!getStoreResult)
         return res.status(404).send({error:"Error! Didn't find a store with that id."});
     else if(getStoreResult.userId != loggedUser._id)
         return res.status(401).send({error:"Error! The requested store doesn't belong to this garage owner."});
@@ -172,7 +172,7 @@ router.delete('/stores/:storeId/delete-category/:categoryId',userAuthenticated,(
         //Checking if the category exists by it's ID
         category.exists(categoryId)
         .then(getCategoryResult => {
-        if(getCategoryResult == null)
+        if(!getCategoryResult)
             return res.status(404).send({error:"Error! Didn't find a cateory with that id."});
         //Startting the process of deleting the category
         //1- Getting all the categories from the store's menu

@@ -185,29 +185,29 @@
 -isInStock:type:Boolean
 -tags:String[]
 //Methods
-+exists(productId):Product
-+countAll(type):Int
-+countByStore(storeId,type):Int
-+countByCategory(categoryId,type):Int
++exists(String productId):Product
++countAll(String type):Int
++countByStore(String storeId,String type):Int
++countByCategory(sTRING categoryId,String type):Int
 +countByOffers():Int
-+countByOffersOfStore(storeId):Int
-+validateProductInfo(productInfo):String
-+createProduct(productInfo):Product
-+updateProduct(updatedProduct):Product
-+deleteProduct(productId):Product
-+deleteProductsOfCategory(categoryId):Product[]
-+getProductById(productId):Product[]
-+getProductsOfCategory(categoryId,type,limit,skip,nameSort,priceSort):Product[]
-+deleteProductsOfCategoriesId(categoriesIds):Product[]
-+addOffer(productId, offer):Product[]
-+removeOffer(offerId):Product
-+getProductsWithOffers(limit, skip):Product[]
-+getProductsWithOffersOfStore(storeId, limit, skip):Product[]
-+getAllProducts(type,limit,skip,nameSort,priceSort):Product[]
-+getProductsOfStore(storeId,type,limit,skip,nameSort,priceSort):Product[]
++countByOffersOfStore(String storeId):Int
++validateProductInfo(Product productInfo):String
++createProduct(Product productInfo):Product
++updateProduct(Product updatedProduct):Product
++deleteProduct(String productId):Product
++deleteProductsOfCategory(String categoryId):Product[]
++getProductById(String productId):Product[]
++getProductsOfCategory(String categoryId,String type,Number limit,Number skip,Number nameSort,Number priceSort):Product[]
++deleteProductsOfCategoriesId(String[] categoriesIds):Product[]
++addOffer(String productId,Offer offer):Product[]
++removeOffer(String offerId):Product
++getProductsWithOffers(Number limit, Number skip):Product[]
++getProductsWithOffersOfStore(String storeId, Number limit, Number skip):Product[]
++getAllProducts(String type,Number limit,Number skip,Number nameSort,Number priceSort):Product[]
++getProductsOfStore(String storeId,String type,Number limit,Number skip,Number nameSort,Number priceSort):Product[]
 +expiredOffers():Product[]
-+searchProducts(searchText, limit, skip):Product[]
-+findProductAndItsOffer(ProductId):Product[]
++searchProducts(String searchText, Number limit, Number skip):Product[]
++findProductAndItsOffer(String ProductId):Product[]
 ---------------------------------------------------------------------------------------------------
 //Warehouse
 //Attributes
@@ -217,14 +217,294 @@
 +Warehouse():ctor
 +validateWarehouseInfo(warehouseInfo):String
 +createWarehouse():Warehouse
-+deleteWarehouse(warehouseId):Warehouse
++deleteWarehouse(String warehouseId):Warehouse
 +linkWarehouse(info):Warehouse
-+addProduct(storeId,productId,categoryId,amount):Warehouse
-+removeProductsFromWarehouse(storeId,categoryId):Warehouse
-+removeProductFromWarehouse(storeId,productId):Warehouse
++addProduct(String storeId,String productId,String categoryId,amount):Warehouse
++removeProductsFromWarehouse(String storeId,String categoryId):Warehouse
++removeProductFromWarehouse(String storeId,String productId):Warehouse
 +deleteWarehouseByStoreId(storeIds):Warehouse
-+getWarehouse(warehouseId):Warehouse
-+getProductFromWarehouse(warehouseId, productId):Warehouse
-+decreaseAmaountOfProduct(warehouseId, productId, quantity):Warehouse
-+increaseAmaountOfProduct(warehouseId, productId, quantity):Warehouse
++getWarehouse(String warehouseId):Warehouse
++getProductFromWarehouse(String warehouseId,String productId):Warehouse
++decreaseAmaountOfProduct(String warehouseId,String productId,Number quantity):Warehouse
++increaseAmaountOfProduct(String warehouseId,String productId,Number quantity):Warehouse
 ---------------------------------------------------------------------------------------------------
+//Complaint
+//Attributes
+-submitterId:String
+-message:Message
+-garageOwnerId:String
+-garageId:String
+//Methods
++Complaint():ctor
++countAllComplaints():Number
++countByGarageOwner(String garageOwnerId):Number
++createComplaint(String submitterId,Message message,String garageOwnerId,String storeId):Complaint
++getAllComplaints(Number limit,Number skip):Complaint[]
++getComplaint(String complaintId):Complaint
++getGarageOwnerComplaints(String garageOwnerId,Number limit,Number skip):Complaint[]
++deleteComplaint(String complaintId):Complaint
+--------------------------------------------------------------------------------------------------------
+//Offer
+//Attributes
+-discountRate:Number
+-duration:Number
+-newPrice:Number
+-expirationDate:Date
+//Methods
++Offer():ctor
++validateOfferInfo(offer):String
++exists(offerId):Offer
++createOffer(discountRate,duration,newPrice):Offer
++deleteOffer(offerId):Offer
++removeExpiredOffers():Offer[]
+--------------------------------------------------------------------------------------------------------
+//Categoty
+//Attributes
+-name:String
+-storeId:String
+-products:Product[]
+-tags:String
+//Methods
++Category():ctor
++exists(String categoryId):Category
++validateCategoryInfo(Category categoryInfo):String
++createCategory(Category categoryInfo):Category
++updateCategory(Category categoryInfo):Category
++deleteCategory(String categoryId):Category
++addProduct(String categoryId,Product product):Category
++findCategoryById(String categoryId):Category
++deleteCategoriesByStoreIds(String[] storeIds):Category[]
++getAllCategoriesInUserStores(String[] storeIds):Category[]
++findCategoryByName(String categoryName):Category
++removeProductFromCategory(String categoryId,String productId):Category
++searchCategories(String searchText):Category[]
+--------------------------------------------------------------------------------------------------------
+//Message
+//Attributes
+-owner:String
+-data:String
+-date:Date
+//Methods
++Message():ctor
++validateMessageInfo(message):String
++createMessage(userId,messageBody):Message
++deleteMessage(messageId):Message
+--------------------------------------------------------------------------------------------------------
+//ShoppingCart
+//Attributes
+-Items:CartItem[]
+-totalBill:Number
+//Methods
++ShoppingCart():ctor
++createShoppingCart():ShoppingCart
++updateShoppingCart(Object shoppingCart):ShoppingCart
++deleteAllShoppingCart():ShoppingCart[]
++deleteShoppingCart(String shoppingCartId):ShoppingCart
++getShoppingCart(String shoppingCartId):ShoppingCart
++addCartItem(String shoppingCartId,CartItem cartItem):ShoppingCart
++removeCartItem(String shoppingCartId,String cartItemId):ShoppingCart
++removeAllCartItem(String shoppingCartId):ShoppingCart
+--------------------------------------------------------------------------------------------------------
+//CartItem
+//Attributes
+-product:Product
+-shoppingCart:String
+-storeId:String
+-quantity:Number
+-date:Date
+-totalPrice:Number
+//Methods
++CartItem():ctor
++createCartItem():CartItem
++updateCartItem(CartItem updatedCartItem):CartItem
++deleteCartItem(String cartItemId):CartItem
++deleteAllCartItemsAssociatedWithShoppingCartId(String shoppingCartId):CartItem[]
++getCartItem(String cartItemId):CartItem
++getCartItemsAssociatedWithShoppingCartId(String shoppingCartId,Number limit,Number skip):CartItem[]
++getCartItemAssociatedWithShoppingCartId(String shoppingCartId,String cartItemId):CartItem[]
++deleteAllCartItem():CartItem[]
+--------------------------------------------------------------------------------------------------------
+//Report
+//Attributes
+-totalIncome:Number
+-listOfSoldItems:Order[]
+-listOfCancelItems:Order[]
+//Methods
++createReport(Report reportInfo):Report
++updateReport(Report updatedreport):Report
++deleteReport(String reportId):Report
++getReport(StringreportId):Report
++getAllReports():Report[]
++addOrder(String reportId,String orderId):Report
++addCancelOrder(String reportId,String orderId):Report
++clearReport(String reportId):Report
+------------------------------------------------------------------------------------------------------------
+//Order
+//Attributes
+-shoppingCart:ShoppingCart
+-deliveryAddress:String,
+-phoneNumber:String
+-carOwnerId:String
+-date:Date
+-status:String
+-storeId:String
+//Methods
++Order():ctor
++createOrder(Order OrderInfo):Order
++updateOrder(Order updatedOrder):Order
++deleteOrder(String orderId):Order
++removeOrder(String OrderId):Order
++getOrder(OrderId):Order
++removeAllOrders():Order[]
++deleteAllOrder() :Order[]
++getOrdersByStoreId(String storeId,Number limit,Number skip):Order[]
++getOrdersByStoreIdAndStatus(String storeId,String status,Number limit,Number skip):Order[]
++getOrderByCarOwnerId(String carOwnerId,Number limit,Number skip):Order[]
+--------------------------------------------------------------------------------------------------------------
+//Conatct
+//Attributes
+-ownerId:String
+-contacts: Object[]
+{name: String,_id: {type: String}}
+//Methods
++createContact(Contact contactInfo):Contact
++updateContact(Contact updatedContact):Contact
++deleteContact(String ownerId):Contact
++getContact(String contactId):Contact
++getContactByOwnerId(String ownerId):Contact[]
++getContactByOwnerIdAndSubContactId(String ownerId,String subContactId):Contact[]
++deleteAllContact():Contact[]
+--------------------------------------------------------------------------------------------------------------
+//GarageOwner
+//Attributes
+-user:User
+-stores:Store[]
+-reportId:String
+-isVerified:Boolean
+-isTrusted:Boolean
+//Methods
++GarageOwner():ctor
++getWaitingUsers(String[] ids,Number limit,Number skip):GarageOwner[]
++acceptWaitingUser(String userId):GarageOwner
++deleteGarageOwnerByUserId(String userId):GarageOwner
++getAllGarageOwners(String[] ids,Number limit,Number skip):GarageOwner[]
++addStoreToList(String garageOwnerId,Store storeInfo):GarageOwner
++deleteGarageOwnerByUserId(String userId):GarageOwner[]
++removeStoreFromList(String garageOwnerId,String storeId):GarageOwner
++createGarageOwner(GarageOwner GarageOwnerInfo):GarageOwner
++updateGarageOwner(String GarageOwnerId):GarageOwner
++deleteGarageOwner(String GarageOwnerId):GarageOwner
++getGarageOwner(String GarageOwnerId):GarageOwner
++getGarageOwnerByUserId(String userId):GarageOwner
++deleteAllGarageOwner():GarageOwner[]
++removeOrder(String garageOwnerId,String storeId,String orderId):GarageOwner
++trustGarageOwner(String garageOwnerId):GarageOwner
+--------------------------------------------------------------------------------------------------------------
+//Menu
+//Attributes
+-storeId:String
+-categories:category[]
+//Methods
++Menu():ctor
++createMenu():Menu
++deleteMenu(String menuId):Menu
++linkMenu(String info):Menu
++addCategory(String storeId,Category category):Menu
++updateMenu(Menu menu):Menu
++getAllCategories(String storeId):Menu[]
++deleteMenuByStoreId(String storeIds):Menu[]
++getMenu(menuId):Menu
+--------------------------------------------------------------------------------------------------------------
+//CarOwner
+//Attributes
+-user:User
+-shoppingCart:ShoppingCart
+-orders:Order[]
+-cars:Car[]
+//Methods
++CarOwner():ctor
++getAllCarOwners(Number limit,Number skip):CarOwner[]
++addCarToList(String carOwnerId,Car carInfo):CarOwner
++removeCarFromList(String carOwnerId,String carId):CarOwner
++createCarOwner(CarOwner CarOwnerInfo):CarOwner
++updateCarOwner(CarOwner updatedCarOwner) :CarOwner
++deleteCarOwner(String CarOwnerId):CarOwner
++getCarOwner(String CarOwnerId):CarOwner
++getCarOwnerByUserId(String userId) :CarOwner
++deleteAllCarOwner():CarOwner[]
++addOrder(String userId,Order createdOrder):CarOwner
++removeOrder(String carOwnerId,String orderId):CarOwner
++clearShoppingcart(String userId):CarOwner
++getOrder(String carOwnerId,String orderId):CarOwner
++getOrders(String userId):CarOwner
++deleteCarOwner(String carOwnerId):CarOwner
+--------------------------------------------------------------------------------------------------------------
+//Store
+//Attributes
+-userId:String
+-name:String
+-address:String
+-image:String
+-description:String
+-openTime:String
+-closeTime:String
+-location:Geolocation
+-menu:Menu
+-warehouse:Warehouse
+-tags:String
+-orders:Order[]
+-garageOwnerId:String
+//Methods
++Store():ctor
++validateStoreInfo(Store storeInfo):String
++exists(String storeId):Store
++countAll():Number
++countByGarageOwner(String userId):Number
++countBySameAddress(String address):Number
++createStore(Store storeInfo):Store
++updateStore(Store storeInfo):Store
++deleteStore(String storeId):Store
++getStoreById(String storeId):Store
++getAllStores(Number limit,Number skip):Store[]
++getStoresByUserId(String userId):Store[]
++getStoresIdByUserId(String userId):Store[]
++getFullStoresByUserId(String userId, Number limit, Number skip):Store[]
++getSameAddressStores(String address,Number limit,Number skip):Store[]
++getStoresByLocation(lat,long,Number limit,Number skip):Store[]
++deleteStoreByUserId(String userId):Store[]
++getStore(String storeId):Store
++deleteAllStore():Store[]
++updateOrderStatus(String storeId,String orderId,String status):Store
++addOrder(String storeId,String orderId):Store
++getStoresAssociatedWithGarageOwner(String garageOwnerId):Store[]
++getOrderFromeStore(String storeId,String orderId):Store
++searchStores(String searchText, Number limit, Number skip):Store[]
+--------------------------------------------------------------------------------------------------------------
+//User
+//Attributes
+-fullName:String
+-username:String
+-email:String
+-password:String
+-phoneNumber:String
+-address:String
+-role:String
+-logged:Boolean
+//Methods
++User():ctor
++exists(String userId):User
++checkUsername(String username):User
++checkPhone(String phone):User
++checkEmail(String email):User
++countByRole(String role):Number
++countAll():Number
++validateUserInfo(User userInfo):String
++createUser(User userInfo):User
++updateUser(User userInfo):User
++getUserById(String userId):User
++getAllUsersIdOfARole(String role):User[]
++acceptWaitingUser(String userId):User
++deleteUser(String userId):User
++getUser(String userId):User
++findUserByUsername(username) User
++deleteAllUser():User[]

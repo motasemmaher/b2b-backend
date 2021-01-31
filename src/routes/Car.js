@@ -77,7 +77,7 @@ router.put('/user/manage-car-owner/update-car/:carId',userAuthenticated,(req, re
     
     car.exists(carId)
     .then(getCarResult => {
-    if(getCarResult == null)
+    if(!getCarResult)
         return res.status(404).send({error:"Error! Didn't find a car with that id."})
     carOwner.getCarOwnerByUserId(loggedUser._id)
         .then(carOwnerResult => {
@@ -111,7 +111,7 @@ router.delete('/user/manage-car-owner/delete-car/:carId',userAuthenticated,(req,
     
     car.exists(carId)
     .then(getCarResult => {
-    if(getCarResult == null)
+    if(!getCarResult)
         return res.status(404).send({error:"Error! Didn't find a car with that id."})
 
     carOwner.getCarOwnerByUserId(loggedUser._id)

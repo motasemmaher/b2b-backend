@@ -52,7 +52,7 @@ router.get('/stores/:storeId/offers',(req,res) => {
 
     store.exists(storeId)
     .then(getStoreResult => {
-    if(getStoreResult == null)
+    if(!getStoreResult)
         return res.status(404).send({error:"Error! Didn't find a store with thats id."});
     else
     {
@@ -96,23 +96,45 @@ router.post('/stores/:storeId/offers/add-offer',userAuthenticated,(req,res) => {
     
     store.exists(storeId)
     .then(getStoreResult => {
-    if(getStoreResult == null)
+    if(!getStoreResult)
         return res.status(404).send({error:"Error! Didn't find store with that id."});
     else if(getStoreResult.userId != loggedUser._id)
         return res.status(401).send({error:"Error! The requested store doesn't belong to this garage owner."});
     
     let errors = {};
+    let count = 0;
     productOffers = req.body.productOffers;
+
+
     productOffers.forEach((productOffer,index,productOffers) => {
         product.getProductById(productOffer['productId'])
         .then(productResult => {
+            
+        if(productResult == null)
+        {
+            count++;
+            errors[productOffer['productId']] = "No such product witht that ID";
+            if(index  === productOffers.length - 1)            
+                return res.status(200).send({
+                    message:"Processed offers successfuly with "+count+" errors",
+                    errors:errors
+                });
+        }
+        else
+        {
             newPrice = productResult.price - (productResult.price*(productOffer['discountRate']/100));
             const offerValidationResult = offer.validateOfferInfo({discountRate:productOffer['discountRate'],
                                                                     duration:productOffer['duration'],
                                                                     newPrice:newPrice});
-            if(typeof offerValidationResult !== 'undefined'){
+            if(typeof offerValidationResult !== 'undefined')
+            {
+                count++;
                 errors[productResult._id] = offerValidationResult.error;
-                return;
+                if(index  === productOffers.length - 1)            
+                   return res.status(200).send({
+                        message:"Processed offers successfuly with "+count+" errors",
+                        errors:errors
+                    });
             }
             else
             {           
@@ -120,26 +142,47 @@ router.post('/stores/:storeId/offers/add-offer',userAuthenticated,(req,res) => {
                 .then(offerResult => {
                 product.addOffer(productOffer['productId'],offerResult)
                     .then(updatedProductResult => {
-                        if(index  === storesArray.length - 1)            
-                        return res.status(200).send({
-                            message:"Processed offers successfuly with "+errors.length+"errors",
-                            errors:errors
-                        });
+                        if(index  === productOffers.length - 1)            
+                            return res.status(200).send({
+                                message:"Processed offers successfuly with "+count+" errors",
+                                errors:errors
+                            });
                     })
                     .catch(err => {
                         offer.deleteOffer(offerResult._id);
+                        count++;
                         errors[productResult._id] = "Errors with adding offer to product. "+err;
+                        if(index  === productOffers.length - 1)            
+                            return res.status(200).send({
+                                message:"Processed offers successfuly with "+count+" errors",
+                               errors:errors
+                            });
                     });
                 })
                 .catch(err => {
+                    count++;
                     errors[productResult._id] = "Errors with creating offer. "+err;
+                    
+                    if(index  === productOffers.length - 1)            
+                        return res.status(200).send({
+                            message:"Processed offers successfuly with "+count+" errors",
+                            errors:errors
+                        });
                 });
             }
+        }
         })
         .catch(err => {
-            errors[productResult._id] = "Errors with getting product. "+err;
+            count++;
+            errors[productOffer['productId']] = "Errors with getting product. "+err;
+            
+            if(index  === productOffers.length - 1)            
+               return res.status(200).send({
+                        message:"Processed offers successfuly with "+count+" errors",
+                        errors:errors
+                    });
         });
-    });//End of foreach    
+    });//End of foreach 
     })
     .catch(err => {return res.status(500).send({error:"Error getting store with that id.    "+err})});
     
@@ -156,14 +199,14 @@ router.delete('/stores/:storeId/offers/delete-offer/:offerId',userAuthenticated,
     {
         store.exists(storeId)
         .then(getStoreResult => {
-        if(getStoreResult == null)
+        if(!getStoreResult)
             return res.status(404).send({error:"Error! Didn't find store with that id."});
         else if(getStoreResult.userId != loggedUser._id)
             return res.status(401).send({error:"Error! The requested store doesn't belong to this garage owner."});
         
         offer.exists(offerId)
         .then(getOfferResult => {
-        if(getOfferResult == null)
+        if(!getOfferResult)
             return res.status(404).send({error:"Error! Didn't find offer with that id."});
         else
         {
