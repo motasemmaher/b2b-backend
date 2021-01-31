@@ -41,19 +41,19 @@ router.post('/auth/garage-owner/create',upload.single('image'),(req, res) => {
         
         user.checkUsername(userInfo.username)
         .then(usernameCheckResult => {
-        if(usernameCheckResult != null)
+        if(!usernameCheckResult)
             return res.status(400).send({error:"Error! The username you entered is already in use by another user."});
         else
         {
             user.checkEmail(userInfo.email)
             .then(emailCheckResult => {
-            if(emailCheckResult != null)
+            if(!emailCheckResult)
                 return res.status(400).send({error:"Error! The email you entered is already in use by another user."});
             else
             {
                 user.checkPhone(userInfo.phoneNumber)
                 .then(phoneNumberCheckResult => {
-                if(phoneNumberCheckResult != null)
+                if(!phoneNumberCheckResult)
                     return res.status(400).send({error:"Error! The phone number you entered is already in use by another user."});
                 else
                 {
@@ -135,19 +135,19 @@ router.post('/auth/car-owner/create', (req,res) => {
 
         user.checkUsername(userInfo.username)
         .then(usernameCheckResult => {
-        if(usernameCheckResult != null)
+        if(!usernameCheckResult)
             return res.status(400).send({error:"Error! The username you entered is already in use by another user."});
         else
         {
             user.checkEmail(userInfo.email)
             .then(emailCheckResult => {
-            if(emailCheckResult != null)
+            if(!emailCheckResult)
                 return res.status(400).send({error:"Error! The email you entered is already in use by another user."});
             else
             {
                 user.checkPhone(userInfo.phoneNumber)
                 .then(phoneNumberCheckResult => {
-                if(phoneNumberCheckResult != null)
+                if(!phoneNumberCheckResult)
                     return res.status(400).send({error:"Error! The phone number you entered is already in use by another user."});
                 else
                 {

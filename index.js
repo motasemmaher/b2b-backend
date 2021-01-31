@@ -60,7 +60,7 @@ app.use(bodyParser.urlencoded({
 
 //Setting-up CORS options
 const corsOptions = {
-    origin: ['http://localhost:8100', 'http://localhost:8101'],
+    origin: ['http://localhost:8100', 'http://localhost:8101', 'http://dev.makt-b2b.live'],
     methods: "*",
     optionsSuccessStatus: 200
 }
