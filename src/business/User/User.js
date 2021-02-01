@@ -39,9 +39,9 @@ module.exports =  class User {
         return promiseResult;
     }
 
-    validateUserInfo(userInfo)
+    validateUserInfo(userInfo, isPasswordExists = true)
     {
-        const validationResult = UserValidation.validateUserInfo(userInfo);
+        const validationResult = UserValidation.validateUserInfo(userInfo, isPasswordExists);
         if(validationResult !== "pass")
             return {error:"Error: "+validationResult};
     }

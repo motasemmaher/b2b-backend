@@ -2,24 +2,24 @@ const validator = require('validator');
 
 module.exports = {
 
-    validateUserInfo(user)
-    {
-        if(user.fullName === undefined || !validator.matches(user.fullName,/(^[\p{L}\s]{3,64}$)/ugi))
+    validateUserInfo(user, isPasswordExists) {
+        console.log(user)
+        if (!user.fullName || !validator.matches(user.fullName, /(^[\p{L}\s]{3,64}$)/ugi))
             return "Invalid user fullname !";
-        if(user.username === undefined || !validator.matches(user.username,/(^[\p{L}\d_]{8,64}$)/ugi))
+        if (!user.username || !validator.matches(user.username, /(^[\p{L}\d_]{8,64}$)/ugi))
             return "Invalid user username !";
-        if(user.email === undefined || !validator.isEmail(user.email))
+        if (!user.email || !validator.isEmail(user.email))
             return "Invalid user email !";
-        if(user.phoneNumber === undefined || !validator.matches(user.phoneNumber,/(^[0][7][789]\d{7}$)/))
+        if (!user.phoneNumber || !validator.matches(user.phoneNumber, /(^[0][7][789]\d{7}$)/))
             return "Invalid user phone number !";
-        if(user.password === undefined || !validator.matches(user.password,/(^.{8,64}$)/))
+        if (isPasswordExists && (!user.password || !validator.matches(user.password, /(^.{8,64}$)/)))
             return "Invalid user password !";
-        if(user.address === undefined || !validator.matches(user.address,/(^[\p{L}'-]{4,9}$)/ugi))
+        if (!user.address || !validator.matches(user.address, /(^[\p{L}'-]{4,9}$)/ugi))
             return "Invalid user address !";
-        if(user.role === undefined || !["admin", "garageOwner", "carOwner", "waitingUser"].includes(user.role))  
+        if (!user.role || !["admin", "garageOwner", "carOwner", "waitingUser"].includes(user.role))
             return "Invalid user role !";
 
         return "pass";
     }
-    
+
 }

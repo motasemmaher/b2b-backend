@@ -60,7 +60,7 @@ app.use(bodyParser.urlencoded({
 
 //Setting-up CORS options
 const corsOptions = {
-    origin: ['http://localhost:8100', 'http://localhost:8101', 'http://dev.makt-b2b.live'],
+    origin: ['http://localhost:8100', 'http://localhost:8101', 'https://makt-b2b.live'],
     methods: "*",
     optionsSuccessStatus: 200
 }
@@ -233,10 +233,10 @@ const OneSignal = require('onesignal-node');
 const client = new OneSignal.Client('96c26840-bc81-400a-b25c-63cba4a21b7a', 'N2U4Y2VmYmUtMmJhYS00MWI5LTk2YTQtOWI5ZDg2Zjc0MWZm');
 start = async () => {
     const responseD = await client.viewDevice('edd73d40-ffa5-4994-80a2-59dc3263ee14');
-    console.log(responseD.body);
+    // console.log(responseD.body);
 
     const response = await client.viewDevices({ limit: 200, offset: 0 });
-    console.log(response.body);
+    // console.log(response.body);
 
     const notification = {
         contents: {
@@ -253,19 +253,19 @@ start = async () => {
     // using async/await
     try {
         const response = await client.createNotification(notification);
-        console.log(response.body.id);
+        // console.log(response.body.id);
     } catch (e) {
         if (e instanceof OneSignal.HTTPError) {
             // When status code of HTTP response is not 2xx, HTTPError is thrown.
-            console.log(e.statusCode);
-            console.log(e.body);
+            // console.log(e.statusCode);
+            // console.log(e.body);
         }
     }
 
     // or you can use promise style:
-    client.createNotification(notification)
-        .then(response => console.log(response))
-        .catch(e => { });
+    // client.createNotification(notification)
+    //     .then(response => console.log(response))
+    //     .catch(e => { });
 
 }
 start()
