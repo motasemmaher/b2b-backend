@@ -163,9 +163,7 @@ router.put('/admin/waiting-users/accept/:userId', userAuthenticated, (req, res) 
     loggedUser = req.user;
     if (loggedUser.role !== "admin")
         return res.status(401).send({ error: "Unauthorized user !" });
-    //Checking if the request body id empty or not, if it is then return error response
-    //if (Object.keys(req.body).length === 0)
-    //    return res.status(400).send({ error: "No data was sent!" });
+
     //Checking if the user exist
     userId = req.params.userId;
     user.exists(userId)
