@@ -299,8 +299,8 @@ router.post('/shopping-cart/checkout', userAuthenticated, (req, res) => {
                                     if (retrivedStorage.storage[0].amount >= cart.quantity) {
                                         if (retrivedStorage.storage[0].amount === cart.quantity) {
                                             await product.getProductById(cart.product).then(async retrivedProduct => {
-                                                retrivedProduct[0].isInStock = false;
-                                                await product.updateProduct(retrivedProduct[0]).then(async updatedProduct => {
+                                                retrivedProduct.isInStock = false;
+                                                await product.updateProductStock(retrivedProduct).then(async updatedProduct => {
                                                     await warehouse.decreaseAmaountOfProduct(retrivedStore.warehouse, cart.product, cart.quantity).then(async updatedWarehouse => {
                                                         await shoppingCart.createShoppingCart({}).then(async createdShoppingCartForStore => {
                                                             cart.shoppingCart = createdShoppingCartForStore._id;
@@ -324,12 +324,11 @@ router.post('/shopping-cart/checkout', userAuthenticated, (req, res) => {
                                                                                     if (index === owner.shoppingCart.Items.length - 1) {
                                                                                         await carOwner.clearShoppingcart(owner._id).then(clearedShoppingCart => {
                                                                                             // subscription.getSubscriptionByUserId(userInfo._id).then(subscriptionInfo => {
-                                                                                            //     webPush.sendNotification(subscriptionInfo, payload).catch(error => console.error(error));
-                                                                                            //     res.send(addedOrderToStore);
+                                                                                                // webPush.sendNotification(subscriptionInfo, payload).catch(error => console.error(error));
+                                                                                                res.send(addedOrderToStore);
                                                                                             // }).catch(err => {
                                                                                             //     res.status(500).send({error: 'INTERNAL_SERVER_ERROR'});
-                                                                                            // });     
-                                                                                                                                                                                                                                                                
+                                                                                            // });                                                                                                                                                                                    
                                                                                         });
                                                                                     }
                                                                                 }).catch(err => {

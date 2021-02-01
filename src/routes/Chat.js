@@ -81,20 +81,22 @@ router.get('/user/chat/hasContactId/:subcontactId', userAuthenticated, (req, res
 router.post('/user/contact', userAuthenticated, (req, res) => {
     let contactBetween = "";
     const garageOwnerId = req.body.garageOwnerId;
+    const stoteName = req.body.storeName;
     const userInfo = req.user;
     if (userInfo._id > garageOwnerId) {
         contactBetween = userInfo._id + "-" + garageOwnerId
     } else {
         contactBetween = garageOwnerId + "-" + userInfo._id
     }
+    
     contact.updateContact({
         ownerId: userInfo._id,
-        name: req.body.storeName,
+        name: stoteName,
         otherUserId: garageOwnerId
     }).then(retrivedUserContact => {
         contact.updateContact({
             ownerId: garageOwnerId,
-            name: userInfo.userName,
+            name: userInfo.username,
             otherUserId: userInfo._id
         }).then(retrivedGarageOwnerContact => {
             chat.createChat({

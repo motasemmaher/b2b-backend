@@ -38,11 +38,6 @@ app.use(session({
 
 require('./src/models/model');
 
-//Objects
-const user = require('./src/business/Objects').USER;
-const garageOwner = require('./src/business/Objects').GARAGEOWNER;
-const report = require('./src/business/Objects').REPORT;
-
 // validation by thaer
 const limitAndSkipValidation = require('./src/shared/limitAndSkipValidation');
 
@@ -118,6 +113,29 @@ app.delete('/user/logout', userAuthenticated, (req, res) => {
     res.send({ sucess: true })
     // res.redirect('/user/login');
 });
+
+
+
+//Requring the scheduled jobs
+//Starting the generate report services
+const generatingReports = require('./src/scheduled Jobs/generatingReports');
+generatingReports.generateGarageOwnerReport();
+generatingReports.generatingAdminReport();
+//Starting the clean-up expired offers service
+const removeExpiredOffers = require('./src/scheduled Jobs/removingExpiredOffers');
+removeExpiredOffers.removeExpiredOffers();
+//Starting the training service
+const modelTrain = require('./src/scheduled Jobs/trainingModel');
+modelTrain.train();
+
+
+
+
+
+
+
+
+
 
 
 
@@ -362,27 +380,13 @@ const adminReport = schedule.scheduleJob('0 0 1 * *', () => {
         .catch(err => console.log({ error: "Error getting all the garage owners. " + err }));
 });
 
-const http = require("http")
 
 
-const startTrinModelForSearchByImage = schedule.scheduleJob('0 0 1 * *', () => {
-    let url = new URL("http://localhost:8000/start-training")
-    http
-        .request(
-            url,
-            res => {
-                console.log('Model Was Trained')
-            }
-        )
-        .end()
-});
 
 //--------------------Chat--------------------\\
 
 // const server = require('http').Server(app);
 // const io = require('socket.io')(server);
-
-
 
 //Load Routes
 const shoppingCartRoute = require('./src/routes/ShoppingCart');
@@ -398,12 +402,5 @@ app.use(searchRoute);
 app.use(permissionsRoute);
 app.use(chatRoute);
 
-carvaldation = require('./src/business/Car/validate')
-app.get("/test", (req, res) => {
-    let model = req.body.model;
-    let make = req.body.make;
-    let year = req.body.year;
-    let result = carvaldation.validateCarInfo({ model, make, year });
-    res.send(result);
-})
+
 module.exports = app;

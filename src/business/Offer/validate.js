@@ -1,7 +1,8 @@
+//Requiring the validation package
 const validator = require('validator');
-
+//Exporting the validation method
 module.exports = {
-    
+    //A method to validate the offer information
    validateOfferInfo(offer)
     {
         if(offer.discountRate !== undefined)

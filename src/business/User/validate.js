@@ -1,5 +1,6 @@
+//Requiring the validation package
 const validator = require('validator');
-
+//Exporting the validation method
 module.exports = {
 
     validateUserInfo(user, isPasswordExists) {

@@ -20,6 +20,6 @@ const Complaint = new schema({
         type: schema.Types.ObjectId,
         ref: 'Store'
     }
-})
+})  
 
 module.exports = Complaint;

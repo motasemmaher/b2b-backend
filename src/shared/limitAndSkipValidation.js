@@ -1,6 +1,8 @@
+//Requiring the validation package
 const validator = require('validator');
-
+//Exporting the necessary methods
 module.exports = {
+    //A method to validate the limit and skip values
     validateLimitAndSkip(limit, skip) {
         if((limit === null && skip === null) || (limit === undefined && skip === undefined))
             return "default both";
@@ -11,6 +13,7 @@ module.exports = {
         return "pass";
     }
     ,
+    //A method to set the limit and skip values
     limitAndSkipValues(limit, skip) 
     {    
         const validationResult = this.validateLimitAndSkip(limit, skip);   
