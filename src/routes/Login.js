@@ -1,16 +1,18 @@
-const login = require('./src/auth/login');
+const express = require("express");
+const router = express.Router();
+const login = require('../auth/login');
 const {
     userAuthenticated
-} = require('./src/middleware/authentication');
+} = require('../middleware/authentication');
 
 // Login User 
-app.get('/user/login', (req, res) => {
+router.get('/user/login', (req, res) => {
     res.json({
         state: 'Hello from login page'
     });
 });
 
-app.post('/user/login', (req, res, next) => {
+router.post('/user/login', (req, res, next) => {
     // The HTTP 429 Too Many Requests response status code indicates the user has sent too many 
     // requests in a given amount of time ("rate limiting").        
     // A Retry-After header might be included to this 
@@ -48,10 +50,12 @@ app.post('/user/login', (req, res, next) => {
     }
 });
 
-app.delete('/user/logout', userAuthenticated, (req, res) => {
+router.delete('/user/logout', userAuthenticated, (req, res) => {
     // console.log(req.session.token)
     // req.headers.authorization.split(' ')[0]
     req.session.token = null;
     res.send({ sucess: true })
     // res.redirect('/user/login');
 });
+
+module.exports = router;
