@@ -200,7 +200,7 @@ module.exports = {
             
             // });
         }).catch(err => {
-            console.log(err);
+            // console.log(err);
         });
         return Promise.resolve(loginInfo);
     }
