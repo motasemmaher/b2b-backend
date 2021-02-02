@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
-const uri = "mongodb+srv://admin:admin@cluster0.n4bjd.mongodb.net/GP?retryWrites=true&w=majority";
-const testuri = "mongodb+srv://admin:admin@cluster0.n4bjd.mongodb.net/GPTest?retryWrites=true&w=majority";
-//const uri = 'mongodb://localhost:27017/GPTest';
+// const uri = "mongodb+srv://admin:admin@cluster0.n4bjd.mongodb.net/GP?retryWrites=true&w=majority";
+// const testuri = "mongodb+srv://admin:admin@cluster0.n4bjd.mongodb.net/GPTest?retryWrites=true&w=majority";
+const uri = 'mongodb://localhost:27017/GPTestv3';
 //const testuri = 'mongodb://localhost:27017/GPTest';
 //"test":"mocha --recursive --timeout 100000 --exit"
 //"test": "nyc --reporter=text --timeout 100000 mocha --exit"
