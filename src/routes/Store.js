@@ -248,7 +248,7 @@ router.post('/user/manage-garage-owner/add-store', userAuthenticated, upload.sin
     {
         //Storing the data from the request body then validating it
         //const storeInfo = {...req.body,image:req.file.path,userId:loggedUser._id};
-        const storeInfo = { ...req.body, userId: loggedUser._id };
+        let storeInfo = { ...req.body, userId: loggedUser._id };
         const storeValidationResult = store.validateStoreInfo(storeInfo);
         //If errors were found, then return error response
         if (typeof storeValidationResult !== 'undefined')
@@ -331,8 +331,10 @@ router.put('/user/manage-garage-owner/update-store/:storeId', userAuthenticated,
     {
         //Cheking if the store exists
         storeId = req.params.storeId;
+        // console.log(storeId);
         store.exists(storeId)
             .then(getStoreResult => {
+                // console.log(getStoreResult)
             //If the store doesn't exist, then return an error response
             if (!getStoreResult)
                 return res.status(404).send({ error: "Error! Didn't find store with that id." });
@@ -347,15 +349,17 @@ router.put('/user/manage-garage-owner/update-store/:storeId', userAuthenticated,
                 //Storing data from the request body then validating them
                 const body = req.body;
                 const storeInfo = { _id: storeId, ...body ,image:path}; // , image: req.file.path
-                const storeValidationResult = store.validateStoreInfo(storeInfo);
+                const storeValidationResult = store.validateStoreInfo(storeInfo);000000
                 //If error was found, then return an error response
                 if (typeof storeValidationResult !== 'undefined')
                     return res.status(400).send({ error: storeValidationResult.error });
                 else 
                 {
+                    
                     //Updating store
                     store.updateStore(storeInfo)
                         .then(storeResult => {
+                            
                         //Getting store
                         store.getStoreById(storeResult._id)
                             .then(updatedStore => {

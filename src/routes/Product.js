@@ -203,6 +203,7 @@ router.get('/stores/:storeId/category/:categoryId/products/:productId?', (req, r
     //Checking the name and price sort values
     let nameSort = parseInt(req.query.nameSort);
     let priceSort = parseInt(req.query.priceSort);
+    console.log('hhhhhh')
     if (nameSort == null)
         nameSort = 0;
     if (priceSort == null)
@@ -314,7 +315,7 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
                     return res.status(401).send({ error: "Error! The requested store doesn't belong to this garage owner." });
                 else {
                     //Checking if the category exists by it's ID
-                    categoryId = req.params.categoryId;
+                    categoryId = req.params.categoryId;                    
                     category.exists(categoryId)
                         .then(getCategoryResult => {
                             //If it doesn't exist, return an error response
@@ -324,8 +325,10 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
                                 //Creating product
                                 //Storing and validating the data from the request body
                                 productInfo = { ...req.body, storeId: storeId, categoryId: categoryId }; // image: req.file.path,
+
                                 const productValidationResult = product.validateProductInfo(productInfo);
                                 const warehouseValidationResult = warehouse.validateWarehouseInfo({ amount: req.body.amount });
+                                
                                 //If the validation result have errors, then return an error response
                                 if (typeof productValidationResult !== 'undefined')
                                     return res.status(400).send({ error: productValidationResult.error });
@@ -333,6 +336,7 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
                                     return res.status(400).send({ error: warehouseValidationResult.error });
                                 //If no errors were found, then proceed
                                 else {
+                                    
                                     //Generating random id as an imagename
                                     const randomIdValue = randomId.generateId();
                                     const path = `public/images/${randomIdValue}.png`;
@@ -340,11 +344,13 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
                                     garageOwner.getGarageOwnerByUserId(loggedUser._id)
                                         .then(garageOwnerResult => {
                                             //If the garageOwner doesn't exist, then return an error response
-                                            if (garageOwnerResult != null)
-                                                return res.status(400).send("Didn't find a garageOwner with that userId !");
+                                            // if (garageOwnerResult != null)
+                                            //     return res.status(400).send("Didn't find a garageOwner with that userId !");
                                             //If the garageOwner is a trusted one, then save and train the image processing model
                                             tags = req.body.generalType + "," + productInfo.tags;
+                                            console.log(productInfo)
                                             productInfo = { ...productInfo, tags: tags, image: path };
+                                            
                                             if (garageOwnerResult.isTrusted) {
                                                 //TRAINING CALL
                                                 axios
@@ -368,7 +374,7 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
                                                             //Adding the product and its quantity to the warehouse
                                                             warehouse.addProduct(storeId, productResult._id, categoryId, req.body.amount)
                                                                 .then(warehouseResult => {
-                                                                    //Uploading image to the server
+                                                                    //Uploading image to the server                                                                    
                                                                     uploadImage.upload(path, req.body.image);
                                                                     //Returning a successful response
                                                                     return res.status(200).send(productResult);
