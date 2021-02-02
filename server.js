@@ -5,8 +5,13 @@ const permissions = new Permissions();
 const PORT = 3000;
 const chat = require('./src/business/Objects').CHAT;
 const { placeOrder } = require('./src/routes/ShoppingCart');
-let http = require('http');
-let server = http.Server(app);
+const https = require('https');
+const fs = require('fs');
+const options = {
+    key: fs.readFileSync('key.pem'),
+    cert: fs.readFileSync('cert.pem')
+  };
+let server = https.createServer(options,app);
 
 // let socketIO = require('socket.io');
 // let io = socketIO(server, );
