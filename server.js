@@ -2,7 +2,7 @@ const app = require('./index.js');
 const connection = require('./connect');
 const Permissions = require('./src/business/Permissions/Permissions');
 const permissions = new Permissions();
-const PORT = 3000;
+const PORT = 80;
 connection.connect()
     .then(app.listen(PORT, () => {
         Promise.all([
