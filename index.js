@@ -89,12 +89,12 @@ app.use(bodyParser.urlencoded({
     extended: true
 }))
 //Setting-up CORS options
-// const corsOptions = {
-//     origin: 'http://localhost:8100',
-//     methods: "*",
-//     optionsSuccessStatus: 200
-// }
-app.use(cors())
+const corsOptions = {
+    origin: ['http://localhost:8100',  'https://makt-b2b.live'],
+    methods: "*",
+    optionsSuccessStatus: 200
+}
+app.use(cors(corsOptions))
 
 
 /*-------------------------------------------------Thaer's work start-------------------------------------------------*/
