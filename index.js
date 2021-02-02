@@ -90,7 +90,7 @@ app.use(bodyParser.urlencoded({
 }))
 //Setting-up CORS options
 const corsOptions = {
-    origin: ['http://localhost:8100',  'https://makt-b2b.live'],
+    origin: ['http://localhost:8100', 'https://makt-b2b.live'],
     methods: "*",
     optionsSuccessStatus: 200
 }
@@ -115,6 +115,10 @@ app.put('/update-menu/:id', (req, res) => {
     res.send("Updated Menu");
 });
 
+
+app.get('/', (req, res) => {
+    res.send("server is worked correctlly!");
+});
 
 // Login User 
 app.get('/user/login', (req, res) => {
@@ -198,7 +202,7 @@ app.post('/user/login', (req, res, next) => {
 
 app.delete('/user/logout', (req, res) => {
     req.session.token = null;
-    res.send({sucess: true})
+    res.send({ sucess: true })
     // res.redirect('/user/login');
 });
 
@@ -1836,7 +1840,7 @@ app.get('/user/manage-car-owner/cars/:carId?', userAuthenticated, (req, res) => 
         });
     else {
         if (req.params.carId == null) {
-            carOwner.getCarOwnerByUserId({user: loggedUser._id}).populate('cars').exec()
+            carOwner.getCarOwnerByUserId({ user: loggedUser._id }).populate('cars').exec()
                 .then(carOwnerResult => {
                     res.send(carOwnerResult.cars);
                 })
@@ -1872,7 +1876,7 @@ app.post('/user/manage-car-owner/add-car', userAuthenticated, (req, res) => {
         else {
             car.createCar(carInfo)
                 .then(carResult => {
-                    carOwner.getCarOwnerByUserId({user: loggedUser._id})
+                    carOwner.getCarOwnerByUserId({ user: loggedUser._id })
                         .then(carOwnerResult => {
                             carOwner.addCarToList(carOwnerResult._id, carResult)
                                 .then(addResult => {
@@ -1911,7 +1915,7 @@ app.put('/user/manage-car-owner/update-car/:carId', userAuthenticated, (req, res
                         error: "Error! Didn't find a car with that id."
                     })
                 else {
-                    carOwner.getCarOwnerByUserId({user: loggedUser._id})
+                    carOwner.getCarOwnerByUserId({ user: loggedUser._id })
                         .then(carOwnerResult => {
                             if (!carOwnerResult.cars.includes(carId))
                                 res.send({
@@ -1929,7 +1933,7 @@ app.put('/user/manage-car-owner/update-car/:carId', userAuthenticated, (req, res
                                     car.updateCar(carInfo)
                                         .then(carResult => {
                                             // res.redirect(`/user/manage-car-owner/cars`);
-                                            res.send({sucess: true})
+                                            res.send({ sucess: true })
                                         })
                                         .catch(err => res.send({
                                             error: "Error with updating Car. " + storeError
@@ -1964,7 +1968,7 @@ app.delete('/user/manage-car-owner/delete-car/:carId', userAuthenticated, (req, 
                         error: "Error! Didn't find a car with that id."
                     })
                 else {
-                    carOwner.getCarOwnerByUserId({user: loggedUser._id})
+                    carOwner.getCarOwnerByUserId({ user: loggedUser._id })
                         .then(carOwnerResult => {
                             console.log(carOwnerResult)
                             if (!carOwnerResult.cars.includes(carId))
@@ -1974,11 +1978,11 @@ app.delete('/user/manage-car-owner/delete-car/:carId', userAuthenticated, (req, 
                             else {
                                 car.deleteCar(carId)
                                     .then(carResult => {
-                                        carOwner.getCarOwnerByUserId({user: loggedUser._id})
+                                        carOwner.getCarOwnerByUserId({ user: loggedUser._id })
                                             .then(carOwnerResult => {
                                                 carOwner.removeCarFromList(carOwnerResult._id, carId)
                                                     .then(removeResult => {
-                                                        res.send({sucess: true});
+                                                        res.send({ sucess: true });
                                                     })
                                                     .catch(err => res.send({
                                                         error: "Error removing car from the carOwner. " + err
