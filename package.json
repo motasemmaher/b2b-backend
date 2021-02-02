@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha --recursive --timeout 100000 --exit",
     "test-coverage": "nyc --reporter=text --reporter=lcov mocha --exit",
-    "start": "pm2 start ecosystem.config.js --env production"
+    "start": "node server.js"
   },
   "author": "",
   "license": "ISC",

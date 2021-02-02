@@ -40,7 +40,7 @@ io.on('connection', (socket) => {
 
 connection.connect()
     .then(() => {
-        server.listen(PORT, () => {
+        server.listen(process.env.PORT || 3000, () => {
 
             Promise.all([
                 permissions.createPermissions('carOwner'),
@@ -57,4 +57,3 @@ connection.connect()
     })
     .catch(() => console.log("Didn't open port"));
 
-// zone-evergreen.js:2845 GET http://localhost:3000/socket.io/?EIO=3&transport=polling&t=NSliDjj 404 (Not Found)
