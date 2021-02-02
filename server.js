@@ -4,7 +4,7 @@ const Permissions = require('./src/business/Permissions/Permissions');
 const permissions = new Permissions();
 const PORT = 80;
 connection.connect()
-    .then(app.listen(PORT, () => {
+    .then(app.listen(80, () => {
         Promise.all([
             permissions.createPermissions('carOwner'),
             permissions.createPermissions('garageOwner'),
@@ -15,6 +15,6 @@ connection.connect()
         }).catch(err => {
             
         });
-        console.log(`Listening to server http://localhost:${PORT}`)
+        console.log(`Listening to server http://localhost:${80}`)
     }))
     .catch(() => console.log("Didn't open port"));
