@@ -54,13 +54,14 @@ function testDeleted(carId)
 }
 
 describe('Car Class Tests', () => {    
+  
 
   before((done) => {
     connection.connect()
               .then(() => done())
               .catch((err) => done(err));
   });
-
+  
   it('Validating car information without errors.', (done) => {
     const validationResult = car.validateCarInfo({make:make,model:model,year:year});
     expect(validationResult).to.be.undefined;

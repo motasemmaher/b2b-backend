@@ -28,19 +28,20 @@ let createdCartItemId = null;
 
 const updatedQuantity = 10;
 
+
 //Testing functions
 function test(result) {
     expect(result).to.contain.property('_id');
 }
 
 describe('CartItem Class Tests', () => {
-
+    
     before((done) => {
         connection.connect()
             .then(() => done())
             .catch((err) => done(err));
     });
-/*
+    
     it('Creating CartItem without errors.', (done) => {
         cartItem.createCartItem(createdCartItem)
             .then(createResult => {
@@ -146,6 +147,5 @@ describe('CartItem Class Tests', () => {
                     .catch(err => done(err));
             })
             .catch(err => done(err));
-    }); */
-
+    }); 
 });

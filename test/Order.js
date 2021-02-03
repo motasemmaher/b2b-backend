@@ -128,12 +128,11 @@ describe('Order Class Tests', () => {
         order.deleteOrder(createdOrderId)
             .then(deletedOrder => {
                 order.getOrder(deletedOrder._id)
-                    .then(retrievedOrder => {
-                        expect(retrievedOrder).to.equal(null);
-                        done();
-                    })
-                    .catch(err => done(err));
-                done();
+                .then(retrievedOrder => {
+                    expect(retrievedOrder).to.equal(null);
+                    done();
+                })
+                .catch(err => done(err));
             })
             .catch(err => done(err));
     });

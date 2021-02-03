@@ -203,7 +203,6 @@ router.get('/stores/:storeId/category/:categoryId/products/:productId?', (req, r
     //Checking the name and price sort values
     let nameSort = parseInt(req.query.nameSort);
     let priceSort = parseInt(req.query.priceSort);
-    console.log('hhhhhh')
     if (nameSort == null)
         nameSort = 0;
     if (priceSort == null)
@@ -411,160 +410,152 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId', us
     if (loggedUser.role !== "garageOwner")
         return res.status(401).send({ error: "Unauthorized user !" });
     //Checking if the request body id empty or not, if it is then return error response
-    if(Object.keys(req.body).length === 0)
-        return res.status(400).send({error:"No data was sent!"});
-    else 
-    {
+    if (Object.keys(req.body).length === 0)
+        return res.status(400).send({ error: "No data was sent!" });
+    else {
         //Checking if the store exists
         storeId = req.params.storeId;
         store.exists(storeId)
             .then(getStoreResult => {
-            //If it doesn't exist, then return an error response
-            if (!getStoreResult)
-                return res.status(404).send({ error: "Error! Didn't find a store with that id." });
-            //If it doesn't belong to the loggedUser, then return an error response
-            else if (getStoreResult.userId != loggedUser._id)
-                return res.status(401).send({ error: "Error! The requested store doesn't belong to this garage owner." });
-            else 
-            {
-                //Checking if the category exists by it's ID
-                categoryId = req.params.categoryId;
-                category.exists(categoryId)
-                    .then(getCategoryResult => {
-                    //If it doesn't exist, then return an error response
-                    if (!getCategoryResult)
-                        return res.status(404).send({ error: "Error! Didn't find a category with that id." })
-                    else 
-                    {
-                        //Checking if the product exists
-                        productId = req.params.productId;
-                        product.exists(productId)
-                            .then(getProductResult => {
+                //If it doesn't exist, then return an error response
+                if (!getStoreResult)
+                    return res.status(404).send({ error: "Error! Didn't find a store with that id." });
+                //If it doesn't belong to the loggedUser, then return an error response
+                else if (getStoreResult.userId != loggedUser._id)
+                    return res.status(401).send({ error: "Error! The requested store doesn't belong to this garage owner." });
+                else {
+                    //Checking if the category exists by it's ID
+                    categoryId = req.params.categoryId;
+                    category.exists(categoryId)
+                        .then(getCategoryResult => {
                             //If it doesn't exist, then return an error response
-                            if (!getProductResult)
-                                return res.status(404).send({ error: "Error! Didn't find a product with that id." })
-                            else 
-                            {
-                                //Generating random id as an imagename
-                                const randomIdValue = randomId.generateId();
-                                const path = `public/images/${randomIdValue}.png`;
-                                //Storing the data from the request body then validating them
-                                productInfo = { ...req.body }; //  image: req.file.path
-                                //If the amount =0, then change the stock status of the product to false
-                                if (req.body.amount === 0)
-                                    productInfo = { ...productInfo, isInStock: false };
-                                const productValidationResult = product.validateProductInfo(productInfo);
-                                const warehouseValidationResult = warehouse.validateWarehouseInfo({ amount: req.body.amount });
-                                //If errors were found, then return an error response
-                                if (typeof productValidationResult !== 'undefined')
-                                    return res.status(400).send({ error: productValidationResult.error });
-                                else if (typeof warehouseValidationResult !== 'undefined')
-                                    return res.status(400).send({ error: warehouseValidationResult.error });
-                                //If no errors were found, then procedd to updating the product
-                                else
-                                {
-                                    //Updating product
-                                    category.findCategoryById(categoryId)
-                                        .then(categoryFindByNameResult => {
-                                        tags = req.body.generalType+","+ updatedProductInfo.tags;
-                                        updatedProductInfo = { _id: productId, ...productInfo, categoryId: categoryFindByNameResult._id,tags:tags,image:path } // , image: req.file.path,
-                                        //If the garageOwner is trusted, then save and train the image processing nmodel
-                                        if (garageOwnerResult.isTrusted)
-                                        {
-                                            //Training call   
-                                            //TRAINING CALL
-                                            axios
-                                            .post(`http://localhost:8000/add-image/${req.body.generalType}/${randomIdValue}`, {
-                                                img: req.body.image
-                                            })
-                                            .then(res => {
-                                                console.log(`statusCode: ${res.statusCode}`)
-                                                console.log(res)
-                                            })
-                                            .catch(error => {
-                                                console.error(error)
-                                            })
-                                        }
-                                        //Updating the product
-                                        product.updateProduct(updatedProductInfo)
-                                            .then(productResult => {
-                                            if (categoryFindByNameResult._id != categoryId)
-                                            {
-                                                //Updating the product int the category
-                                                category.removeProductFromCategory(categoryId, productId)
-                                                    .then(removeProductFromCategoryResult => {
-                                                    category.addProduct(updatedProductInfo.categoryId, productResult._id)
-                                                        .then(addProductTocategoryResult => {
-                                                        //Update the product in the warehouse
-                                                        warehouse.removeProductFromWarehouse(storeId, productId)
-                                                            .then(removeProductFromWarehouseResult => {
-                                                            warehouse.addProduct(storeId, productId, updatedProductInfo.categoryId, req.body.amount)
-                                                                .then(addProductToWarehouseResult => {
-                                                                //Getting the product
-                                                                product.getProductById(productId)
-                                                                    .then(productFindResult => {
-                                                                    //Uploading the image
-                                                                    uploadImage.upload(path,req.body.image)
-                                                                    //Returning a successful response
-                                                                    return res.status(200).send(productFindResult);
-                                                                    })
-                                                                    //If getting product runs into error, then return an error response
-                                                                    .catch(err => {return res.status(500).send({ error: "Error finding updated product.  " + err })});
+                            if (!getCategoryResult)
+                                return res.status(404).send({ error: "Error! Didn't find a category with that id." })
+                            else {
+                                //Checking if the product exists
+                                productId = req.params.productId;
+                                product.exists(productId)
+                                    .then(getProductResult => {
+                                        //If it doesn't exist, then return an error response
+                                        if (!getProductResult)
+                                            return res.status(404).send({ error: "Error! Didn't find a product with that id." })
+                                        else {
+                                            //Generating random id as an imagename
+                                            const randomIdValue = randomId.generateId();
+                                            const path = `public/images/${randomIdValue}.png`;
+                                            //Storing the data from the request body then validating them
+                                            productInfo = { ...req.body }; //  image: req.file.path
+                                            //If the amount =0, then change the stock status of the product to false
+                                            if (req.body.amount === 0)
+                                                productInfo = { ...productInfo, isInStock: false };
+                                            const productValidationResult = product.validateProductInfo(productInfo);
+                                            const warehouseValidationResult = warehouse.validateWarehouseInfo({ amount: req.body.amount });
+                                            //If errors were found, then return an error response
+                                            if (typeof productValidationResult !== 'undefined')
+                                                return res.status(400).send({ error: productValidationResult.error });
+                                            else if (typeof warehouseValidationResult !== 'undefined')
+                                                return res.status(400).send({ error: warehouseValidationResult.error });
+                                            //If no errors were found, then procedd to updating the product
+                                            else {
+                                                //Updating product
+                                                category.findCategoryById(categoryId)
+                                                    .then(categoryFindByNameResult => {
+                                                        tags = req.body.generalType + "," + updatedProductInfo.tags;
+                                                        updatedProductInfo = { _id: productId, ...productInfo, categoryId: categoryFindByNameResult._id, tags: tags, image: path } // , image: req.file.path,
+                                                        //If the garageOwner is trusted, then save and train the image processing nmodel
+                                                        if (garageOwnerResult.isTrusted) {
+                                                            //Training call   
+                                                            //TRAINING CALL
+                                                            axios
+                                                                .post(`http://localhost:8000/add-image/${req.body.generalType}/${randomIdValue}`, {
+                                                                    img: req.body.image
                                                                 })
-                                                                //If adding product to warehouse runs into error, then return an error response
-                                                                .catch(err => {return res.status(500).send({ error: "Error adding product to warehouse. " + err })});
+                                                                .then(res => {
+                                                                    console.log(`statusCode: ${res.statusCode}`)
+                                                                    console.log(res)
+                                                                })
+                                                                .catch(error => {
+                                                                    console.error(error)
+                                                                })
+                                                        }
+                                                        //Updating the product
+                                                        product.updateProduct(updatedProductInfo)
+                                                            .then(productResult => {
+                                                                if (categoryFindByNameResult._id != categoryId) {
+                                                                    //Updating the product int the category
+                                                                    category.removeProductFromCategory(categoryId, productId)
+                                                                        .then(removeProductFromCategoryResult => {
+                                                                            category.addProduct(updatedProductInfo.categoryId, productResult._id)
+                                                                                .then(addProductTocategoryResult => {
+                                                                                    //Update the product in the warehouse
+                                                                                    warehouse.removeProductFromWarehouse(storeId, productId)
+                                                                                        .then(removeProductFromWarehouseResult => {
+                                                                                            warehouse.addProduct(storeId, productId, updatedProductInfo.categoryId, req.body.amount)
+                                                                                                .then(addProductToWarehouseResult => {
+                                                                                                    //Getting the product
+                                                                                                    product.getProductById(productId)
+                                                                                                        .then(productFindResult => {
+                                                                                                            //Uploading the image
+                                                                                                            uploadImage.upload(path, req.body.image)
+                                                                                                            //Returning a successful response
+                                                                                                            return res.status(200).send(productFindResult);
+                                                                                                        })
+                                                                                                        //If getting product runs into error, then return an error response
+                                                                                                        .catch(err => { return res.status(500).send({ error: "Error finding updated product.  " + err }) });
+                                                                                                })
+                                                                                                //If adding product to warehouse runs into error, then return an error response
+                                                                                                .catch(err => { return res.status(500).send({ error: "Error adding product to warehouse. " + err }) });
+                                                                                        })
+                                                                                        //If removing product from warehouse runs into error, then return an error response
+                                                                                        .catch(err => { return res.status(500).send({ error: "Error removing product from warehouse. " + err }) });
+                                                                                })
+                                                                                //If adding product to category runs into error, then return an error response
+                                                                                .catch(err => { return res.status(500).send({ error: "Error adding product to category. " + err }) });
+                                                                        })
+                                                                        //If removing product from category runs into error, then return an error response
+                                                                        .catch(err => { return res.status(500).send({ error: "Error removing product from category. " + err }) });
+                                                                }
+                                                                //we can get rid of this if/else
+                                                                else {
+                                                                    warehouse.removeProductFromWarehouse(storeId, productId)
+                                                                        .then(removeProductResultFromWarehouse => {
+                                                                            warehouse.addProduct(storeId, productId, categoryId, req.body.amount)
+                                                                                .then(addProductToWarehouseResult => {
+                                                                                    product.getProductById(productId)
+                                                                                        .then(productFindResult => {
+                                                                                            //Uploading the image
+                                                                                            uploadImage.upload(path, req.body.image)
+                                                                                            //Returning a successful response
+                                                                                            return res.status(200).send(productFindResult);
+                                                                                        })
+                                                                                        //If getting product runs into error, then return an error response
+                                                                                        .catch(err => { return res.status(500).send({ error: "Error finding updated product.  " + err }) })
+                                                                                })
+                                                                                //If adding product to warehouse runs into error, then return an error response
+                                                                                .catch(err => { return res.status(500).send({ error: "Error adding product to warehouse. " + err }) });
+                                                                        })
+                                                                        //If removing product from warehouse runs into error, then return an error response
+                                                                        .catch(err => { return res.status(500).send({ error: "Error removing product from warehouse. " + err }) });
+                                                                }
                                                             })
-                                                            //If removing product from warehouse runs into error, then return an error response
-                                                            .catch(err => {return res.status(500).send({ error: "Error removing product from warehouse. " + err })});
-                                                        })
-                                                        //If adding product to category runs into error, then return an error response
-                                                        .catch(err => {return res.status(500).send({ error: "Error adding product to category. " + err })});
+                                                            //If updating product into error, then return an error response
+                                                            .catch(err => { return res.status(500).send({ error: "Error updating product. " + err }) });
                                                     })
-                                                    //If removing product from category runs into error, then return an error response
-                                                    .catch(err => {return res.status(500).send({ error: "Error removing product from category. " + err })});
+                                                    //If getting category runs into error, then return an error response
+                                                    .catch(err => { return res.status(500).send({ error: "Couldn't find a category with that name. " + err }) });
                                             }
-                                            //we can get rid of this if/else
-                                            else
-                                            {
-                                                warehouse.removeProductFromWarehouse(storeId, productId)
-                                                    .then(removeProductResultFromWarehouse => {
-                                                    warehouse.addProduct(storeId, productId, categoryId, req.body.amount)
-                                                        .then(addProductToWarehouseResult => {
-                                                        product.getProductById(productId)
-                                                            .then(productFindResult => {
-                                                            //Uploading the image
-                                                            uploadImage.upload(path,req.body.image)
-                                                            //Returning a successful response
-                                                            return res.status(200).send(productFindResult);
-                                                            })
-                                                            //If getting product runs into error, then return an error response
-                                                            .catch(err => {return res.status(500).send({ error: "Error finding updated product.  " + err })})
-                                                        })
-                                                        //If adding product to warehouse runs into error, then return an error response
-                                                        .catch(err => {return res.status(500).send({ error: "Error adding product to warehouse. " + err })});
-                                                    })
-                                                    //If removing product from warehouse runs into error, then return an error response
-                                                    .catch(err => {return res.status(500).send({ error: "Error removing product from warehouse. " + err })});
-                                            }
-                                            })
-                                            //If updating product into error, then return an error response
-                                            .catch(err => {return res.status(500).send({ error: "Error updating product. " + err })});
-                                        })
-                                        //If getting category runs into error, then return an error response
-                                        .catch(err => {return res.status(500).send({ error: "Couldn't find a category with that name. " + err })});
-                                }
+                                        }
+                                    })
+                                    //If getting product runs into error, then return an error response
+                                    .catch(err => { return res.status(500).send({ error: "Error getting product by id.    " + err }) });
                             }
-                            })
-                            //If getting product runs into error, then return an error response
-                            .catch(err => {return res.status(500).send({ error: "Error getting product by id.    " + err })});
-                    }
-                    })
-                    //If getting category runs into error, then return an error response
-                    .catch(err => {return res.status(500).send({ error: "Error getting category id. " + err })})
-            }
+                        })
+                        //If getting category runs into error, then return an error response
+                        .catch(err => { return res.status(500).send({ error: "Error getting category id. " + err }) })
+                }
             })
             //If getting store runs into error, then return an error response
-            .catch(err => {return res.status(500).send({ error: "Error getting store id. " + err })});
+            .catch(err => { return res.status(500).send({ error: "Error getting store id. " + err }) });
     }
 });
 //----------Delete Product----------

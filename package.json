@@ -4,8 +4,8 @@
   "description": "This is the backend for the graduation project",
   "main": "server.js",
   "scripts": {
-    "test": "mocha --recursive --timeout 100000 --exit",
-    "test-coverage": "nyc --reporter=text --reporter=lcov mocha --exit",
+    "test": "mocha --recursive --no-timeouts --exit",
+    "test-coverage": "nyc --no-timeouts --inspect --reporter=text --reporter=lcov mocha --exit",
     "start": "nodemon server.js"
   },
   "author": "",

@@ -67,14 +67,14 @@ app.use(cors(corsOptions));
 //Requring the scheduled jobs
 //Starting the generate report services
 const generatingReports = require('./src/scheduled Jobs/generatingReports');
-generatingReports.generateGarageOwnerReport();
-generatingReports.generatingAdminReport();
+//generatingReports.generateGarageOwnerReport();
+//generatingReports.generatingAdminReport();
 //Starting the clean-up expired offers service
 const removeExpiredOffers = require('./src/scheduled Jobs/removingExpiredOffers');
-removeExpiredOffers.removeExpiredOffers();
+//removeExpiredOffers.removeExpiredOffers();
 //Starting the training service
 const modelTrain = require('./src/scheduled Jobs/trainingModel');
-modelTrain.train();
+//modelTrain.train();
 
 
 
