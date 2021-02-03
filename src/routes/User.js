@@ -370,14 +370,14 @@ router.put('/user/manage-user-info', userAuthenticated, (req, res) => {
     .catch(err => {return res.status(500).send({error:"Error with getting User. "+err})});
 });
 
-router.get('/user-info/:id', userAuthenticated, (req, res) => {
-    const userId = req.params.id;
+router.get('/user-info', userAuthenticated, (req, res) => {
+    loggedUser = req.user;
+    const userId = loggedUser._id;
     user.getUser(userId)
         .then(result => {
             return res.status(200).send({
                 user: {
-                    name: result.fullName,
-                    id: result._id
+                    result
                 }
             });
         })

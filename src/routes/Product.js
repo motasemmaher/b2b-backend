@@ -293,8 +293,8 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
                                     const path = `public/images/${randomIdValue}.png`;
                                     garageOwner.getGarageOwnerByUserId(loggedUser._id)
                                         .then(garageOwnerResult => {
-                                            if (garageOwnerResult != null)
-                                                return res.status(400).send("Didn't find a garageOwner with that userId !");
+                                            if (garageOwnerResult == null)
+                                                return res.status(400).send({error:"Didn't find a garageOwner with that userId !"});
                                             if(garageOwnerResult.isTrusted)
                                             {
                                                 tags = req.body.generalType+","+ productInfo.tags;
