@@ -27,15 +27,17 @@ router.get('/search', (req, res) => {
                     productsSearchResult, storesSearchResult
                 });
             }).catch(err => {
-                return res.status(404).send({
-                    error: "ERROR_IN_SEARCH"
-                });
+
+                return res.status(404).send({ error: "ERROR_IN_SEARCH" });
+
             });
         }).catch(err => {
             return res.status(404).send({ error: "ERROR_IN_SEARCH" });
         });
+
     }
     else {
+
         return res.status(400).send({
             error: 'ERROR_YOU_MUST_SPECIFY_WHERE_YOU_WANT_TO_SEARCH_IN_STORES_OR_PRODUCTS'
         });

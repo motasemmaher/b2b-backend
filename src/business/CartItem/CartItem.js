@@ -1,3 +1,4 @@
+//Requiring the necessary files and models
 const CartItemModel = require('../../models/model/CartItem');
 
 module.exports = class CartItem {

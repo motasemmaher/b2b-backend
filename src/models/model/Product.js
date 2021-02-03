@@ -142,9 +142,9 @@ module.exports =
     }
     ,
     removeOffer(value) {
-        const result = ProductModel.findOneAndUpdate({ offer: { _id: value.offerId } },
+        const result = ProductModel.updateMany({ offer: { _id: value.offerId } },
             { offer: null },
-            { "useFindAndModify": false }
+            //{ "useFindAndModify": false }
         );
 
         if (result)
@@ -271,7 +271,6 @@ module.exports =
         const priceSort = value.priceSort;
         const limit = value.limit;
         const skip = value.skip;
-        const from = value.type
         const type = setProductType(value.type);
         let result;
 
@@ -348,12 +347,6 @@ module.exports =
                 tags: { $in: value.searchText },
             }
             ]
-        }, {
-            name: 1,
-            price: 1,
-            image: 1,
-            productType: 1,
-            description: 1
         })
             .limit(value.limit)
             .skip(value.skip);

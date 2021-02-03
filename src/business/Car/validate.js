@@ -1,7 +1,8 @@
+//Requiring the necessary packages
 const validator = require('validator');
-
+//E xporting the validation method
 module.exports = {
-    
+   //A method to validate the car information
    validateCarInfo(car)
     {
         //if(!validator.matches(car.make,/(^[A-Z a-z \s\d'-]{3,24}$)/))

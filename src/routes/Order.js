@@ -236,22 +236,20 @@ router.put('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
                                     shoppingCart.getShoppingCart(updatedOrderStatus.shoppingCart).populate('Items').then(retrivedSoppingCart => {
                                         store.getStore(storeId).then(retrivedStore => {                                            
                                             retrivedSoppingCart.Items.forEach((item, index) => {
-                                                console.log(retrivedSoppingCart)
+                                                // console.log(retrivedSoppingCart)
                                                 if (status === 'delivered') { 
                                                     console.log(gaOwner);                                                   
                                                     // warehouse.decreaseAmaountOfProduct(retrivedStore.warehouse, item.product, item.quantity).then(updatedWarehouse => {
                                                     if (index === retrivedSoppingCart.Items.length - 1) {
                                                         report.addOrder(gaOwner.reportId, orderId).then(updatedReport => {
+                                                            console.log(updatedReport)
                                                             return res.status(200).send(updatedOrderStatus);
                                                         }).catch(err => {
                                                             return res.status(500).send({
-                                                                error: 'INTERNAL_SERVER_ERROR'
+                                                                error: 'dsdfsfdsd'
                                                             });
                                                         });
                                                     }
-                                                    // }).catch(err => {
-                                                    //     res.status(400).send('There is no available quantity in this store');
-                                                    // });
                                                 } else if (status === 'cancel') {                                                    
                                                     warehouse.increaseAmaountOfProduct(retrivedStore.warehouse, item.product, item.quantity).then(updatedWarehouse => {                                                        
                                                         product.getProductById(item.product).then(retrivedProduct => {                                                            
