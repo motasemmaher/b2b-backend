@@ -9,10 +9,6 @@ const http = require('http');
 
 let server = http.Server(app);
 
-<<<<<<< HEAD
-=======
-
->>>>>>> b2d7750c8a6b47358a1bb81667db13f70c3c692b
 let {
     userForChat
 } = require('./src/routes/Chat');
@@ -38,7 +34,7 @@ io.on('connection', (socket) => {
 
 connection.connect()
     .then(() => {
-        server.listen(process.env.PORT || 3000, () => {
+        server.listen(process.env.PORT || PORT, () => {
 
             Promise.all([
                 permissions.createPermissions('carOwner'),
