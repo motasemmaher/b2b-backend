@@ -23,7 +23,7 @@ describe('ShoppingCart Class Tests', () => {
             .then(() => done())
             .catch((err) => done(err));
     });
-/*
+
     it('Creating shoppingcart without errors.', (done) => {
         shoppingCart.createShoppingCart()
             .then(createResult => {
@@ -36,29 +36,28 @@ describe('ShoppingCart Class Tests', () => {
             })
             .catch(err => done(err));
     });
-    /*
-        it('Deleting shoppingcart without errors.', (done) => {
-            shoppingCart.createShoppingCart()
-            .then(createResult => {
-                shoppingCart.deleteShoppingCart(createResult._id)
-                .then(deleteResult => {
-                    test(deleteResult);
-                    done();
-                })
-                .catch(err => done(err));
-            })
-            .catch(err => done(err));
-        });
-       */
-  /*
-       it('should get ShoppingCart', (done) => {
-        shoppingCart.getShoppingCart(shoppingCartId)
-            .then(retrievedShoppingCart => {
-                expect(retrievedShoppingCart.Items).to.be.an('array').that.includes(cartItemId);
-                expect(retrievedShoppingCart.totalBill).to.equal(1500);
+
+    it('Deleting shoppingcart without errors.', (done) => {
+        shoppingCart.createShoppingCart()
+        .then(createResult => {
+            shoppingCart.deleteShoppingCart(createResult._id)
+            .then(deleteResult => {
+                test(deleteResult);
                 done();
             })
             .catch(err => done(err));
+        })
+        .catch(err => done(err));
+    });
+
+    it('should get ShoppingCart', (done) => {
+        shoppingCart.getShoppingCart(shoppingCartId)
+        .then(retrievedShoppingCart => {
+            expect(retrievedShoppingCart.Items).to.be.an('array').that.includes(cartItemId);
+            expect(retrievedShoppingCart.totalBill).to.equal(1500);
+            done();
+        })
+        .catch(err => done(err));
     });
 
     it('should update ShoppingCart', (done) => {
@@ -97,5 +96,5 @@ describe('ShoppingCart Class Tests', () => {
             })
             .catch(err => done(err));
     });
-*/
+
 });

@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const AdminSchema = require("../schema/Admin");
 const AdminModel= mongoose.model('Admin', AdminSchema);
 
+/*
 module.exports = {
     createAdmin(value) {
         const result = AdminModel.create(value);
@@ -66,3 +67,4 @@ module.exports = {
             };
     }
 };
+*/

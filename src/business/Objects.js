@@ -19,6 +19,7 @@ const Chat = require('./Chat/Chat');
 const Report = require('./Report/Report');
 const Permissions = require('./Permissions/Permissions');
 const Subscription = require('./Subscription/Subscription');
+const Admin = require('./Admin/Admin');
 //Objects
 const USER = new User();
 const GARAGEOWNER = new GarageOwner();
@@ -40,5 +41,6 @@ const CHAT = new Chat();
 const REPORT = new Report();
 const PERMISSIONS = new Permissions();
 const SUBSCRIPTION = new Subscription();
+const ADMIN = new Admin();
 //Exporting the objects to be used in other parts of the project
-module.exports = {USER,GARAGEOWNER, CHAT,CAROWNER,STORE,WAREHOUSE,MENU,CATEGORY,PRODUCT,COMPLAINT,MESSAGE,OFFER,CAR,SHOPPINGCART, CARTITEM, ORDER, PERMISSIONS, REPORT, CONTACT, SUBSCRIPTION};
+module.exports = {USER,GARAGEOWNER, CHAT,CAROWNER,STORE,WAREHOUSE,MENU,CATEGORY,PRODUCT,COMPLAINT,MESSAGE,OFFER,CAR,SHOPPINGCART, CARTITEM, ORDER, PERMISSIONS, REPORT, CONTACT, SUBSCRIPTION, ADMIN};

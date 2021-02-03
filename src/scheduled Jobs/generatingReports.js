@@ -20,7 +20,6 @@ module.exports = {
     generateGarageOwnerReport()
     {
         const garageOwnerReport = schedule.scheduleJob('0 0 1 * *', () => {
-        // const garageOwnerReport = schedule.scheduleJob('* * * * *', () => {
             //Getting all the garageOwners
             user.getAllUsersIdOfARole('garageOwner')
             .then(garageOwners => {
@@ -73,7 +72,6 @@ module.exports = {
     generatingAdminReport() 
     {
         const adminReport = schedule.scheduleJob('0 0 1 * *', () => {
-        // const adminReport = schedule.scheduleJob('* * * * *', () => {
             //Getting all garageOwners
             user.getAllUsersIdOfARole('garageOwner')
             .then(garageOwners => {
