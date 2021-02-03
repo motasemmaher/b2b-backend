@@ -106,22 +106,22 @@ module.exports =
         if (nameSort == 0 && priceSort == 0)
             result = ProductModel.find({ categoryId: value.categoryId, productType: { $in: type } })
                 .skip(skip).limit(limit)
-                .select('name price image description');
+                .select('name price image description isInStock');
         else if (nameSort == 0 && priceSort != 0)
             result = ProductModel.find({ categoryId: value.categoryId, productType: { $in: type } })
                 .skip(skip).limit(limit)
                 .sort({ price: priceSort })
-                .select('name price image description');
+                .select('name price image description isInStock');
         else if (nameSort != 0 && priceSort == 0)
             result = ProductModel.find({ categoryId: value.categoryId, productType: { $in: type } })
                 .skip(skip).limit(limit)
                 .sort({ name: nameSort })
-                .select('name price image description');
+                .select('name price image description isInStock');
         else if (nameSort != 0 && priceSort != 0)
             result = ProductModel.find({ categoryId: value.categoryId, productType: { $in: type } })
                 .skip(skip).limit(limit)
                 .sort({ name: nameSort, price: priceSort })
-                .select('name price image description');
+                .select('name price image description isInStock');
 
         if (result)
             return result;
@@ -240,25 +240,25 @@ module.exports =
             result = ProductModel.find({ productType: { $in: type } })
                 .skip(skip).limit(limit)
                 .populate('offer')
-                .select('name price image offer description categoryId storeId');
+                .select('name price image offer description isInStock categoryId storeId');
         else if (nameSort == 0 && priceSort != 0)
             result = ProductModel.find({ productType: { $in: type } })
                 .skip(skip).limit(limit)
                 .sort({ price: priceSort })
                 .populate('offer')
-                .select('name price image offer description categoryId storeId');
+                .select('name price image offer description isInStock categoryId storeId');
         else if (nameSort != 0 && priceSort == 0)
             result = ProductModel.find({ productType: { $in: type } })
                 .skip(skip).limit(limit)
                 .sort({ name: nameSort })
                 .populate('offer')
-                .select('name price image offer description categoryId storeId');
+                .select('name price image offer description isInStock categoryId storeId');
         else if (nameSort != 0 && priceSort != 0)
             result = ProductModel.find({ productType: { $in: type } })
                 .skip(skip).limit(limit)
                 .sort({ name: nameSort, price: priceSort })
                 .populate('offer')
-                .select('name price image offer description categoryId storeId');
+                .select('name price image offer description isInStock categoryId storeId');
 
         if (result)
             return result;
@@ -278,26 +278,26 @@ module.exports =
             result = ProductModel.find({ storeId: value.storeId, productType: { $in: type } })
                 .skip(skip).limit(limit)
                 .populate('offer')
-                .select('name price image offer description categoryId storeId');
+                .select('name price image offer description isInStock categoryId storeId');
         else if (nameSort == 0 && priceSort != 0)
             //result = ProductModel.find({storeId:value.storeId})
             result = ProductModel.find({ storeId: value.storeId, productType: { $in: type } })
                 .skip(skip).limit(limit)
                 .sort({ price: priceSort })
                 .populate('offer')
-                .select('name price image offer description categoryId storeId');
+                .select('name price image offer description isInStock categoryId storeId');
         else if (nameSort != 0 && priceSort == 0)
             result = ProductModel.find({ storeId: value.storeId, productType: { $in: type } })
                 .skip(skip).limit(limit)
                 .sort({ name: nameSort })
                 .populate('offer')
-                .select('name price image offer description categoryId storeId');
+                .select('name price image offer description isInStock categoryId storeId');
         else if (nameSort != 0 && priceSort != 0)
             result = ProductModel.find({ storeId: value.storeId, productType: { $in: type } })
                 .skip(skip).limit(limit)
                 .sort({ name: nameSort, price: priceSort })
                 .populate('offer')
-                .select('name price image offer description categoryId storeId');
+                .select('name price image offer description isInStock categoryId storeId');
 
         if (result)
             return result;

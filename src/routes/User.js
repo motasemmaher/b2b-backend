@@ -438,16 +438,21 @@ router.put('/user/manage-user-info', userAuthenticated, (req, res) => {
         //If getting the user runs into error, then return an error response
         .catch(err => { return res.status(500).send({ error: "Error with getting User. " + err }) });
 });
+
 //----------Getting User information----------
+
 router.get('/user-info', userAuthenticated, (req, res) => {
     loggedUser = req.user;
     const userId = loggedUser._id;
     user.getUser(userId)
-        .then(userResult => {
-            if (userResult == null)
-                return res.status(404).send({ error: "Error! Didn't find a user with that id." })
-            else
-                return res.status(200).send({ user: { userResult} });
+
+        .then(result => {
+            return res.status(200).send({
+                user: {
+                    result
+                }
+            });
+
         })
         //If getting the user runs into error, then return an error response
         .catch(err => res.status(500).send({ error: "Error getting the user. " + err }));

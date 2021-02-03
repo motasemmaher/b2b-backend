@@ -14,11 +14,9 @@ function escapeRegex(text) {
 
 //---------------------search in (stores or products)---------------------\\
 router.get('/search', (req, res) => {
-    let skip = req.query.skip || '0';
-    let limit = req.query.limit || '/* 30 */';
-    const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip);
-
-    skip = limitAndSkipValues.skip;
+    let skip = req.query.skip;
+    let limit = req.query.limit;
+    const limitAndSkipValues = limitAndSkipValidation.limitAndSkipValues(limit, skip); skip = limitAndSkipValues.skip;
     limit = limitAndSkipValues.limit;
     const search = req.query.search;
     if (search) {
@@ -29,12 +27,17 @@ router.get('/search', (req, res) => {
                     productsSearchResult, storesSearchResult
                 });
             }).catch(err => {
+
                 return res.status(404).send({ error: "ERROR_IN_SEARCH" });
+
             });
         }).catch(err => {
             return res.status(404).send({ error: "ERROR_IN_SEARCH" });
         });
-    } else {
+
+    }
+    else {
+
         return res.status(400).send({
             error: 'ERROR_YOU_MUST_SPECIFY_WHERE_YOU_WANT_TO_SEARCH_IN_STORES_OR_PRODUCTS'
         });

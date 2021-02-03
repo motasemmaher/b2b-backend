@@ -122,7 +122,9 @@ module.exports = {
 
     findFullStores(value)
     {
-        const result = StoreModel.find({}).select('name , address , image , openTime , closeTime, userId, garageOwnerId').skip(value.skip).limit(value.limit)//.pretty();
+
+        const result = StoreModel.find({}).select('name address image openTime closeTime userId garageOwnerId').skip(value.skip).limit(value.limit)//.pretty();
+
         if (result) 
             return result;
         else
@@ -133,7 +135,7 @@ module.exports = {
 
     findSameAddressStores(value)
     {
-        const result = StoreModel.find({address:value.address}).select('name , address , image , openTime , closeTime').skip(value.skip).limit(value.limit)//.pretty();
+        const result = StoreModel.find({address:value.address}).select('name address image openTime closeTime').skip(value.skip).limit(value.limit)//.pretty();
         if (result) 
             return result;
         else 
@@ -144,7 +146,7 @@ module.exports = {
         const result = StoreModel.find({location:{
             $near :
             { $geometry: { type: "Point",  coordinates: [value.lat,value.long] } }
-        }}).select('name , address , image , openTime , closeTime').skip(value.skip).limit(value.limit)//.pretty();
+        }}).select('name address image openTime closeTime').skip(value.skip).limit(value.limit)//.pretty();
         
         if (result) 
             return result;
