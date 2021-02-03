@@ -355,8 +355,8 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
                             garageOwner.getGarageOwnerByUserId(loggedUser._id)
                                 .then(garageOwnerResult => {
                                 //If the garageOwner doesn't exist, then return an error response
-                                if (garageOwnerResult != null)
-                                    return res.status(400).send("Didn't find a garageOwner with that userId !");
+                                if (garageOwnerResult == null)
+                                    return res.status(400).send({error:"Didn't find a garageOwner with that userId !"});
                                 //If the garageOwner is a trusted one, then save and train the image processing model
                                 tags = req.body.generalType+","+ productInfo.tags;
                                 productInfo = { ...productInfo,tags:tags,image:path};

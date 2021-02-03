@@ -272,7 +272,7 @@ describe('Product Class Tests', () => {
     it('Count all products without errors. (all types)', (done) => {
         PRODUCT.countAll("all")
         .then(countResult => {
-            expect(countResult).to.equal(18);
+            expect(countResult).to.equal(19);
             done();
         })
         .catch(err => done(err));
@@ -290,7 +290,7 @@ describe('Product Class Tests', () => {
     it('Count all products without errors. (Part type)', (done) => {
         PRODUCT.countAll("Part")
         .then(countResult => {
-            expect(countResult).to.equal(0);
+            expect(countResult).to.equal(1);
             done();
         })
         .catch(err => done(err));
@@ -750,7 +750,7 @@ describe('Product Class Tests', () => {
     it('Getting all products without errors. (all types - nolimit&noSkip - noNameSort&noPriceSort)', (done) => {
         PRODUCT.getAllProducts("all",0,0,0,0)
         .then(getResult => {
-            expect(getResult.length).to.equal(18);
+            expect(getResult.length).to.equal(19);
             done();
         })
         .catch(err => done(err));
@@ -759,7 +759,7 @@ describe('Product Class Tests', () => {
     it('Getting all products without errors. (Part type - nolimit&noSkip - noNameSort&noPriceSort)', (done) => {
         PRODUCT.getAllProducts("Part",0,0,0,0)
         .then(getResult => {
-            expect(getResult.length).to.equal(0);
+            expect(getResult.length).to.equal(1);
             done();
         })
         .catch(err => done(err));
@@ -882,7 +882,7 @@ describe('Product Class Tests', () => {
         .catch(err => done(err));
     });
     
-    it('Getting all products without errors. (all types - nolimit&noSkip - noNameSort&noPriceSort)', (done) => {
+    it('Getting all products of store without errors. (all types - nolimit&noSkip - noNameSort&noPriceSort)', (done) => {
         PRODUCT.getProductsOfStore(existingStoreId,"all",0,0,0,0)
         .then(getResult => {
             expect(getResult.length).to.equal(6);
@@ -891,7 +891,7 @@ describe('Product Class Tests', () => {
         .catch(err => done(err));
     });
 
-    it('Getting all products without errors. (Part type - nolimit&noSkip - noNameSort&noPriceSort)', (done) => {
+    it('Getting all products of store without errors. (Part type - nolimit&noSkip - noNameSort&noPriceSort)', (done) => {
         PRODUCT.getProductsOfStore(existingStoreId,"Part",0,0,0,0)
         .then(getResult => {
             expect(getResult.length).to.equal(0);
@@ -900,7 +900,7 @@ describe('Product Class Tests', () => {
         .catch(err => done(err));
     });
 
-    it('Getting all products without errors. (Service type - nolimit&noSkip - noNameSort&noPriceSort)', (done) => {
+    it('Getting all products of store without errors. (Service type - nolimit&noSkip - noNameSort&noPriceSort)', (done) => {
         PRODUCT.getProductsOfStore(existingStoreId,"Service",0,0,0,0)
         .then(getResult => {
             expect(getResult.length).to.equal(6);
@@ -909,7 +909,7 @@ describe('Product Class Tests', () => {
         .catch(err => done(err));
     });
 
-    it('Getting all products without errors. (Service type - limit=1&noSkip - noNameSort&noPriceSort)', (done) => {
+    it('Getting all products of store without errors. (Service type - limit=1&noSkip - noNameSort&noPriceSort)', (done) => {
         PRODUCT.getProductsOfStore(existingStoreId,"Service",1,0,0,0)
         .then(getResult => {
             expect(getResult.length).to.equal(1);
@@ -918,7 +918,7 @@ describe('Product Class Tests', () => {
         .catch(err => done(err));
     });
 
-    it('Getting all products without errors. (Service type - nolimit&skip=1 - noNameSort&noPriceSort)', (done) => {
+    it('Getting all products of store without errors. (Service type - nolimit&skip=1 - noNameSort&noPriceSort)', (done) => {
         PRODUCT.getProductsOfStore(existingStoreId,"Service",0,1,0,0)
         .then(getResult => {
             expect(getResult.length).to.equal(5);
@@ -927,7 +927,7 @@ describe('Product Class Tests', () => {
         .catch(err => done(err));
     });
 
-    it('Getting all products without errors. (Service type - nolimit&noskip - nameSort=1&noPriceSort)', (done) => {
+    it('Getting all products of store without errors. (Service type - nolimit&noskip - nameSort=1&noPriceSort)', (done) => {
         PRODUCT.getProductsOfStore(existingStoreId,"Service",0,0,1,0)
         .then(getResult => {
             expect(getResult.length).to.equal(6);
@@ -937,7 +937,7 @@ describe('Product Class Tests', () => {
         .catch(err => done(err));
     });
 
-    it('Getting all products without errors. (Service type - nolimit&noskip - nameSort=-1&noPriceSort)', (done) => {
+    it('Getting all products of store without errors. (Service type - nolimit&noskip - nameSort=-1&noPriceSort)', (done) => {
         PRODUCT.getProductsOfStore(existingStoreId,"Service",0,0,-1,0)
         .then(getResult => {
             expect(getResult.length).to.equal(6);
@@ -947,7 +947,7 @@ describe('Product Class Tests', () => {
         .catch(err => done(err));
     });
 
-    it('Getting all products without errors. (Service type - nolimit&noskip - noNameSort&priceSort=1)', (done) => {
+    it('Getting all products of store without errors. (Service type - nolimit&noskip - noNameSort&priceSort=1)', (done) => {
         PRODUCT.getProductsOfStore(existingStoreId,"Service",0,0,0,1)
         .then(getResult => {
             expect(getResult.length).to.equal(6);
@@ -957,7 +957,7 @@ describe('Product Class Tests', () => {
         .catch(err => done(err));
     });
 
-    it('Getting all products without errors. (Service type - nolimit&noskip - noNameSort&priceSort=-1)', (done) => {
+    it('Getting all products of store without errors. (Service type - nolimit&noskip - noNameSort&priceSort=-1)', (done) => {
         PRODUCT.getProductsOfStore(existingStoreId,"Service",0,0,0,-1)
         .then(getResult => {
             expect(getResult.length).to.equal(6);
@@ -967,7 +967,7 @@ describe('Product Class Tests', () => {
         .catch(err => done(err));
     });
     
-    it('Getting all products without errors. (Service type - nolimit&noskip - nameSort=1&priceSort=1)', (done) => {
+    it('Getting all products of store without errors. (Service type - nolimit&noskip - nameSort=1&priceSort=1)', (done) => {
         PRODUCT.getProductsOfStore(existingStoreId,"Service",0,0,1,1)
         .then(getResult => {
             expect(getResult.length).to.equal(6);
@@ -977,7 +977,7 @@ describe('Product Class Tests', () => {
         .catch(err => done(err));
     });
 
-    it('Getting all products without errors. (Service type - nolimit&noskip - nameSort=-1&priceSort=-1)', (done) => {
+    it('Getting all products of store without errors. (Service type - nolimit&noskip - nameSort=-1&priceSort=-1)', (done) => {
         PRODUCT.getProductsOfStore(existingStoreId,"Service",0,0,-1,-1)
         .then(getResult => {
             expect(getResult.length).to.equal(6);
@@ -987,7 +987,7 @@ describe('Product Class Tests', () => {
         .catch(err => done(err));
     });
 
-    it('Getting all products without errors. (Service type - nolimit&noskip - nameSort=1&priceSort=-1)', (done) => {
+    it('Getting all products of store without errors. (Service type - nolimit&noskip - nameSort=1&priceSort=-1)', (done) => {
         PRODUCT.getProductsOfStore(existingStoreId,"Service",0,0,1,-1)
         .then(getResult => {
             expect(getResult.length).to.equal(6);
@@ -997,7 +997,7 @@ describe('Product Class Tests', () => {
         .catch(err => done(err));
     });
 
-    it('Getting all products without errors. (Service type - nolimit&noskip - nameSort=-1&priceSort=1)', (done) => {
+    it('Getting all products of store without errors. (Service type - nolimit&noskip - nameSort=-1&priceSort=1)', (done) => {
         PRODUCT.getProductsOfStore(existingStoreId,"Service",0,0,-1,1)
         .then(getResult => {
             expect(getResult.length).to.equal(6);
@@ -1007,7 +1007,7 @@ describe('Product Class Tests', () => {
         .catch(err => done(err));
     });
 
-    it('Getting all products without errors. (Service type - nolimit&skip=1 - noNameSort&priceSort=-1)', (done) => {
+    it('Getting all products of store without errors. (Service type - nolimit&skip=1 - noNameSort&priceSort=-1)', (done) => {
         PRODUCT.getProductsOfStore(existingStoreId,"Service",0,1,0,-1)
         .then(getResult => {
             expect(getResult.length).to.equal(5);

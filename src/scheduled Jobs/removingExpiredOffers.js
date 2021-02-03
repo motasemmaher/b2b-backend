@@ -8,8 +8,8 @@ module.exports = {
     removeExpiredOffers()
     {
         //----------Clear Offers----------
-        //const checkOffers = schedule.scheduleJob('0 * * * *', () => {
-        const checkOffers = schedule.scheduleJob('* * * * *', () => {
+        const checkOffers = schedule.scheduleJob('0 * * * *', () => {
+        //const checkOffers = schedule.scheduleJob('* * * * *', () => {
             console.log("CHECKING OFFERS");
             //Getting expire offers
             product.expiredOffers()

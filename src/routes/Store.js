@@ -123,6 +123,7 @@ router.get('/view-stores/nearby', (req, res) => {
 });
 //----------View nearby stores by location----------
 router.get('/view-stores/location', userAuthenticated,(req, res) => {
+    console.log("inside")
     //Getting and checking if the logged user is an authorized one, if not then return error response
     loggedUser = req.user;
     if(loggedUser.role !== "carOwner")
@@ -248,7 +249,7 @@ router.post('/user/manage-garage-owner/add-store', userAuthenticated, upload.sin
     {
         //Storing the data from the request body then validating it
         //const storeInfo = {...req.body,image:req.file.path,userId:loggedUser._id};
-        const storeInfo = { ...req.body, userId: loggedUser._id };
+        storeInfo = { ...req.body, userId: loggedUser._id };
         const storeValidationResult = store.validateStoreInfo(storeInfo);
         //If errors were found, then return error response
         if (typeof storeValidationResult !== 'undefined')

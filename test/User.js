@@ -279,8 +279,8 @@ describe('User Class Tests', () => {
     it("Count by role without error (CarOwner)", (done) => {
         USER.countByRole("carOwner")
         .then(countResult => {
-            expect(countResult).to.equal(2);
-            done();
+            expect(countResult).to.equal(3);
+            done()
         })
         .catch(err => done(err));
     });
@@ -288,7 +288,7 @@ describe('User Class Tests', () => {
     it("Count by role without error (GarageOwner)", (done) => {
         USER.countByRole("garageOwner")
         .then(countResult => {
-            expect(countResult).to.equal(2);
+            expect(countResult).to.equal(3);
             done();
         })
         .catch(err => done(err));
@@ -297,7 +297,7 @@ describe('User Class Tests', () => {
     it("Count All users without error", (done) => {
         USER.countAll()
         .then(countResult => {
-            expect(countResult).to.equal(4);
+            expect(countResult).to.equal(6);
             done();
         })
         .catch(err => done(err));
@@ -458,7 +458,7 @@ describe('User Class Tests', () => {
     it("Getting all users ids of a role without errors. (carOwner)", (done) => {
         USER.getAllUsersIdOfARole("carOwner")
         .then(getResult => {
-            expect(getResult.length).to.equal(2);
+            expect(getResult.length).to.equal(3);
             done();
         })
         .catch(err => done(err));
@@ -476,7 +476,7 @@ describe('User Class Tests', () => {
     it("Getting all users ids of a role without errors. (garageOwner)", (done) => {
         USER.getAllUsersIdOfARole("garageOwner")
         .then(getResult => {
-            expect(getResult.length).to.equal(2);
+            expect(getResult.length).to.equal(3);
             done();
         })
         .catch(err => done(err));

@@ -119,14 +119,14 @@ app.delete('/user/logout', userAuthenticated, (req, res) => {
 //Requring the scheduled jobs
 //Starting the generate report services
 const generatingReports = require('./src/scheduled Jobs/generatingReports');
-generatingReports.generateGarageOwnerReport();
-generatingReports.generatingAdminReport();
+//generatingReports.generateGarageOwnerReport();
+//generatingReports.generatingAdminReport();
 //Starting the clean-up expired offers service
 const removeExpiredOffers = require('./src/scheduled Jobs/removingExpiredOffers');
-removeExpiredOffers.removeExpiredOffers();
+//removeExpiredOffers.removeExpiredOffers();
 //Starting the training service
 const modelTrain = require('./src/scheduled Jobs/trainingModel');
-modelTrain.train();
+//modelTrain.train();
 
 
 
@@ -252,14 +252,15 @@ const shoppingCartRoute = require('./src/routes/ShoppingCart');
 const orderRoute = require('./src/routes/Order');
 const searchRoute = require('./src/routes/Search');
 const permissionsRoute = require('./src/routes/Permissions');
-const chatRoute = require('./src/routes/Chat').router;
+//const chatRoute = require('./src/routes/Chat');
+//const chatRoute = require('./src/routes/Chat').router;
 
 // Use Routes
 app.use(shoppingCartRoute);
 app.use(orderRoute);
 app.use(searchRoute);
 app.use(permissionsRoute);
-app.use(chatRoute);
+//app.use(chatRoute);
 
 
 module.exports = app;

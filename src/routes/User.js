@@ -383,8 +383,10 @@ router.put('/admin/view-users/trust/:userId', userAuthenticated, (req, res) => {
     //Getting garageOwner
     garageOwner.getGarageOwnerByUserId(userId)
         .then(garageOwnerResult => {
-            //Trudting the garaeOwner
-            garageOwner.trustGarageOwner(garageOwnerResult._id)
+        if(garageOwnerResult == null)
+            return res.status(400).send({error:"Error! Didn't find a garageOwner with that userId."});
+            //Trusting the garaeOwner
+        garageOwner.trustGarageOwner(garageOwnerResult._id)
             .then(trustResult => {
                 //Getting garageOwner
                 garageOwner.getGarageOwnerByUserId(userId)

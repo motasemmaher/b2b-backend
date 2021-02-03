@@ -336,7 +336,7 @@ describe('Store Class Tests', () => {
   it('Count of all stores without errors.', (done) => {
     STORE.countAll()
     .then(counteResult => {
-        expect(counteResult).to.equal(5);
+        expect(counteResult).to.equal(6);
         done();
     })
     .catch(err => done(err));
@@ -363,7 +363,7 @@ describe('Store Class Tests', () => {
   it('Count of stores with the same provided address without errors.', (done) => {
     STORE.countBySameAddress("Amman")
     .then(counteResult => {
-        expect(counteResult).to.equal(5);
+        expect(counteResult).to.equal(6);
         done();
     })
     .catch(err => done(err));
@@ -459,7 +459,7 @@ describe('Store Class Tests', () => {
   it('Getting all store without errors (nolimit&noskip).', (done) => {
     STORE.getAllStores(0,0)
     .then(getResult => {
-        expect(getResult.length).to.equal(5);
+        expect(getResult.length).to.equal(6);
         done();
     })
     .catch(err => done(err))
@@ -478,7 +478,7 @@ describe('Store Class Tests', () => {
     STORE.getAllStores(0,1)
     .then(getResult => {
         test(getResult[1],name,address,description,openTime,closeTime,lat,long,tags,userId,warehouseId,menuId);
-        expect(getResult.length).to.equal(4);
+        expect(getResult.length).to.equal(5);
         done();
     })
     .catch(err => done(err))
@@ -487,7 +487,7 @@ describe('Store Class Tests', () => {
   it('Getting store with same address without errors (nolimit&noskip).', (done) => {
     STORE.getSameAddressStores("Amman",0,0)
     .then(getResult => {
-        expect(getResult.length).to.equal(5);
+        expect(getResult.length).to.equal(6);
         done();
     })
     .catch(err => done(err))
@@ -506,7 +506,7 @@ describe('Store Class Tests', () => {
     STORE.getSameAddressStores("Amman",0,1)
     .then(getResult => {
         test(getResult[1],name,address,description,openTime,closeTime,lat,long,tags,userId,warehouseId,menuId);
-        expect(getResult.length).to.equal(4);
+        expect(getResult.length).to.equal(5);
         done();
     })
     .catch(err => done(err))
@@ -515,7 +515,7 @@ describe('Store Class Tests', () => {
   it('Getting near stores by location without errors (nolimit&noskip).', (done) => {
     STORE.getStoresByLocation(validLat,validLong,0,0)
     .then(getResult => {
-        expect(getResult.length).to.equal(5);
+        expect(getResult.length).to.equal(6);
         expect(getResult[0].name).to.equal("store401");
         expect(getResult[1].name).to.equal("store301");
         expect(getResult[2].name).to.equal("store101");
@@ -539,7 +539,7 @@ describe('Store Class Tests', () => {
   it('Getting near stores by location without errors (nolimit&skip=1).', (done) => {
     STORE.getStoresByLocation(validLat,validLong,0,1)
     .then(getResult => {
-        expect(getResult.length).to.equal(4);
+        expect(getResult.length).to.equal(5);
         expect(getResult[0].name).to.equal("store301");
         expect(getResult[1].name).to.equal("store101");
         expect(getResult[2].name).to.equal("store102");
@@ -561,7 +561,7 @@ describe('Store Class Tests', () => {
   it('Getting store Ids by user Id (non-existing userId).', (done) => {
     STORE.getStoresIdByUserId(nonExistingGarageOwnerId)
     .then(getResult => {
-        expect(getResult).to.be.null;
+        expect(getResult.length).to.equal(0);
         done();
     })
     .catch(err => done(err))
