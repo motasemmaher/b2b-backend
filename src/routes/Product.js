@@ -203,7 +203,6 @@ router.get('/stores/:storeId/category/:categoryId/products/:productId?', (req, r
     //Checking the name and price sort values
     let nameSort = parseInt(req.query.nameSort);
     let priceSort = parseInt(req.query.priceSort);
-    console.log('hhhhhh')
     if (nameSort == null)
         nameSort = 0;
     if (priceSort == null)
