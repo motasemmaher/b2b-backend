@@ -55,7 +55,7 @@ app.use(bodyParser.urlencoded({
 
 //Setting-up CORS options
 const corsOptions = {
-    origin: ['http://localhost:8100', 'http://localhost:8101', 'https://makt-b2b.live'],
+    origin: ['http://localhost:8100', 'http://localhost:8101', 'https://makt-b2b.live', 'https://b2b-stg.herokuapp.com'],
     methods: "*",
     optionsSuccessStatus: 200
 }

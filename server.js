@@ -6,15 +6,9 @@ const PORT = 3000;
 const chat = require('./src/business/Objects').CHAT;
 const { placeOrder } = require('./src/routes/ShoppingCart');
 const http = require('http');
-// const fs = require('fs');
-// const options = {
-//     key: fs.readFileSync('key.pem'),
-//     cert: fs.readFileSync('cert.pem')
-//   };
+
 let server = http.Server(app);
 
-// let socketIO = require('socket.io');
-// let io = socketIO(server, );
 let {
     userForChat
 } = require('./src/routes/Chat');
