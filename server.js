@@ -8,7 +8,6 @@ const { placeOrder } = require('./src/routes/ShoppingCart');
 const http = require('http');
 
 let server = http.Server(app);
-
 let {
     userForChat
 } = require('./src/routes/Chat');
