@@ -123,7 +123,7 @@ router.get('/view-stores/nearby', (req, res) => {
 });
 //----------View nearby stores by location----------
 router.get('/view-stores/location', userAuthenticated,(req, res) => {
-    console.log("inside")
+
     //Getting and checking if the logged user is an authorized one, if not then return error response
     loggedUser = req.user;
     if(loggedUser.role !== "carOwner")

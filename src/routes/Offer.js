@@ -122,7 +122,6 @@ router.post('/stores/:storeId/offers/add-offer',userAuthenticated,(req,res) => {
     //Storing the data from the request body
     productOffers = req.body.productOffers;
     productOffers.forEach((productOffer,index,productOffers) => {
-        console.log(productOffer)
         product.getProductById(productOffer['productId'])
         .then(productResult => {
         //If no product was found with that id, the error will be added to the error array
