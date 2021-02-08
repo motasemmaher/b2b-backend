@@ -4,7 +4,6 @@ const validator = require('validator');
 module.exports = {
 
     validateUserInfo(user, isPasswordExists) {
-        console.log(user)
         if (!user.fullName || !validator.matches(user.fullName, /(^[\p{L}\s]{3,64}$)/ugi))
             return "Invalid user fullname !";
         if (!user.username || !validator.matches(user.username, /(^[\p{L}\d_]{8,64}$)/ugi))

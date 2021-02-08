@@ -4,6 +4,7 @@ const router = express.Router();
 const { userAuthenticated } = require('../middleware/authentication');
 const limitAndSkipValidation = require('../shared/limitAndSkipValidation');
 const nodemailer = require('nodemailer');
+const bcrypt = require('bcrypt');
 //Requiring the necessay objects
 const user = require('../business/Objects').USER;
 const garageOwner = require('../business/Objects').GARAGEOWNER;
@@ -22,6 +23,13 @@ const hrTransporter = nodemailer.createTransport({
         pass: 'b2bgp2020'
     }
 });
+
+//----------Hashing password----------
+function hashPassword(password) {
+    const hash = bcrypt.hashSync(password, 10);
+    return hash;
+}
+
 //----------Get waiting users----------
 router.get('/admin/waiting-users', userAuthenticated, (req, res) => {
     //Getting and checking if the logged user is an authorized one, if not then return error response    
@@ -413,13 +421,21 @@ router.put('/user/manage-user-info', userAuthenticated, (req, res) => {
             if (!getUserResult)
                 return res.status(404).send({ error: "Error! Didn't find a user with that id." })
             //Validating the data
-            const userValidationResult = user.validateUserInfo(userInfo);
+            let isPasswordExists = false;
+            if(userInfo.password)
+            {
+                isPasswordExists = true;
+            }
+            const userValidationResult = user.validateUserInfo(userInfo,isPasswordExists);
             //If error was found, then return an error response
             if (typeof userValidationResult !== 'undefined')
                 return res.status(400).send({ error: userValidationResult.error });
-            //Hashing password
-            hashedPassword = hashPassword(userInfo.password);
-            userInfo = { ...userInfo, password: hashedPassword };
+            if(isPasswordExists)
+            {
+                //Hashing password
+                hashedPassword = hashPassword(userInfo.password);
+                userInfo = { ...userInfo, password: hashedPassword };
+            }
             //Updating user information
             user.updateUser(userInfo)
                 .then(userResult => {
