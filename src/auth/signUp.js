@@ -17,6 +17,7 @@ const car = require('../business/Objects').CAR;
 const shoppingCart = require('../business/Objects').SHOPPINGCART;
 const contact = require('../business/Objects').CONTACT;
 const report = require('../business/Objects').REPORT;
+
 //----------Hashing password----------
 function hashPassword(password) {
     const hash = bcrypt.hashSync(password, 10);
