@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const upload = require('../shared/imageUpload');
 const uploadImage = require('../shared/uploadImage');
-
+const randomId = require('../shared/generateRandomId');
 //Requiring the necessary Objects
 const user = require('../business/Objects').USER;
 const garageOwner = require('../business/Objects').GARAGEOWNER;
@@ -94,7 +94,7 @@ router.post('/auth/garage-owner/create',(req, res) => {
                                             warehouse.linkWarehouse({_id:warehouseResult._id,storeId:storeResult._id});
                                             menu.linkMenu({_id:menuResult._id,storeId:storeResult._id});
                                             //Uploading image to the server
-                                            uploadImage.upload(path,req.body.image);
+                                            uploadImage.upload(path,storeInfo.image);
                                             //Returning the successful response
                                             return res.status(200).send({created:true,message:"SUCCESSFULLY_CREATED_GARAGEOWNER_(WAITING_USER)"});
                                             })
