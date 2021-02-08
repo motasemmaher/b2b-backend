@@ -238,11 +238,10 @@ router.put('/store/:storeId/order/:orderId', userAuthenticated, (req, res) => {
                                             retrivedSoppingCart.Items.forEach((item, index) => {
                                                 // console.log(retrivedSoppingCart)
                                                 if (status === 'delivered') { 
-                                                    console.log(gaOwner);                                                   
+                                                 
                                                     // warehouse.decreaseAmaountOfProduct(retrivedStore.warehouse, item.product, item.quantity).then(updatedWarehouse => {
                                                     if (index === retrivedSoppingCart.Items.length - 1) {
                                                         report.addOrder(gaOwner.reportId, orderId).then(updatedReport => {
-                                                            console.log(updatedReport)
                                                             return res.status(200).send(updatedOrderStatus);
                                                         }).catch(err => {
                                                             return res.status(500).send({

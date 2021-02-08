@@ -349,7 +349,6 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
 
                                             //If the garageOwner is a trusted one, then save and train the image processing model
                                             tags = req.body.generalType + "," + productInfo.tags;
-                                            console.log(productInfo)
                                             productInfo = { ...productInfo, tags: tags, image: path };
 
                                             if (garageOwnerResult.isTrusted) {
@@ -464,7 +463,6 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId', us
                                                         updatedProductInfo = { _id: productId, ...productInfo, categoryId: categoryFindByNameResult._id, tags: tags, image: path } // , image: req.file.path,
                                                         //If the garageOwner is trusted, then save and train the image processing nmodel
                                                         if (garageOwnerResult.isTrusted) {
-                                                            //Training call   
                                                             //TRAINING CALL
                                                             axios
                                                                 .post(`http://localhost:8000/add-image/${req.body.generalType}/${randomIdValue}`, {

@@ -35,7 +35,6 @@ router.delete('/user/contact', userAuthenticated, (req, res) => {
     ).then(results => {
         res.status(200).send(results);
     }).catch(err => {
-        console.log(err);
         res.status(400).send({
             error: err
         });
@@ -55,7 +54,6 @@ router.get('/user/chat/:contactID', userAuthenticated, (req, res) => {
         res.status(200).send(results);
     }).catch(err => {
         if (err) {
-            console.log(err);
             res.status(400).send({
                 error: err
             })
