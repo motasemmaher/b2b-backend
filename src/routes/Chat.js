@@ -29,10 +29,10 @@ router.get('/user/contacts', userAuthenticated, (req, res) => {
 
 router.delete('/user/contact', userAuthenticated, (req, res) => {
     const userInfo = req.user;
-    contact.deleteOne(
+    contact.deleteContact(
         userInfo._id
     ).then(results => {
-        res.status(201).send(results);
+        res.status(200).send(results);
     }).catch(err => {
         console.log(err);
         res.status(400).send({

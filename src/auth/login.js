@@ -18,7 +18,7 @@ const {
 } = require('rate-limiter-flexible');
 
 const maxWrongAttemptsFromIPperDay = 1000;
-const maxConsecutiveFailsByUsernameAndIP = 100000000000;
+const maxConsecutiveFailsByUsernameAndIP = 3;
 
 const mongoConn = mongoose.connection;
 
