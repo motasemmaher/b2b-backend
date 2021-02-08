@@ -9,6 +9,7 @@ let userForChat = new Set();
 
 router.get('/user/contacts', userAuthenticated, (req, res) => {
     const userInfo = req.user;
+    console.log(userInfo)
     contact.getContactByOwnerId(userInfo._id).then(results => {
         if (results != null) {
             results.contacts.forEach(Element => {
@@ -19,7 +20,7 @@ router.get('/user/contacts', userAuthenticated, (req, res) => {
                 }
             })
         }
-        res.status(200).send(results);
+        res.status(200).send({contacts: results});
     }).catch(err => {
         res.status(400).send({
             error: err
