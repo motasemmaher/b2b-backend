@@ -257,9 +257,9 @@ router.post('/user/manage-garage-owner/add-store', userAuthenticated, upload.sin
         else 
         {
             //Generating random id to be used as an image name
-            const randomIdValue = randomId.generateId();
-            const path = `public/images/${randomIdValue}.png`;
-            storeInfo = {...storeInfo,image:path};
+            //const randomIdValue = randomId.generateId();
+            //const path = `public/images/${randomIdValue}.png`;
+            //storeInfo = {...storeInfo,image:path};
             //Creating menu
             menu.createMenu()
                 .then(menuResult => {
@@ -279,7 +279,7 @@ router.post('/user/manage-garage-owner/add-store', userAuthenticated, upload.sin
                             garageOwner.addStoreToList(garageOwnerResult._id, storeResult)
                                 .then(addingResult => {
                                 //Uploading image to the server
-                                uploadImage.upload(path,req.body.image);
+                                //uploadImage.upload(path,req.body.image);
                                 //Returning a successful response
                                 return res.status(200).send(addingResult);
                                 })
@@ -345,12 +345,13 @@ router.put('/user/manage-garage-owner/update-store/:storeId', userAuthenticated,
             else
             {
                 //Generating random id to be used as an image name
-                const randomIdValue = randomId.generateId();
-                const path = `public/images/${randomIdValue}.png`;
+                //const randomIdValue = randomId.generateId();
+                //const path = `public/images/${randomIdValue}.png`;
                 //Storing data from the request body then validating them
                 const body = req.body;
-                const storeInfo = { _id: storeId, ...body ,image:path}; // , image: req.file.path
-                const storeValidationResult = store.validateStoreInfo(storeInfo);000000
+                //const storeInfo = { _id: storeId, ...body ,image:path}; // , image: req.file.path
+                const storeInfo = { _id: storeId, ...body}; // , image: req.file.path
+                const storeValidationResult = store.validateStoreInfo(storeInfo);
                 //If error was found, then return an error response
                 if (typeof storeValidationResult !== 'undefined')
                     return res.status(400).send({ error: storeValidationResult.error });
@@ -365,7 +366,7 @@ router.put('/user/manage-garage-owner/update-store/:storeId', userAuthenticated,
                         store.getStoreById(storeResult._id)
                             .then(updatedStore => {
                             //Uploading image to the server
-                            uploadImage.upload(path,req.body.image);
+                            //uploadImage.upload(path,req.body.image);
                             //Returning a successful response
                             return res.status(200).send(updatedStore);
                             })

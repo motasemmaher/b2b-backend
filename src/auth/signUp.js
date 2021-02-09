@@ -77,10 +77,11 @@ router.post('/auth/garage-owner/create',(req, res) => {
                         warehouse.createWarehouse()
                             .then(warehouseResult =>{
                             //Generating random id as an imagename
-                            const randomIdValue = randomId.generateId();
-                            const path = `public/images/${randomIdValue}.png`;
+                            //const randomIdValue = randomId.generateId();
+                            //const path = `public/images/${randomIdValue}.png`;
                             //Creating the store
-                            store.createStore({...storeInfo,userId:userResult._id,menu:menuResult,warehouse:warehouseResult,image:path})//,image:req.file.path
+                            //store.createStore({...storeInfo,userId:userResult._id,menu:menuResult,warehouse:warehouseResult,image:path})//,image:req.file.path
+                            store.createStore({...storeInfo,userId:userResult._id,menu:menuResult,warehouse:warehouseResult})//,image:req.file.path
                                 .then(storeResult => {
                                 //Creating report
                                 report.createReport({})
@@ -95,7 +96,7 @@ router.post('/auth/garage-owner/create',(req, res) => {
                                             warehouse.linkWarehouse({_id:warehouseResult._id,storeId:storeResult._id});
                                             menu.linkMenu({_id:menuResult._id,storeId:storeResult._id});
                                             //Uploading image to the server
-                                            uploadImage.upload(path,storeInfo.image);
+                                            //uploadImage.upload(path,storeInfo.image);
                                             //Returning the successful response
                                             return res.status(200).send({created:true,message:"SUCCESSFULLY_CREATED_GARAGEOWNER_(WAITING_USER)"});
                                             })

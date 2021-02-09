@@ -337,8 +337,8 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
                                 else {
 
                                     //Generating random id as an imagename
-                                    const randomIdValue = randomId.generateId();
-                                    const path = `public/images/${randomIdValue}.png`;
+                                    //const randomIdValue = randomId.generateId();
+                                    //const path = `public/images/${randomIdValue}.png`;
                                     //Getting the garaqgeOwner
                                     garageOwner.getGarageOwnerByUserId(loggedUser._id)
                                         .then(garageOwnerResult => {
@@ -349,7 +349,8 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
 
                                             //If the garageOwner is a trusted one, then save and train the image processing model
                                             tags = req.body.generalType + "," + productInfo.tags;
-                                            productInfo = { ...productInfo, tags: tags, image: path };
+                                            //productInfo = { ...productInfo, tags: tags, image: path };
+                                            productInfo = { ...productInfo, tags: tags};
 
                                             if (garageOwnerResult.isTrusted) {
                                                 //TRAINING CALL
@@ -376,7 +377,7 @@ router.post('/stores/:storeId/category/:categoryId/create-product', userAuthenti
                                                             warehouse.addProduct(storeId, productResult._id, categoryId, req.body.amount)
                                                                 .then(warehouseResult => {
                                                                     //Uploading image to the server                                                                    
-                                                                    uploadImage.upload(path, req.body.image);
+                                                                    //uploadImage.upload(path, req.body.image);
                                                                     //Returning a successful response
                                                                     return res.status(200).send(productResult);
                                                                 })
@@ -440,8 +441,8 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId', us
                                             return res.status(404).send({ error: "Error! Didn't find a product with that id." })
                                         else {
                                             //Generating random id as an imagename
-                                            const randomIdValue = randomId.generateId();
-                                            const path = `public/images/${randomIdValue}.png`;
+                                            //const randomIdValue = randomId.generateId();
+                                            //const path = `public/images/${randomIdValue}.png`;
                                             //Storing the data from the request body then validating them
                                             productInfo = { ...req.body }; //  image: req.file.path
                                             //If the amount =0, then change the stock status of the product to false
@@ -460,7 +461,8 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId', us
                                                 category.findCategoryById(categoryId)
                                                     .then(categoryFindByNameResult => {
                                                         tags = req.body.generalType + "," + updatedProductInfo.tags;
-                                                        updatedProductInfo = { _id: productId, ...productInfo, categoryId: categoryFindByNameResult._id, tags: tags, image: path } // , image: req.file.path,
+                                                        //updatedProductInfo = { _id: productId, ...productInfo, categoryId: categoryFindByNameResult._id, tags: tags, image: path } // , image: req.file.path,
+                                                        updatedProductInfo = { _id: productId, ...productInfo, categoryId: categoryFindByNameResult._id, tags: tags} // , image: req.file.path,
                                                         //If the garageOwner is trusted, then save and train the image processing nmodel
                                                         if (garageOwnerResult.isTrusted) {
                                                             //TRAINING CALL
@@ -494,7 +496,7 @@ router.put('/stores/:storeId/category/:categoryId/update-product/:productId', us
                                                                                                     product.getProductById(productId)
                                                                                                         .then(productFindResult => {
                                                                                                             //Uploading the image
-                                                                                                            uploadImage.upload(path, req.body.image)
+                                                                                                            //uploadImage.upload(path, req.body.image)
                                                                                                             //Returning a successful response
                                                                                                             return res.status(200).send(productFindResult);
                                                                                                         })
