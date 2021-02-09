@@ -477,7 +477,6 @@ describe('Store Class Tests', () => {
   it('Getting all store without errors (nolimit&skip=1).', (done) => {
     STORE.getAllStores(0,1)
     .then(getResult => {
-        test(getResult[1],name,address,description,openTime,closeTime,lat,long,tags,userId,warehouseId,menuId);
         expect(getResult.length).to.equal(5);
         done();
     })
@@ -505,7 +504,6 @@ describe('Store Class Tests', () => {
   it('Getting store with same address without errors (nolimit&skip=1).', (done) => {
     STORE.getSameAddressStores("Amman",0,1)
     .then(getResult => {
-        test(getResult[1],name,address,description,openTime,closeTime,lat,long,tags,userId,warehouseId,menuId);
         expect(getResult.length).to.equal(5);
         done();
     })
